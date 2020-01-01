@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "framity",
+  "version": "${version}",
+
+  "name": "Framity",
+  "description": "",
+  "authors": [
+    "Alex Habich <me@alexnader.dev>"
+  ],
+  "contact": {
+    "homepage": "https://alexnader.dev/"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/framity/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.alexnader.framity.FramityKt::init"
+    ],
+    "client": [
+      "dev.alexnader.framity.FramityKt::clientInit"
+    ]
+  },
+  "mixins": [
+    "mixins.framity.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.7.1",
+    "fabric": "*",
+    "fabric-language-kotlin": "*",
+    "minecraft": "1.15.x"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}

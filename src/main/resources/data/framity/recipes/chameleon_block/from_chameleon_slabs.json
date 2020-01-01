@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "framity:slab_frame",
+      "count": 2
+    }
+  ],
+  "result": {
+    "item": "framity:block_frame"
+  }
+}

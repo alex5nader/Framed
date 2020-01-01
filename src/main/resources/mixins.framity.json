@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "dev.alexnader.framity.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+    "BakedQuadMixin",
+    "StairsBlockMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
