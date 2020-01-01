@@ -1,16 +1,45 @@
-# Fabric Example Mod - Kotlin
+# Framity
 
-## Setup
+Framity is a [Minecraft](https://www.minecraft.net/) mod for the [Fabric](https://fabricmc.net/use/) mod loader.
 
-0. Create a new mod repository by pressing the "Use this template" button and clone the created repository.
+Framity adds several types of block frame with various shapes. Each
+frame can have its texture changed to that of any full-size block in
+the game. While flowers, slabs, and similar items, are able to be
+placed into the world, they are not able to be placed into a frame.
 
-1. Import build.gradle file with IntelliJ IDEA
+## Download
 
-2. Edit build.gradle and mod.json to suit your needs.
-    * The "mixins" object can be removed from mod.json if you do not need to use mixins.
-    * Please replace all occurences of "modid" with your own mod ID - sometimes, a different string may also suffice.
-3. Run!
+Framity is not currently available, but when it is, it will be available through
+its [CurseForge page](https://www.curseforge.com/minecraft/mc-mods/framity).
+
+## Planned Features
+
+The features below are in no particular order, and are not guaranteed to be added.
+
+- Overlay textures
+    - Grass
+    - Snow
+    - Mycelium
+    - Path
+    - Hay
+    - Vines
+- Frame blocks
+    - Fence
+    - Fence gate
+    - Slope
+    - Bed
+    - Flower pot
+    - Door
+    - Trapdoor
+    - Torch
+    - Pressure plate
+    - Lever
+    - Button
+- Other
+    - Independent sides → Each side of the frame can have a different texture  
+    - Glowstone dust → Frame gains light level of 15
 
 ## License
 
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+- All assets from and inspired by Carpenter's Blocks are licensed under the [LGPL v2.1](LICENSE_LGPL.md)
+- All other files are licensed under the [MIT License](LICENSE_MIT.md)
