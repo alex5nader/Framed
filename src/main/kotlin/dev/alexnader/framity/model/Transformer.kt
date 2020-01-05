@@ -1,5 +1,6 @@
 package dev.alexnader.framity.model
 
+import dev.alexnader.framity.clamp
 import dev.alexnader.framity.util.SpriteSet
 import dev.alexnader.framity.util.then
 import net.fabricmc.fabric.api.client.render.ColorProviderRegistry
@@ -16,6 +17,7 @@ import net.minecraft.block.Blocks
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.texture.Sprite
+import net.minecraft.client.util.SpriteIdentifier
 import net.minecraft.item.ItemStack
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
@@ -36,11 +38,12 @@ object Tag {
 fun flip(f: Float) = 1 - f
 
 interface MeshTransformer : RenderContext.QuadTransform {
+
     fun prepare(blockView: BlockRenderView?, state: BlockState?, pos: BlockPos?, randomSupplier: Supplier<Random>?): MeshTransformer
     fun prepare(stack: ItemStack?, randomSupplier: Supplier<Random>?): MeshTransformer
 }
 
-class VoxelTransformer : MeshTransformer {
+class VoxelTransformer(defaultSprite: Sprite) : MeshTransformer {
     companion object {
         private val CLIENT: MinecraftClient = MinecraftClient.getInstance()
         private val RENDERER: Renderer = RendererAccess.INSTANCE.renderer
@@ -49,32 +52,23 @@ class VoxelTransformer : MeshTransformer {
         const val WHITE      = 0x00FFFFFF
         const val FULL_ALPHA = 0xFF000000.toInt()
 
-//        private fun xSprite(qe: MutableQuadView, sprite: Sprite) {
-//        }
-//
-//        private fun ySprite(qe: MutableQuadView, sprite: Sprite) {
-//            qe.sprite(0, 0, MathHelper.lerp(qe.x(0), sprite.minU, sprite.maxU), MathHelper.lerp(qe.z(0), sprite.minV, sprite.maxV))
-//                .sprite(1, 0, MathHelper.lerp(qe.x(1), sprite.minU, sprite.maxU), MathHelper.lerp(qe.z(1), sprite.minV, sprite.maxV))
-//                .sprite(2, 0, MathHelper.lerp(qe.x(2), sprite.minU, sprite.maxU), MathHelper.lerp(qe.z(2), sprite.minV, sprite.maxV))
-//                .sprite(3, 0, MathHelper.lerp(qe.x(3), sprite.minU, sprite.maxU), MathHelper.lerp(qe.z(3), sprite.minV, sprite.maxV))
-//        }
-//
-//        private fun zSprite(qe: MutableQuadView, sprite: Sprite) {
-//            qe.sprite(0, 0, MathHelper.lerp(qe.x(0), sprite.minU, sprite.maxU), MathHelper.lerp(1 - qe.y(0), sprite.minV, sprite.maxV))
-//                .sprite(1, 0, MathHelper.lerp(qe.x(1), sprite.minU, sprite.maxU), MathHelper.lerp(1 - qe.y(1), sprite.minV, sprite.maxV))
-//                .sprite(2, 0, MathHelper.lerp(qe.x(2), sprite.minU, sprite.maxU), MathHelper.lerp(1 - qe.y(2), sprite.minV, sprite.maxV))
-//                .sprite(3, 0, MathHelper.lerp(qe.x(3), sprite.minU, sprite.maxU), MathHelper.lerp(1 - qe.y(3), sprite.minV, sprite.maxV))
-//        }
+        private val CLAMP_01 = clamp(0f)(1f)
 
         private fun applySprite(qe: MutableQuadView, sprite: Sprite, u: (Int) -> Float, v: (Int) -> Float) {
-            qe.sprite(0, 0, MathHelper.lerp(u(0), sprite.minU, sprite.maxU), MathHelper.lerp(v(0), sprite.minV, sprite.maxV))
-                .sprite(1, 0, MathHelper.lerp(u(1), sprite.minU, sprite.maxU), MathHelper.lerp(v(1), sprite.minV, sprite.maxV))
-                .sprite(2, 0, MathHelper.lerp(u(2), sprite.minU, sprite.maxU), MathHelper.lerp(v(2), sprite.minV, sprite.maxV))
-                .sprite(3, 0, MathHelper.lerp(u(3), sprite.minU, sprite.maxU), MathHelper.lerp(v(3), sprite.minV, sprite.maxV))
+            val clampedU = u then CLAMP_01
+            val clampedV = v then CLAMP_01
+            qe.sprite(0, 0, MathHelper.lerp(clampedU(0), sprite.minU, sprite.maxU), MathHelper.lerp(clampedV(0), sprite.minV, sprite.maxV))
+                .sprite(1, 0, MathHelper.lerp(clampedU(1), sprite.minU, sprite.maxU), MathHelper.lerp(clampedV(1), sprite.minV, sprite.maxV))
+                .sprite(2, 0, MathHelper.lerp(clampedU(2), sprite.minU, sprite.maxU), MathHelper.lerp(clampedV(2), sprite.minV, sprite.maxV))
+                .sprite(3, 0, MathHelper.lerp(clampedU(3), sprite.minU, sprite.maxU), MathHelper.lerp(clampedV(3), sprite.minV, sprite.maxV))
+        }
+
+        fun ofSprite(spriteId: SpriteIdentifier): () -> MeshTransformer = {
+            VoxelTransformer(spriteId.sprite)
         }
     }
 
-    private val sprites = SpriteSet()
+    private val sprites = SpriteSet(defaultSprite)
 
     private var color: Int = 0
     private var mat: RenderMaterial? = null

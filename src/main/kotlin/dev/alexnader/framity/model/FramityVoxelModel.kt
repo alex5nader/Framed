@@ -10,26 +10,30 @@ import net.minecraft.client.util.SpriteIdentifier
 import net.minecraft.state.property.Property
 import java.util.function.Function
 
-class FramityVoxelModel(
+open class FramityVoxelModel(
     block: Block,
     properties: List<Property<out Comparable<*>>>,
+    sprite: SpriteIdentifier,
+    transformerFactory: () -> MeshTransformer,
     state: BlockState,
     spriteMap: Function<SpriteIdentifier, Sprite>
-) : BaseFrameModel(
-    state, spriteMap, TRANSFORMER::get
-) {
+) : BaseFrameModel(sprite, transformerFactory, state, spriteMap) {
     companion object {
-        val TRANSFORMER: ThreadLocal<MeshTransformer> = ThreadLocal.withInitial(::VoxelTransformer)
-
-        fun of(block: Block, properties: List<Property<out Comparable<*>>>) =
-            { state: BlockState, spriteMap: Function<SpriteIdentifier, Sprite> ->
-                FramityVoxelModel(block, properties, state, spriteMap)
-            }
+        val of =
+            { block: Block ->
+            { properties: List<Property<out Comparable<*>>> ->
+            { sprite: SpriteIdentifier ->
+            { spriteMap: Function<SpriteIdentifier, Sprite> ->
+            { transformerFactory: () -> MeshTransformer ->
+            { state: BlockState ->
+                FramityVoxelModel(block, properties, sprite, transformerFactory, state, spriteMap)
+        }}}}}}
     }
 
     override val blockStateMap = BlockStateMap<Mesh>()
 
     init {
+        @Suppress("unchecked_cast")
         properties.forEach { blockStateMap.includeProperty(it as Property<Comparable<Any>>) }
 
         block.stateManager.states.forEach { tState ->

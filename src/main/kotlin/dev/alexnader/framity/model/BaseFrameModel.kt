@@ -1,6 +1,6 @@
 package dev.alexnader.framity.model
 
-import dev.alexnader.framity.FRAME_SPRITE_IDENTIFIER
+import dev.alexnader.framity.HOLLOW_FRAME_ID
 import net.fabricmc.fabric.api.renderer.v1.Renderer
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh
@@ -11,13 +11,14 @@ import net.minecraft.client.util.SpriteIdentifier
 import java.util.function.Function
 
 abstract class BaseFrameModel(
+    sprite: SpriteIdentifier,
+    transformerFactory: () -> MeshTransformer,
     defaultState: BlockState,
-    spriteMap: Function<SpriteIdentifier, Sprite>,
-    transformerFactory: () -> MeshTransformer
+    spriteMap: Function<SpriteIdentifier, Sprite>
 ) : TransformableModel(
     transformerFactory,
     defaultState,
-    spriteMap.apply(FRAME_SPRITE_IDENTIFIER),
+    spriteMap.apply(sprite),
     ModelHelper.MODEL_TRANSFORM_BLOCK
 ) {
     companion object {

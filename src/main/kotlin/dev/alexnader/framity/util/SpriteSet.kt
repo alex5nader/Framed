@@ -1,7 +1,6 @@
 package dev.alexnader.framity.util
 
-import dev.alexnader.framity.FRAME_SPRITE_IDENTIFIER
-import dev.alexnader.framity.adapters.AccessibleBakedQuad
+import dev.alexnader.framity.mixin.AccessibleBakedQuad
 import net.fabricmc.fabric.api.renderer.v1.model.ModelHelper
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.model.BakedModel
@@ -13,16 +12,16 @@ import net.minecraft.util.math.Direction
 import java.util.*
 import kotlin.collections.HashMap
 
-class SpriteSet {
+class SpriteSet(private val defaultSprite: Sprite) {
     companion object {
-        val DEFAULT_SPRITE: Sprite = FRAME_SPRITE_IDENTIFIER.sprite
+        @Suppress("deprecation")
         val FALLBACK_SPRITE: Sprite =
             MinecraftClient.getInstance()
                 .getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX)
                 .apply(MissingSprite.getMissingSpriteId())
     }
 
-    private val quads = HashMap<Direction, BakedQuad>()
+    private val quads = HashMap<Direction?, BakedQuad>()
     private var default = true
 
     fun clear() {
@@ -42,9 +41,9 @@ class SpriteSet {
 
     operator fun get(dir: Direction): Sprite {
         return if (this.default) {
-            DEFAULT_SPRITE
+            defaultSprite
         } else {
-            (this.quads[dir] as AccessibleBakedQuad?)?.getSprite() ?: FALLBACK_SPRITE
+            (this.quads[dir] as AccessibleBakedQuad?)?.sprite ?: FALLBACK_SPRITE
         }
     }
 

@@ -22,7 +22,7 @@ import net.minecraft.world.BlockView
 import net.minecraft.world.IWorld
 import java.util.stream.IntStream
 
-class StairsFrame : BaseFrame(), IStairs {
+class StairsFrame : WaterloggableFrame(), IStairs {
     companion object {
         private fun composeShape(
             i: Int, base: VoxelShape, northWest: VoxelShape, northEast: VoxelShape, southWest: VoxelShape, southEast: VoxelShape
@@ -143,7 +143,8 @@ class StairsFrame : BaseFrame(), IStairs {
         world: IWorld?,
         pos: BlockPos?,
         neighborPos: BlockPos?
-    ): BlockState {
+    ): BlockState? {
+        @Suppress("deprecation")
         return if (facing!!.axis.isHorizontal) (state!!.with(
             StairsBlock.SHAPE, stairsShape(state, world!!, pos!!)
         ) as BlockState) else super.getStateForNeighborUpdate(state, facing, neighborState, world, pos, neighborPos)
@@ -152,12 +153,9 @@ class StairsFrame : BaseFrame(), IStairs {
     override fun getPlacementState(ctx: ItemPlacementContext?): BlockState? {
         val direction = ctx!!.side
         val blockPos = ctx.blockPos
-        val fluidState = ctx.world?.getFluidState(blockPos)
-        val blockState = defaultState?.with(StairsBlock.FACING, ctx.playerFacing)?.with(
-            StairsBlock.HALF,
-            if (direction != Direction.DOWN && (direction == Direction.UP || ctx.hitPos.y - blockPos.y.toDouble() <= 0.5)) BlockHalf.BOTTOM else BlockHalf.TOP
-        )
-        //        ?.with(StairsBlock.WATERLOGGED, fluidState?.fluid == Fluids.WATER)
+        val blockState = super.getPlacementState(ctx)
+            ?.with(StairsBlock.FACING, ctx.playerFacing)
+            ?.with(StairsBlock.HALF, if (direction != Direction.DOWN && (direction == Direction.UP || ctx.hitPos.y - blockPos.y.toDouble() <= 0.5)) BlockHalf.BOTTOM else BlockHalf.TOP)
         val shape = stairsShape(blockState, ctx.world, blockPos)
         return blockState?.with(StairsBlock.SHAPE, shape)
     }
@@ -175,14 +173,9 @@ class StairsFrame : BaseFrame(), IStairs {
     override fun hasSidedTransparency(state: BlockState?) = true
 
     override fun isSideInvisible(state: BlockState, neighbor: BlockState, facing: Direction?): Boolean {
-        println("comparing to ${neighbor.block}")
-        if (neighbor.block != this)
-            return false
-        val selfFacing = state.get(StairsBlock.FACING)
-        val selfHalf = state.get(StairsBlock.HALF)
-        val otherFacing = neighbor.get(StairsBlock.FACING)
-        val otherHalf = neighbor.get(StairsBlock.HALF)
-        return selfHalf == otherHalf || selfFacing == otherFacing
+        return neighbor.block == this
+                && (state.get(StairsBlock.HALF) == neighbor.get(StairsBlock.HALF)
+                    || state.get(StairsBlock.FACING) == neighbor.get(StairsBlock.FACING))
     }
 
     override fun createBlockEntity(view: BlockView?) = FrameEntity(STAIRS_FRAME, STAIRS_FRAME_ENTITY)

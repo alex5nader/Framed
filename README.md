@@ -24,7 +24,7 @@ The features below are in no particular order, and are not guaranteed to be adde
     - Hay
     - Vines
 - Frame blocks
-    - Fence
+    - Fence ✔
     - Fence gate
     - Slope
     - Bed

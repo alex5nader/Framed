@@ -1,3 +1,7 @@
 package dev.alexnader.framity
 
-data class Vector2f(val x: Float, val y: Float)
+val clamp = { min: Float -> { max: Float -> { value: Float -> when {
+    value < min -> min
+    value > max -> max
+    else -> value
+}}}}

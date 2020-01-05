@@ -2,5 +2,6 @@
   "block.framity.block_frame": "Block Frame",
   "block.framity.slab_frame": "Slab Frame",
   "block.framity.stairs_frame": "Stairs Frame",
+  "block.framity.fence_frame": "Fence Frame",
   "itemGroup.framity.framity": "Framity"
 }

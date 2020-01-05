@@ -11,14 +11,14 @@ import java.util.*
 import java.util.function.Supplier
 
 abstract class TransformableModel(
-    private val transformerFactory: (() -> MeshTransformer)?,
+    protected val transformerFactory: (() -> MeshTransformer)?,
     defaultState: BlockState,
     sprite: Sprite,
     transformation: ModelTransformation
 ) : StatefulModel(
     defaultState, sprite, transformation
 ) {
-    private fun transformed(context: RenderContext?, transformer: MeshTransformer?, block: () -> Unit) {
+    protected fun transformed(context: RenderContext?, transformer: MeshTransformer?, block: () -> Unit) {
         transformer?.let { context?.pushTransform(it) }
         block()
         transformer?.let { context?.popTransform() }

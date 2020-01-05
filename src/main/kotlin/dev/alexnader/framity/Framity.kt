@@ -1,25 +1,26 @@
 package dev.alexnader.framity
 
 import dev.alexnader.framity.adapters.KtBlock
-//import dev.alexnader.framity.block_entities.BlockFrameEntity
 import dev.alexnader.framity.block_entities.FrameEntity
-//import dev.alexnader.framity.block_entities.SlabFrameEntity
-//import dev.alexnader.framity.block_entities.StairsFrameEntity
 import dev.alexnader.framity.blocks.*
-import dev.alexnader.framity.model.FramityModelVariantProvider
-import dev.alexnader.framity.model.FramityVoxelModel
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
+import dev.alexnader.framity.model.*
+import dev.alexnader.framity.util.curried
+import dev.alexnader.framity.util.uncurried
+import grondag.fermion.client.models.AbstractModel
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry
+import net.fabricmc.fabric.api.renderer.v1.Renderer
+import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.HorizontalConnectedBlock
 import net.minecraft.block.StairsBlock
-import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.texture.Sprite
 import net.minecraft.client.texture.SpriteAtlasTexture
 import net.minecraft.client.util.SpriteIdentifier
 import net.minecraft.state.property.Properties
 import net.minecraft.state.property.Property
 import net.minecraft.util.Identifier
+import java.util.function.Function
 
 val MOD = Mod("framity")
 
@@ -39,11 +40,18 @@ val STAIRS_FRAME_ENTITY = MOD.blockEntity(::FrameEntity, "stairs_frame_entity", 
 val FENCE_FRAME = MOD.block(::FenceFrame, "fence_frame")
 val FENCE_FRAME_ENTITY = MOD.blockEntity(::FrameEntity, "fence_frame_entity", FENCE_FRAME)
 
-val FRAME_SPRITE_IDENTIFIER = SpriteIdentifier(
+@Suppress("deprecation")
+val HOLLOW_FRAME_ID = SpriteIdentifier(
     SpriteAtlasTexture.BLOCK_ATLAS_TEX,
-    Identifier("framity", "block/frame")
+    Identifier("framity", "block/hollow_frame")
 )
-val UV_SPRITE_IDENTIFIER = SpriteIdentifier(
+@Suppress("deprecation")
+val FULL_FRAME_ID = SpriteIdentifier(
+    SpriteAtlasTexture.BLOCK_ATLAS_TEX,
+    Identifier("framity", "block/full_frame")
+)
+@Suppress("deprecation")
+val UV_ID = SpriteIdentifier(
     SpriteAtlasTexture.BLOCK_ATLAS_TEX,
     Identifier("framity", "block/uv")
 )
@@ -57,16 +65,16 @@ fun init() {
     MOD.registerAll()
 }
 
-fun <B: Block> registerVoxelModel(
+fun <B: Block> registerModel(
     ktBlock: KtBlock<B>,
     sprites: List<SpriteIdentifier>,
     properties: List<Property<out Comparable<*>>>,
-    defaultState: (BlockState) -> BlockState = { it }
+    model: (Block) -> (List<Property<out Comparable<*>>>) -> (SpriteIdentifier) -> (() -> MeshTransformer) -> (BlockState) -> (Function<SpriteIdentifier, Sprite>) -> AbstractModel
 ) {
     MODEL_VARIANT_PROVIDER.registerModels(
         ktBlock.block,
-        defaultState(ktBlock.block.defaultState),
-        FramityVoxelModel.of(ktBlock.block, properties),
+        ktBlock.block.defaultState,
+        model(ktBlock.block)(properties)(sprites[0])(VoxelTransformer.ofSprite(sprites[0])).uncurried(),
         sprites
     )
 }
@@ -76,8 +84,28 @@ fun clientInit() {
     MOD.registerAllClient()
 
     ModelLoadingRegistry.INSTANCE.registerVariantProvider { MODEL_VARIANT_PROVIDER }
-    registerVoxelModel(BLOCK_FRAME, listOf(FRAME_SPRITE_IDENTIFIER), emptyList())
-    registerVoxelModel(SLAB_FRAME, listOf(FRAME_SPRITE_IDENTIFIER), listOf(Properties.FACING))
-    registerVoxelModel(STAIRS_FRAME, listOf(FRAME_SPRITE_IDENTIFIER), listOf(StairsBlock.FACING, StairsBlock.HALF, StairsBlock.SHAPE))
-    registerVoxelModel(FENCE_FRAME, listOf(FRAME_SPRITE_IDENTIFIER), listOf(HorizontalConnectedBlock.NORTH, HorizontalConnectedBlock.EAST, HorizontalConnectedBlock.SOUTH, HorizontalConnectedBlock.WEST))
+    registerModel(
+        BLOCK_FRAME,
+        listOf(HOLLOW_FRAME_ID),
+        emptyList(),
+        (::FramityVoxelModel).curried()
+    )
+    registerModel(
+        SLAB_FRAME,
+        listOf(HOLLOW_FRAME_ID),
+        listOf(Properties.FACING),
+        (::FramityVoxelModel).curried()
+    )
+    registerModel(
+        STAIRS_FRAME,
+        listOf(HOLLOW_FRAME_ID),
+        listOf(StairsBlock.FACING, StairsBlock.HALF, StairsBlock.SHAPE),
+        (::FramityVoxelModel).curried()
+    )
+    registerModel(
+        FENCE_FRAME,
+        listOf(FULL_FRAME_ID),
+        listOf(HorizontalConnectedBlock.NORTH, HorizontalConnectedBlock.EAST, HorizontalConnectedBlock.SOUTH, HorizontalConnectedBlock.WEST),
+        (::CustomItemFramityVoxelModel).curried()((FenceFrame)::getItemMesh)
+    )
 }

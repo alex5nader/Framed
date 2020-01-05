@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "framity:stairs_frame"
+    }
+  ],
+  "result": {
+    "item": "framity:block_frame"
+  }
+}

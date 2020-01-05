@@ -1,15 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "CCC"
+    "F  ",
+    "FF ",
+    "FFF"
   ],
   "key": {
-    "C": {
+    "F": {
       "item": "framity:block_frame"
     }
   },
   "result": {
-    "item": "framity:slab_frame",
-    "count": 6
+    "item": "framity:stairs_frame",
+    "count": 4
   }
 }

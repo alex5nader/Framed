@@ -5,7 +5,9 @@ import dev.alexnader.framity.SLAB_FRAME_ENTITY
 import dev.alexnader.framity.block_entities.FrameEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.block.Waterloggable
 import net.minecraft.entity.EntityContext
+import net.minecraft.fluid.Fluids
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.Properties
@@ -15,7 +17,7 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 
-class SlabFrame : BaseFrame() {
+class SlabFrame : WaterloggableFrame() {
     companion object {
         val NORTH_SHAPE: VoxelShape = VoxelShapes.cuboid(0.0, 0.0, 0.0, 1.0, 1.0, 0.5)
         val SOUTH_SHAPE: VoxelShape = VoxelShapes.cuboid(0.0, 0.0, 0.5, 1.0, 1.0, 1.0)
@@ -26,7 +28,8 @@ class SlabFrame : BaseFrame() {
     }
 
     init {
-        this.defaultState = this.defaultState.with(Properties.FACING, Direction.DOWN)
+        this.defaultState = this.defaultState
+            .with(Properties.FACING, Direction.DOWN)
     }
 
     override fun getPlacementState(ctx: ItemPlacementContext?): BlockState? {
@@ -46,32 +49,34 @@ class SlabFrame : BaseFrame() {
                 Direction.DOWN -> Pair(1 - (hitPos.x - blockPos.x), 1 - (hitPos.z - blockPos.z))
             }
 
+            val state = this.defaultState.with(Properties.WATERLOGGED, ctx.world.getFluidState(blockPos).fluid == Fluids.WATER)
+
             when {
                 // center, ez
-                0.33 <= hPos && hPos < 0.67 && 0.33 <= vPos && vPos < 0.67 -> this.defaultState.with(Properties.FACING, ctx.side.opposite)
+                0.33 <= hPos && hPos < 0.67 && 0.33 <= vPos && vPos < 0.67 -> state.with(Properties.FACING, ctx.side.opposite)
                 // bottom
-                hPos > vPos && (1 - hPos) > vPos -> this.defaultState.with(
+                hPos > vPos && (1 - hPos) > vPos -> state.with(
                     Properties.FACING, when (ctx.side!!) {
                         Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST -> Direction.DOWN
                         Direction.UP -> Direction.NORTH
                         Direction.DOWN -> Direction.SOUTH
                     })
                 // top
-                hPos < vPos && (1 - hPos) < vPos -> this.defaultState.with(
+                hPos < vPos && (1 - hPos) < vPos -> state.with(
                     Properties.FACING, when (ctx.side!!) {
                         Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST -> Direction.UP
                         Direction.UP -> Direction.SOUTH
                         Direction.DOWN -> Direction.NORTH
                     })
                 // left
-                vPos > hPos && (1 - vPos) > hPos -> this.defaultState.with(
+                vPos > hPos && (1 - vPos) > hPos -> state.with(
                     Properties.FACING, when (ctx.side!!) {
                         Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST -> ctx.side.rotateYCounterclockwise()
                         Direction.UP -> Direction.WEST
                         Direction.DOWN -> Direction.EAST
                     })
                 // right
-                vPos < hPos && (1 - vPos) < hPos -> this.defaultState.with(
+                vPos < hPos && (1 - vPos) < hPos -> state.with(
                     Properties.FACING, when (ctx.side!!) {
                         Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST -> ctx.side.rotateYClockwise()
                         Direction.UP -> Direction.EAST
