@@ -41,5 +41,10 @@ The features below are in no particular order, and are not guaranteed to be adde
 
 ## License
 
-- All assets from and inspired by Carpenter's Blocks are licensed under the [LGPL v2.1](LICENSE_LGPL.md)
-- All other files are licensed under the [MIT License](LICENSE_MIT.md)
+- All assets from and inspired by Carpenter's Blocks are licensed under the [LGPL v2.1](LICENSE_LGPL.md). This includes the following paths:
+  - `src/main/resources/assets/framity/textures/block/full_frame.png`
+  - `src/main/resources/assets/framity/textures/block/hollow_frame.ase`
+  - `src/main/resources/assets/framity/textures/block/hollow_frame.png`
+  - `src/main/resources/assets/framity/textures/item/hammer.png`
+  - `src/main/resources/assets/framity/icon.png`
+- All other files are licensed under the [MIT License](LICENSE_MIT.md).
