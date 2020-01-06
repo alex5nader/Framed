@@ -25,15 +25,7 @@ import net.minecraft.world.BlockRenderView
 import java.util.*
 import java.util.function.Supplier
 import arrow.syntax.function.andThen
-
-object Tag {
-    const val Down = 1
-    const val Up = 2
-    const val North = 3
-    const val South = 4
-    const val West = 5
-    const val East = 6
-}
+import dev.alexnader.framity.adapters.tag
 
 fun flip(f: Float) = 1 - f
 
@@ -111,37 +103,37 @@ class VoxelTransformer(defaultSprite: Sprite) : MeshTransformer {
         qe!!.material(this.mat)
 
         when (qe.tag()) {
-            Tag.Down -> {
+            Direction.DOWN.tag -> {
                 if (sprites.hasColor(Direction.DOWN)) {
                     qe.spriteColor(0, this.color, this.color, this.color, this.color)
                 }
                 applySprite(qe, sprites[Direction.DOWN], qe::x, qe::z andThen ::flip)
             }
-            Tag.Up -> {
+            Direction.UP.tag -> {
                 if (sprites.hasColor(Direction.UP)) {
                     qe.spriteColor(0, this.color, this.color, this.color, this.color)
                 }
                 applySprite(qe, sprites[Direction.UP], qe::x, qe::z)
             }
-            Tag.North -> {
+            Direction.NORTH.tag -> {
                 if (sprites.hasColor(Direction.NORTH)) {
                     qe.spriteColor(0, this.color, this.color, this.color, this.color)
                 }
                 applySprite(qe, sprites[Direction.NORTH], qe::x, qe::y andThen ::flip)
             }
-            Tag.South -> {
+            Direction.SOUTH.tag -> {
                 if (sprites.hasColor(Direction.SOUTH)) {
                     qe.spriteColor(0, this.color, this.color, this.color, this.color)
                 }
                 applySprite(qe, sprites[Direction.SOUTH], qe::x andThen ::flip, qe::y andThen ::flip)
             }
-            Tag.East -> {
+            Direction.EAST.tag -> {
                 if (sprites.hasColor(Direction.EAST)) {
                     qe.spriteColor(0, this.color, this.color, this.color, this.color)
                 }
                 applySprite(qe, sprites[Direction.EAST], qe::z andThen ::flip, qe::y andThen ::flip)
             }
-            Tag.West -> {
+            Direction.WEST.tag -> {
                 if (sprites.hasColor(Direction.WEST)) {
                     qe.spriteColor(0, this.color, this.color, this.color, this.color)
                 }
