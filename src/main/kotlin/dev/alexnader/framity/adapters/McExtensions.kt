@@ -7,6 +7,7 @@ import net.minecraft.block.Block
 import net.minecraft.block.enums.StairShape
 import net.minecraft.client.util.math.Vector3f
 import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Quaternion
 import net.minecraft.util.registry.Registry

@@ -3,7 +3,6 @@ package dev.alexnader.framity.block_entities
 import com.mojang.datafixers.Dynamic
 import dev.alexnader.framity.adapters.KtBlock
 import dev.alexnader.framity.adapters.KtBlockEntity
-import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity
 import net.fabricmc.fabric.api.server.PlayerStream
 import net.minecraft.block.Block
@@ -21,20 +20,39 @@ class FrameEntity<B: Block>(
     private val ktBlock: KtBlock<B>,
     type: KtBlockEntity<FrameEntity<B>>
 ): InventoryBlockEntity(
-    type.blockEntity, DefaultedList.ofSize(1, ItemStack.EMPTY)
-), BlockEntityClientSerializable, RenderAttachmentBlockEntity {
+    type.blockEntity, DefaultedList.ofSize(2, ItemStack.EMPTY)
+), RenderAttachmentBlockEntity {
+    companion object {
+        const val ContainedSlot = 0
+        const val GlowstoneSlot = 1
+    }
+
     var containedState: BlockState? = null
         set(v) {
             field = v
             this.markDirty()
         }
 
-    var stack
-        get() = this[0]
+    var containedStack
+        get() = this[ContainedSlot]
         set(stack) {
-            this[0] = stack
+            this[ContainedSlot] = stack
         }
-    val item: Item get() = this.stack.item
+    val item: Item get() = this.containedStack.item
+
+    var glowstoneStack
+        get() = this[GlowstoneSlot]
+        set(stack) {
+            this[GlowstoneSlot] = stack
+        }
+
+    val highestRemovePrioritySlot get() = this.items.indices.findLast { !this.items[it].isEmpty } ?: -1
+
+    var highestRemovePriority
+        get() = this[this.highestRemovePrioritySlot]
+        set(stack) {
+            this[this.highestRemovePrioritySlot] = stack
+        }
 
     override fun getRenderAttachmentData() = this.containedState
 
@@ -71,7 +89,4 @@ class FrameEntity<B: Block>(
         }
         return super.toTag(tag)
     }
-
-    override fun fromClientTag(tag: CompoundTag?) = this.fromTag(tag)
-    override fun toClientTag(tag: CompoundTag?) = this.toTag(tag)
 }

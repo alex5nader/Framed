@@ -13,10 +13,11 @@ interface KtInventory<I: MutableList<ItemStack>>: Inventory {
         this.items[slot] = stack
     }
 
-    val size get() = this.items.size
-    val isEmpty get() = this.items.isEmpty()
+    val capacity get() = this.items.size
+    val count get() = this.items.filter { !it.isEmpty }.size
+    val isEmpty get() = this.items.all { it.isEmpty }
 
-    override fun getInvSize() = this.size
+    override fun getInvSize() = this.capacity
     override fun isInvEmpty() = this.isEmpty
     override fun getInvStack(slot: Int) = this[slot]
 
