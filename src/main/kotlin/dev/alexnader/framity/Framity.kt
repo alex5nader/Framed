@@ -5,6 +5,7 @@ import arrow.syntax.function.uncurried
 import dev.alexnader.framity.adapters.KtBlock
 import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.blocks.*
+import dev.alexnader.framity.items.FramersHammer
 import dev.alexnader.framity.model.*
 import grondag.fermion.client.models.AbstractModel
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry
@@ -22,9 +23,7 @@ import java.util.function.Function
 
 val MOD = Mod("framity")
 
-//val SIMPLE_BLOCK_FRAME = MOD.block(::SimpleBlockFrame, "simple_block_frame")
-//val SIMPLE_SLAB_FRAME = MOD.block(::SimpleSlabFrame, "simple_slab_frame")
-//val SIMPLE_STAIRS_FRAME = MOD.block(::SimpleStairsFrame, "simple_stairs_frame")
+val FRAMERS_HAMMER = MOD.item(::FramersHammer, "framers_hammer")
 
 val BLOCK_FRAME = MOD.block(::BlockFrame, "block_frame")
 val BLOCK_FRAME_ENTITY = MOD.blockEntity(::FrameEntity, "block_frame_entity", BLOCK_FRAME)

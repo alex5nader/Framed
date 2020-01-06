@@ -28,7 +28,6 @@ class FrameEntity<B: Block>(
             field = v
             this.markDirty()
         }
-    var disguised: Boolean = false
 
     var stack
         get() = this[0]
@@ -46,7 +45,6 @@ class FrameEntity<B: Block>(
         } else {
             this.containedState = null
         }
-        this.disguised = tag?.getBoolean("disguised") == true
     }
 
     override fun markDirty() {
@@ -71,7 +69,6 @@ class FrameEntity<B: Block>(
         } else {
             tag?.put("state", BlockState.serialize(NbtOps.INSTANCE, this.containedState).value)
         }
-        tag?.putBoolean("disguised", this.disguised)
         return super.toTag(tag)
     }
 
