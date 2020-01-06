@@ -15,30 +15,18 @@ open class FramityVoxelModel(
     properties: List<Property<out Comparable<*>>>,
     sprite: SpriteIdentifier,
     transformerFactory: () -> MeshTransformer,
-    state: BlockState,
+    defaultState: BlockState,
     spriteMap: Function<SpriteIdentifier, Sprite>
-) : BaseFrameModel(sprite, transformerFactory, state, spriteMap) {
-    companion object {
-        val of =
-            { block: Block ->
-            { properties: List<Property<out Comparable<*>>> ->
-            { sprite: SpriteIdentifier ->
-            { spriteMap: Function<SpriteIdentifier, Sprite> ->
-            { transformerFactory: () -> MeshTransformer ->
-            { state: BlockState ->
-                FramityVoxelModel(block, properties, sprite, transformerFactory, state, spriteMap)
-        }}}}}}
-    }
-
+) : BaseFrameModel(sprite, transformerFactory, defaultState, spriteMap) {
     override val blockStateMap = BlockStateMap<Mesh>()
 
     init {
         @Suppress("unchecked_cast")
         properties.forEach { blockStateMap.includeProperty(it as Property<Comparable<Any>>) }
 
-        block.stateManager.states.forEach { tState ->
-            blockStateMap[tState] = RENDERER.buildMesh { qe ->
-                tState.getOutlineShape(null, null)?.forEachBox { x1, y1, z1, x2, y2, z2 ->
+        block.stateManager.states.forEach { state ->
+            blockStateMap[state] = RENDERER.buildMesh { qe ->
+                state.getOutlineShape(null, null)?.forEachBox { x1, y1, z1, x2, y2, z2 ->
                     qe.cube(
                         x1.toFloat(), y1.toFloat(), z1.toFloat(), x2.toFloat(), y2.toFloat(), z2.toFloat(), -1
                     )

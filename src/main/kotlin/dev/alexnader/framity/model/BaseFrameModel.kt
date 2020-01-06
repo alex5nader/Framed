@@ -1,6 +1,5 @@
 package dev.alexnader.framity.model
 
-import dev.alexnader.framity.HOLLOW_FRAME_ID
 import net.fabricmc.fabric.api.renderer.v1.Renderer
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh

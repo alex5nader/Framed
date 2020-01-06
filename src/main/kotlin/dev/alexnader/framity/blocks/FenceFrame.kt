@@ -4,10 +4,8 @@ import dev.alexnader.framity.FENCE_FRAME
 import dev.alexnader.framity.FENCE_FRAME_ENTITY
 import dev.alexnader.framity.adapters.buildMesh
 import dev.alexnader.framity.block_entities.FrameEntity
-import dev.alexnader.framity.model.cube
 import dev.alexnader.framity.model.cube16
 import net.fabricmc.fabric.api.renderer.v1.Renderer
-import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.FenceGateBlock

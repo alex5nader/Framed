@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.renderer.v1.Renderer
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter
 import net.minecraft.block.Block
+import net.minecraft.block.enums.StairShape
 import net.minecraft.client.util.math.Vector3f
 import net.minecraft.item.Item
 import net.minecraft.util.math.Direction
@@ -26,6 +27,14 @@ inline fun Renderer.buildMesh(block: (QuadEmitter) -> QuadEmitter?): Mesh {
 inline val Direction.mask get() = 1 shl this.horizontal
 
 inline val Direction.tag get() = this.id + 1
+
+inline val StairShape.mirrored get() = when (this) {
+    StairShape.INNER_RIGHT -> StairShape.INNER_LEFT
+    StairShape.INNER_LEFT -> StairShape.INNER_RIGHT
+    StairShape.OUTER_RIGHT -> StairShape.OUTER_LEFT
+    StairShape.OUTER_LEFT -> StairShape.OUTER_RIGHT
+    else -> this
+}
 
 fun VoxelShape.rotated(degrees: Float): VoxelShape {
     var final = VoxelShapes.empty()

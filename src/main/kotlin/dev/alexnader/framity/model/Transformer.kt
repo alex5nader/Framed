@@ -2,7 +2,6 @@ package dev.alexnader.framity.model
 
 import dev.alexnader.framity.clamp
 import dev.alexnader.framity.util.SpriteSet
-import dev.alexnader.framity.util.then
 import net.fabricmc.fabric.api.client.render.ColorProviderRegistry
 import net.fabricmc.fabric.api.renderer.v1.Renderer
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess
@@ -25,6 +24,7 @@ import net.minecraft.util.math.MathHelper
 import net.minecraft.world.BlockRenderView
 import java.util.*
 import java.util.function.Supplier
+import arrow.syntax.function.andThen
 
 object Tag {
     const val Down = 1
@@ -55,8 +55,8 @@ class VoxelTransformer(defaultSprite: Sprite) : MeshTransformer {
         private val CLAMP_01 = clamp(0f)(1f)
 
         private fun applySprite(qe: MutableQuadView, sprite: Sprite, u: (Int) -> Float, v: (Int) -> Float) {
-            val clampedU = u then CLAMP_01
-            val clampedV = v then CLAMP_01
+            val clampedU = u andThen CLAMP_01
+            val clampedV = v andThen CLAMP_01
             qe.sprite(0, 0, MathHelper.lerp(clampedU(0), sprite.minU, sprite.maxU), MathHelper.lerp(clampedV(0), sprite.minV, sprite.maxV))
                 .sprite(1, 0, MathHelper.lerp(clampedU(1), sprite.minU, sprite.maxU), MathHelper.lerp(clampedV(1), sprite.minV, sprite.maxV))
                 .sprite(2, 0, MathHelper.lerp(clampedU(2), sprite.minU, sprite.maxU), MathHelper.lerp(clampedV(2), sprite.minV, sprite.maxV))
@@ -115,7 +115,7 @@ class VoxelTransformer(defaultSprite: Sprite) : MeshTransformer {
                 if (sprites.hasColor(Direction.DOWN)) {
                     qe.spriteColor(0, this.color, this.color, this.color, this.color)
                 }
-                applySprite(qe, sprites[Direction.DOWN], qe::x, qe::z then ::flip)
+                applySprite(qe, sprites[Direction.DOWN], qe::x, qe::z andThen ::flip)
             }
             Tag.Up -> {
                 if (sprites.hasColor(Direction.UP)) {
@@ -127,25 +127,25 @@ class VoxelTransformer(defaultSprite: Sprite) : MeshTransformer {
                 if (sprites.hasColor(Direction.NORTH)) {
                     qe.spriteColor(0, this.color, this.color, this.color, this.color)
                 }
-                applySprite(qe, sprites[Direction.NORTH], qe::x, qe::y then ::flip)
+                applySprite(qe, sprites[Direction.NORTH], qe::x, qe::y andThen ::flip)
             }
             Tag.South -> {
                 if (sprites.hasColor(Direction.SOUTH)) {
                     qe.spriteColor(0, this.color, this.color, this.color, this.color)
                 }
-                applySprite(qe, sprites[Direction.SOUTH], qe::x then ::flip, qe::y then ::flip)
+                applySprite(qe, sprites[Direction.SOUTH], qe::x andThen ::flip, qe::y andThen ::flip)
             }
             Tag.East -> {
                 if (sprites.hasColor(Direction.EAST)) {
                     qe.spriteColor(0, this.color, this.color, this.color, this.color)
                 }
-                applySprite(qe, sprites[Direction.EAST], qe::z then ::flip, qe::y then ::flip)
+                applySprite(qe, sprites[Direction.EAST], qe::z andThen ::flip, qe::y andThen ::flip)
             }
             Tag.West -> {
                 if (sprites.hasColor(Direction.WEST)) {
                     qe.spriteColor(0, this.color, this.color, this.color, this.color)
                 }
-                applySprite(qe, sprites[Direction.WEST], qe::z, qe::y then ::flip)
+                applySprite(qe, sprites[Direction.WEST], qe::z, qe::y andThen ::flip)
             }
         }
 

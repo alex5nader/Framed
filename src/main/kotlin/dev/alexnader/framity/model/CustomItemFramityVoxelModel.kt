@@ -22,19 +22,6 @@ class CustomItemFramityVoxelModel(
     defaultState: BlockState,
     spriteMap: Function<SpriteIdentifier, Sprite>
 ) : FramityVoxelModel(block, properties, sprite, transformerFactory, defaultState, spriteMap) {
-    companion object {
-        val of =
-            { itemMeshProvider: (Renderer) -> Mesh ->
-            { block: Block ->
-            { properties: List<Property<out Comparable<*>>> ->
-            { sprite: SpriteIdentifier ->
-            { transformerFactory: () -> MeshTransformer ->
-            { state: BlockState ->
-            { spriteMap: Function<SpriteIdentifier, Sprite> ->
-                CustomItemFramityVoxelModel(itemMeshProvider, block, properties, sprite, transformerFactory, state, spriteMap)
-        }}}}}}}
-    }
-
     private lateinit var itemMeshVal: Mesh
 
     private val itemMesh: Mesh

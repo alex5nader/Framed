@@ -9,6 +9,7 @@ import dev.alexnader.framity.blocks.SlabFrame.Companion.UP_SHAPE
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.StairsBlock
+import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.enums.BlockHalf
 import net.minecraft.block.enums.StairShape
 import net.minecraft.entity.EntityContext
@@ -22,7 +23,7 @@ import net.minecraft.world.BlockView
 import net.minecraft.world.IWorld
 import java.util.stream.IntStream
 
-class StairsFrame : WaterloggableFrame(), IStairs {
+open class StairsFrame : WaterloggableFrame(), IStairs {
     companion object {
         private fun composeShape(
             i: Int, base: VoxelShape, northWest: VoxelShape, northEast: VoxelShape, southWest: VoxelShape, southEast: VoxelShape
@@ -51,28 +52,35 @@ class StairsFrame : WaterloggableFrame(), IStairs {
             }.toArray { i: Int -> arrayOfNulls<VoxelShape>(i) } as Array<VoxelShape?>
         }
 
-        val BOTTOM_NORTH_WEST_CORNER_SHAPE: VoxelShape = VoxelShapes.cuboid(0.0, 0.0, 0.0, 0.5, 0.5, 0.5)
-        val BOTTOM_SOUTH_WEST_CORNER_SHAPE: VoxelShape = VoxelShapes.cuboid(0.0, 0.0, 0.5, 0.5, 0.5, 1.0)
-        val TOP_NORTH_WEST_CORNER_SHAPE: VoxelShape = VoxelShapes.cuboid(0.0, 0.5, 0.0, 0.5, 1.0, 0.5)
-        val TOP_SOUTH_WEST_CORNER_SHAPE: VoxelShape = VoxelShapes.cuboid(0.0, 0.5, 0.5, 0.5, 1.0, 1.0)
-        val BOTTOM_NORTH_EAST_CORNER_SHAPE: VoxelShape = VoxelShapes.cuboid(0.5, 0.0, 0.0, 1.0, 0.5, 0.5)
-        val BOTTOM_SOUTH_EAST_CORNER_SHAPE: VoxelShape = VoxelShapes.cuboid(0.5, 0.0, 0.5, 1.0, 0.5, 1.0)
-        val TOP_NORTH_EAST_CORNER_SHAPE: VoxelShape = VoxelShapes.cuboid(0.5, 0.5, 0.0, 1.0, 1.0, 0.5)
-        val TOP_SOUTH_EAST_CORNER_SHAPE: VoxelShape = VoxelShapes.cuboid(0.5, 0.5, 0.5, 1.0, 1.0, 1.0)
-        val TOP_SHAPES = composeShapes(
-            UP_SHAPE,
-            BOTTOM_NORTH_WEST_CORNER_SHAPE,
-            BOTTOM_NORTH_EAST_CORNER_SHAPE,
-            BOTTOM_SOUTH_WEST_CORNER_SHAPE,
-            BOTTOM_SOUTH_EAST_CORNER_SHAPE
-        )
-        val BOTTOM_SHAPES = composeShapes(
-            DOWN_SHAPE,
-            TOP_NORTH_WEST_CORNER_SHAPE,
-            TOP_NORTH_EAST_CORNER_SHAPE,
-            TOP_SOUTH_WEST_CORNER_SHAPE,
-            TOP_SOUTH_EAST_CORNER_SHAPE
-        )
+        val TOP_SHAPES: Array<VoxelShape?>?
+        val BOTTOM_SHAPES: Array<VoxelShape?>?
+
+        init {
+            val bottomNorthWest: VoxelShape = VoxelShapes.cuboid(0.0, 0.0, 0.0, 0.5, 0.5, 0.5)
+            val bottomSouthWest: VoxelShape = VoxelShapes.cuboid(0.0, 0.0, 0.5, 0.5, 0.5, 1.0)
+            val topNorthWest: VoxelShape = VoxelShapes.cuboid(0.0, 0.5, 0.0, 0.5, 1.0, 0.5)
+            val topSouthWest: VoxelShape = VoxelShapes.cuboid(0.0, 0.5, 0.5, 0.5, 1.0, 1.0)
+            val bottomNorthEast: VoxelShape = VoxelShapes.cuboid(0.5, 0.0, 0.0, 1.0, 0.5, 0.5)
+            val bottomSouthEast: VoxelShape = VoxelShapes.cuboid(0.5, 0.0, 0.5, 1.0, 0.5, 1.0)
+            val topNorthEast: VoxelShape = VoxelShapes.cuboid(0.5, 0.5, 0.0, 1.0, 1.0, 0.5)
+            val topSouthEast: VoxelShape = VoxelShapes.cuboid(0.5, 0.5, 0.5, 1.0, 1.0, 1.0)
+
+            TOP_SHAPES = composeShapes(
+                UP_SHAPE,
+                bottomNorthWest,
+                bottomNorthEast,
+                bottomSouthWest,
+                bottomSouthEast
+            )
+
+            BOTTOM_SHAPES = composeShapes(
+                DOWN_SHAPE,
+                topNorthWest,
+                topNorthEast,
+                topSouthWest,
+                topSouthEast
+            )
+        }
         val SHAPE_INDICES = arrayOf(12, 5, 3, 10, 14, 13, 7, 11, 13, 7, 11, 14, 8, 4, 1, 2, 4, 1, 2, 8)
 
         // method_10678
@@ -178,5 +186,5 @@ class StairsFrame : WaterloggableFrame(), IStairs {
                     || state.get(StairsBlock.FACING) == neighbor.get(StairsBlock.FACING))
     }
 
-    override fun createBlockEntity(view: BlockView?) = FrameEntity(STAIRS_FRAME, STAIRS_FRAME_ENTITY)
+    override fun createBlockEntity(view: BlockView?): BlockEntity = FrameEntity(STAIRS_FRAME, STAIRS_FRAME_ENTITY)
 }

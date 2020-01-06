@@ -1,15 +1,13 @@
 package dev.alexnader.framity
 
+import arrow.syntax.function.curried
+import arrow.syntax.function.uncurried
 import dev.alexnader.framity.adapters.KtBlock
 import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.blocks.*
 import dev.alexnader.framity.model.*
-import dev.alexnader.framity.util.curried
-import dev.alexnader.framity.util.uncurried
 import grondag.fermion.client.models.AbstractModel
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry
-import net.fabricmc.fabric.api.renderer.v1.Renderer
-import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.HorizontalConnectedBlock
@@ -39,6 +37,9 @@ val STAIRS_FRAME_ENTITY = MOD.blockEntity(::FrameEntity, "stairs_frame_entity", 
 
 val FENCE_FRAME = MOD.block(::FenceFrame, "fence_frame")
 val FENCE_FRAME_ENTITY = MOD.blockEntity(::FrameEntity, "fence_frame_entity", FENCE_FRAME)
+
+val SLOPE_FRAME = MOD.block(::SlopeFrame, "slope_frame")
+val SLOPE_FRAME_ENTITY = MOD.blockEntity(::FrameEntity, "slope_frame_entity", SLOPE_FRAME)
 
 @Suppress("deprecation")
 val HOLLOW_FRAME_ID = SpriteIdentifier(
@@ -107,5 +108,11 @@ fun clientInit() {
         listOf(FULL_FRAME_ID),
         listOf(HorizontalConnectedBlock.NORTH, HorizontalConnectedBlock.EAST, HorizontalConnectedBlock.SOUTH, HorizontalConnectedBlock.WEST),
         (::CustomItemFramityVoxelModel).curried()((FenceFrame)::getItemMesh)
+    )
+    registerModel(
+        SLOPE_FRAME,
+        listOf(HOLLOW_FRAME_ID),
+        listOf(StairsBlock.SHAPE, StairsBlock.HALF, StairsBlock.FACING),
+        (::SlopeFrameModel).curried()
     )
 }
