@@ -44,15 +44,13 @@ class VoxelTransformer(defaultSprite: Sprite) : MeshTransformer {
         const val WHITE      = 0x00FFFFFF
         const val FULL_ALPHA = 0xFF000000.toInt()
 
-        private val CLAMP_01 = clamp(0f)(1f)
+        private fun clamp01(f: Float) = MathHelper.clamp(f, 0f, 1f)
 
         private fun applySprite(qe: MutableQuadView, sprite: Sprite, u: (Int) -> Float, v: (Int) -> Float) {
-            val clampedU = u andThen CLAMP_01
-            val clampedV = v andThen CLAMP_01
-            qe.sprite(0, 0, MathHelper.lerp(clampedU(0), sprite.minU, sprite.maxU), MathHelper.lerp(clampedV(0), sprite.minV, sprite.maxV))
-                .sprite(1, 0, MathHelper.lerp(clampedU(1), sprite.minU, sprite.maxU), MathHelper.lerp(clampedV(1), sprite.minV, sprite.maxV))
-                .sprite(2, 0, MathHelper.lerp(clampedU(2), sprite.minU, sprite.maxU), MathHelper.lerp(clampedV(2), sprite.minV, sprite.maxV))
-                .sprite(3, 0, MathHelper.lerp(clampedU(3), sprite.minU, sprite.maxU), MathHelper.lerp(clampedV(3), sprite.minV, sprite.maxV))
+            qe.sprite(0, 0, MathHelper.lerp(clamp01(u(0)), sprite.minU, sprite.maxU), MathHelper.lerp(clamp01(v(0)), sprite.minV, sprite.maxV))
+                .sprite(1, 0, MathHelper.lerp(clamp01(u(1)), sprite.minU, sprite.maxU), MathHelper.lerp(clamp01(v(1)), sprite.minV, sprite.maxV))
+                .sprite(2, 0, MathHelper.lerp(clamp01(u(2)), sprite.minU, sprite.maxU), MathHelper.lerp(clamp01(v(2)), sprite.minV, sprite.maxV))
+                .sprite(3, 0, MathHelper.lerp(clamp01(u(3)), sprite.minU, sprite.maxU), MathHelper.lerp(clamp01(v(3)), sprite.minV, sprite.maxV))
         }
 
         fun ofSprite(spriteId: SpriteIdentifier): () -> MeshTransformer = {
