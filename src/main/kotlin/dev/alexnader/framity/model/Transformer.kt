@@ -1,6 +1,5 @@
 package dev.alexnader.framity.model
 
-import dev.alexnader.framity.clamp
 import dev.alexnader.framity.util.SpriteSet
 import net.fabricmc.fabric.api.client.render.ColorProviderRegistry
 import net.fabricmc.fabric.api.renderer.v1.Renderer
@@ -27,15 +26,26 @@ import java.util.function.Supplier
 import arrow.syntax.function.andThen
 import dev.alexnader.framity.adapters.tag
 
+/**
+ * Flips a number in the range [0, 1] as if it were in the range [1, 0].
+ */
 fun flip(f: Float) = 1 - f
 
+/**
+ * [RenderContext.QuadTransform] sub-interface which gives the ability
+ * to prepare the transformer for block and item contexts.
+ */
 interface MeshTransformer : RenderContext.QuadTransform {
-
     fun prepare(blockView: BlockRenderView?, state: BlockState?, pos: BlockPos?, randomSupplier: Supplier<Random>?): MeshTransformer
     fun prepare(stack: ItemStack?, randomSupplier: Supplier<Random>?): MeshTransformer
 }
 
-class VoxelTransformer(defaultSprite: Sprite) : MeshTransformer {
+/**
+ * [MeshTransformer] implementor which copies the sprite data from a
+ * [RenderAttachedBlockView] which returns [BlockState] and applies
+ * them to the emitter being transformed.
+ */
+class SpriteCopyTransformer(defaultSprite: Sprite) : MeshTransformer {
     companion object {
         private val CLIENT: MinecraftClient = MinecraftClient.getInstance()
         private val RENDERER: Renderer = RendererAccess.INSTANCE.renderer
@@ -44,8 +54,17 @@ class VoxelTransformer(defaultSprite: Sprite) : MeshTransformer {
         const val WHITE      = 0x00FFFFFF
         const val FULL_ALPHA = 0xFF000000.toInt()
 
+        /**
+         * Clamps a number to the range [0, 1].
+         */
         private fun clamp01(f: Float) = MathHelper.clamp(f, 0f, 1f)
 
+        /**
+         * Applies [sprite] to [qe].
+         *
+         * @param u Function from sprite index to u coordinate.
+         * @param v Function from sprite index to v coordinate.
+         */
         private fun applySprite(qe: MutableQuadView, sprite: Sprite, u: (Int) -> Float, v: (Int) -> Float) {
             qe.sprite(0, 0, MathHelper.lerp(clamp01(u(0)), sprite.minU, sprite.maxU), MathHelper.lerp(clamp01(v(0)), sprite.minV, sprite.maxV))
                 .sprite(1, 0, MathHelper.lerp(clamp01(u(1)), sprite.minU, sprite.maxU), MathHelper.lerp(clamp01(v(1)), sprite.minV, sprite.maxV))
@@ -53,8 +72,11 @@ class VoxelTransformer(defaultSprite: Sprite) : MeshTransformer {
                 .sprite(3, 0, MathHelper.lerp(clamp01(u(3)), sprite.minU, sprite.maxU), MathHelper.lerp(clamp01(v(3)), sprite.minV, sprite.maxV))
         }
 
+        /**
+         * Lazily creates new [SpriteCopyTransformer] using [spriteId]'s sprite.
+         */
         fun ofSprite(spriteId: SpriteIdentifier): () -> MeshTransformer = {
-            VoxelTransformer(spriteId.sprite)
+            SpriteCopyTransformer(spriteId.sprite)
         }
     }
 

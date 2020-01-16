@@ -21,14 +21,19 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 import net.minecraft.world.IWorld
-import java.util.stream.IntStream
 
+/**
+ * [WaterloggableFrame] subclass for stairs frames.
+ */
 open class StairsFrame : WaterloggableFrame(), IStairs {
     companion object {
+        /**
+         * Combines [base] with other [VoxelShape]s based on value of [i].
+         */
         private fun composeShape(
             i: Int, base: VoxelShape, northWest: VoxelShape, northEast: VoxelShape, southWest: VoxelShape, southEast: VoxelShape
-        ): VoxelShape? {
-            var voxelShape: VoxelShape? = base
+        ): VoxelShape {
+            var voxelShape: VoxelShape = base
             if (i and 1 != 0) {
                 voxelShape = VoxelShapes.union(base, northWest)
             }
@@ -44,16 +49,16 @@ open class StairsFrame : WaterloggableFrame(), IStairs {
             return voxelShape
         }
 
+        /**
+         * Generates all combinations of [base] and other [VoxelShape]s.
+         */
         private fun composeShapes(
             base: VoxelShape, northWest: VoxelShape, northEast: VoxelShape, southWest: VoxelShape, southEast: VoxelShape
-        ): Array<VoxelShape?>? {
-            return IntStream.range(0, 16).mapToObj { i: Int ->
-                composeShape(i, base, northWest, northEast, southWest, southEast)
-            }.toArray { i: Int -> arrayOfNulls<VoxelShape>(i) } as Array<VoxelShape?>
-        }
+        ): Array<VoxelShape> =
+            (0..16).map { i -> composeShape(i, base, northWest, northEast, southWest, southEast) }.toTypedArray()
 
-        val TOP_SHAPES: Array<VoxelShape?>?
-        val BOTTOM_SHAPES: Array<VoxelShape?>?
+        val TOP_SHAPES: Array<VoxelShape>
+        val BOTTOM_SHAPES: Array<VoxelShape>
 
         init {
             val bottomNorthWest: VoxelShape = VoxelShapes.cuboid(0.0, 0.0, 0.0, 0.5, 0.5, 0.5)
@@ -83,7 +88,11 @@ open class StairsFrame : WaterloggableFrame(), IStairs {
         }
         val SHAPE_INDICES = arrayOf(12, 5, 3, 10, 14, 13, 7, 11, 13, 7, 11, 14, 8, 4, 1, 2, 4, 1, 2, 8)
 
-        // method_10678
+        //
+        /**
+         * Determines whether or not the block to the direction [dir] of [pos] is stairs.
+         * @see [net.minecraft.block.StairsBlock.method_10678]
+         */
         private fun stairsNearby(state: BlockState?, view: BlockView?, pos: BlockPos?, dir: Direction?): Boolean {
             val blockState = view?.getBlockState(pos?.offset(dir))
             return !StairsBlock.isStairs(blockState) || blockState?.get(StairsBlock.FACING) != state?.get(
@@ -91,7 +100,11 @@ open class StairsFrame : WaterloggableFrame(), IStairs {
             ) || blockState?.get(StairsBlock.HALF) != state?.get(StairsBlock.HALF)
         }
 
-        // method_10675
+        //
+        /**
+         * Calculates the shape a stair block at [pos] should have.
+         * @see [net.minecraft.block.StairsBlock.method_10675]
+         */
         private fun stairsShape(state: BlockState?, view: BlockView, pos: BlockPos): StairShape {
             val direction = state!!.get(StairsBlock.FACING)
             val blockState = view.getBlockState(pos.offset(direction))
@@ -171,11 +184,9 @@ open class StairsFrame : WaterloggableFrame(), IStairs {
     override fun getOutlineShape(state: BlockState?, view: BlockView?, pos: BlockPos?, ePos: EntityContext?): VoxelShape? {
         val facing = state!!.get(StairsBlock.FACING)
         if (facing == Direction.UP || facing == Direction.DOWN) return VoxelShapes.empty()
-        return (if (state.get(StairsBlock.HALF) == BlockHalf.TOP) TOP_SHAPES else BOTTOM_SHAPES)?.get(
-            SHAPE_INDICES[(state.get(StairsBlock.SHAPE) as StairShape).ordinal * 4 + (state.get(
-                StairsBlock.FACING
-            ) as Direction).horizontal]
-        )
+        return (if (state.get(StairsBlock.HALF) == BlockHalf.TOP) TOP_SHAPES else BOTTOM_SHAPES)[SHAPE_INDICES[(state.get(StairsBlock.SHAPE) as StairShape).ordinal * 4 + (state.get(
+            StairsBlock.FACING
+        ) as Direction).horizontal]]
     }
 
     override fun hasSidedTransparency(state: BlockState?) = true

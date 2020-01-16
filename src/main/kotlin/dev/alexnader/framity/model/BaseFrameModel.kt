@@ -9,6 +9,9 @@ import net.minecraft.client.texture.Sprite
 import net.minecraft.client.util.SpriteIdentifier
 import java.util.function.Function
 
+/**
+ * [TransformableModel] subclass for all frame models.
+ */
 abstract class BaseFrameModel(
     sprite: SpriteIdentifier,
     transformerFactory: () -> MeshTransformer,
@@ -25,6 +28,11 @@ abstract class BaseFrameModel(
         val RENDERER: Renderer = RendererAccess.INSTANCE.renderer
     }
 
+    /**
+     * Mapping from [BlockState] to [Mesh]. Must contain a value for all possible [BlockState]s.
+     *
+     * @see [dev.alexnader.framity.util.BlockStateMap]
+     */
     abstract val blockStateMap: Map<BlockState, Mesh>
 
     override fun createMesh(state: BlockState?) = this.blockStateMap[state] ?: error("No defined model for $state")

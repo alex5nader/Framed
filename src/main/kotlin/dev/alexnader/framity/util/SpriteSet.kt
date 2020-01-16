@@ -12,6 +12,9 @@ import net.minecraft.util.math.Direction
 import java.util.*
 import kotlin.collections.HashMap
 
+/**
+ * A defaulted mutable map from [Direction] to [Sprite].
+ */
 class SpriteSet(private val defaultSprite: Sprite) {
     companion object {
         @Suppress("deprecation")

@@ -12,6 +12,9 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.IWorld
 
+/**
+ * [BaseFrame] subclass for all waterloggable frames.
+ */
 abstract class WaterloggableFrame : BaseFrame(), Waterloggable {
     init {
         this.defaultState = this.defaultState.with(Properties.WATERLOGGED, false)

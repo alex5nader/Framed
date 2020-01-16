@@ -25,10 +25,19 @@ import net.minecraft.world.BlockView
 import net.minecraft.world.IWorld
 import net.minecraft.world.World
 
+/**
+ * Base class for frame blocks.
+ */
 abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).hardness(0.33f).sounds(BlockSoundGroup.WOOD).nonOpaque().build()) {
     companion object {
+        /**
+         * Property representing whether or not a frame should give off light.
+         */
         val HasGlowstone: BooleanProperty = BooleanProperty.of("has_glowstone")
 
+        /**
+         * Maps [BlockPos] to [PlayerEntity]. Should be empty except for when a frame is broken.
+         */
         private val posToPlayer: MutableMap<BlockPos, PlayerEntity> = mutableMapOf()
     }
 
@@ -41,14 +50,36 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
         builder?.add(HasGlowstone)
     }
 
+    /**
+     * Frames always render via [BlockRenderType.MODEL].
+     */
     override fun getRenderType(state: BlockState?) = BlockRenderType.MODEL
+
+    /**
+     * Frames are always translucent.
+     */
     override fun isTranslucent(state: BlockState?, view: BlockView?, pos: BlockPos?) = true
+
+    /**
+     * Frames are not a simple full block.
+     */
     override fun isSimpleFullBlock(state: BlockState?, view: BlockView?, pos: BlockPos?) = false
+
+    /**
+     * Frames always have dynamic bounds.
+     */
     override fun hasDynamicBounds() = true
+
+    /**
+     * Frames only render a side as invisible if the other block is the same kind of block as this one.
+     */
     @Suppress("DEPRECATION")
     override fun isSideInvisible(state: BlockState, neighbor: BlockState, facing: Direction?) =
         neighbor.block == this || super.isSideInvisible(state, neighbor, facing)
 
+    /**
+     * Drops inventory onto ground.
+     */
     override fun onBlockRemoved(
         state: BlockState?, world: World?, pos: BlockPos?, newState: BlockState?, moved: Boolean
     ) {
@@ -65,8 +96,16 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
         }
     }
 
-    override fun getLuminance(state: BlockState?) = if (state?.get(HasGlowstone) == true) 15 else 1
+    /**
+     * Returns a light level of 15 if the frame has glowstone dust.
+     * Returns a light level of 0 otherwise.
+     */
+    override fun getLuminance(state: BlockState?) = if (state?.get(HasGlowstone) == true) 15 else 0
 
+    /**
+     * Called on server when left clicked by a player holding a framer's hammer.
+     * Removes the "rightmost" item from [frameEntity].
+     */
     private fun onHammerRemove(world: World, frameEntity: FrameEntity<*>, frameState: BlockState, player: PlayerEntity, giveItem: Boolean) {
         val slot = frameEntity.highestRemovePrioritySlot
         val stackFromBlock = frameEntity.takeInvStack(slot, 1)
@@ -83,6 +122,9 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
         frameEntity.sync()
     }
 
+    /**
+     * Calls [onHammerRemove] when on server.
+     */
     override fun onBlockBreakStart(state: BlockState?, world: World?, pos: BlockPos?, player: PlayerEntity?) {
         @Suppress("DEPRECATION")
         super.onBlockBreakStart(state, world, pos, player)
@@ -96,6 +138,9 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
         }
     }
 
+    /**
+     * Marks [player] as having broken the frame at [pos] so [onHammerRemove] can be called after the break is cancelled.
+     */
     override fun onBreak(world: World?, pos: BlockPos?, state: BlockState?, player: PlayerEntity?) {
         super.onBreak(world, pos, state, player)
 
@@ -106,6 +151,10 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
         posToPlayer[pos] = player
     }
 
+    /**
+     * Reads the player who broke a frame at [pos], calls [onHammerRemove]
+     * with that player, and replaces the block at [pos].
+     */
     override fun onBroken(world: IWorld?, pos: BlockPos?, state: BlockState?) {
         super.onBroken(world, pos, state)
 
@@ -124,6 +173,9 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
         }
     }
 
+    /**
+     * Adds an item to the frame.
+     */
     override fun onUse(
         state: BlockState?, world: World?, pos: BlockPos?, player: PlayerEntity?, hand: Hand?, hit: BlockHitResult?
     ): ActionResult {

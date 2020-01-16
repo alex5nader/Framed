@@ -10,6 +10,11 @@ import net.minecraft.world.BlockRenderView
 import java.util.*
 import java.util.function.Supplier
 
+/**
+ * [StatefulModel] subclass which enables usage of a [MeshTransformer].
+ *
+ * @param transformerFactory Constructor for the transformer to use.
+ */
 abstract class TransformableModel(
     protected val transformerFactory: (() -> MeshTransformer)?,
     defaultState: BlockState,
@@ -18,6 +23,9 @@ abstract class TransformableModel(
 ) : StatefulModel(
     defaultState, sprite, transformation
 ) {
+    /**
+     * Scope function which automatically pushes and pops [transformer] if it isn't null.
+     */
     protected fun transformed(context: RenderContext?, transformer: MeshTransformer?, block: () -> Unit) {
         transformer?.let { context?.pushTransform(it) }
         block()

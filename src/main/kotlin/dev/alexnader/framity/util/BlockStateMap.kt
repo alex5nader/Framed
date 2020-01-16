@@ -3,6 +3,10 @@ package dev.alexnader.framity.util
 import net.minecraft.block.BlockState
 import net.minecraft.state.property.Property
 
+/**
+ * Map from [BlockState] to [V]. Based on hash of combined properties.
+ * Which properties to use are specified via [includeProperty].
+ */
 class BlockStateMap<V> : MutableMap<BlockState, V> {
     private val valuesMap: MutableMap<Int, V> = mutableMapOf()
     private val keysMap: MutableMap<Int, BlockState> = mutableMapOf()
@@ -15,10 +19,9 @@ class BlockStateMap<V> : MutableMap<BlockState, V> {
         this.properties.add(prop as Property<Comparable<Any>>)
     }
 
-    fun excludeProperty(prop: Property<*>) {
-        this.properties.remove(prop)
-    }
-
+    /**
+     * Combines the hashes of all properties from [properties] of [state].
+     */
     private fun hash(state: BlockState): Int {
         return this.properties.map { state.get<Comparable<Any>>(it) }.hashCode()
     }
@@ -58,6 +61,9 @@ class BlockStateMap<V> : MutableMap<BlockState, V> {
         return valuesMap.remove(hash)
     }
 
+    /**
+     * An entry in a [BlockStateMap].
+     */
     data class Entry<V>(override var key: BlockState, override var value: V) : MutableMap.MutableEntry<BlockState, V> {
         override fun setValue(newValue: V): V {
             val old = value

@@ -20,6 +20,12 @@ import net.minecraft.util.math.Direction
 import java.lang.Exception
 import java.util.function.Function
 
+/**
+ * [BaseFrameModel] subclass for slope models.
+ *
+ * @param block The block to derive [BlockState]s from.
+ * @param properties All properties which alter [Mesh] generation. If a property does not affect [Mesh] generation, it should not be present.
+ */
 class SlopeFrameModel(
     block: Block,
     properties: List<Property<out Comparable<*>>>,
@@ -29,9 +35,15 @@ class SlopeFrameModel(
     spriteMap: Function<SpriteIdentifier, Sprite>
 ) : BaseFrameModel(sprite, transformerFactory, defaultState, spriteMap) {
     companion object {
+        /**
+         * Partially applies [part] such that it covers the area from (0, 0) to (1, 1) with [pos] and a color of -1.
+         */
         private fun sizeToFull(part: (QuadEmitter, Float, Int, Float, Float, Float, Float) -> QuadEmitter, pos: Float) =
             part.curried() andThen { it(pos)(-1)(0f)(0f)(1f)(1f) }
 
+        /**
+         * Curried function which produces geometry-bound triangle function.
+         */
         val tri =
             { h1: Float, v1: Float ->
             { h2: Float, v2: Float ->
@@ -41,6 +53,9 @@ class SlopeFrameModel(
                 f.curried() andThen { it(p)(-1)(h1)(v1)(h2)(v2)(h3)(v3) }
             }}}}}
 
+        /**
+         * Flips the uvs of a triangle function.
+         */
         fun <A> flipUv(orig: (Float, Float) -> (Float, Float) -> (Float, Float) -> A) =
             { h1: Float, v1: Float ->
             { h2: Float, v2: Float ->
@@ -48,6 +63,10 @@ class SlopeFrameModel(
                 orig(h3, v3)(h2, v2)(h1, v1)
             }}}
 
+        /**
+         * Curried function which produces a `(QuadEmitter) -> QuadEmitter` which
+         * emits a non culled quad with the given geometry and direction.
+         */
         val nonCulledQuad =
             { dir: Direction ->
             { x1: Float, y1: Float, z1: Float ->
@@ -57,6 +76,10 @@ class SlopeFrameModel(
                 (QuadEmitter::nonCulledQuad).curried() andThen { it(-1)(dir)(x1)(y1)(z1)(x2)(y2)(z2)(x3)(y3)(z3)(x4)(y4)(z4) }
             }}}}}
 
+        /**
+         * Curried function which produces a `(QuadEmitter) -> QuadEmitter` which
+         * emits a non culled tri with the given geometry and direction.
+         */
         val nonCulledTri =
             { dir: Direction ->
             { x1: Float, y1: Float, z1: Float ->
@@ -65,15 +88,34 @@ class SlopeFrameModel(
                 (QuadEmitter::nonCulledTri).curried() andThen { it(-1)(dir)(x1)(y1)(z1)(x2)(y2)(z2)(x3)(y3)(z3) }
             }}}}
 
+        /**
+         * Adapts a geometry function to produce an east side triangle emitter.
+         * Produces a `(QuadEmitter) -> QuadEmitter` which emits the triangle.
+         */
         private fun eastTri(shape: (Float) -> ((QuadEmitter, Float, Int, Float, Float, Float, Float, Float, Float) -> QuadEmitter) -> (QuadEmitter) -> QuadEmitter) =
             shape(1f)(QuadEmitter::eastTriangle)
+        /**
+         * Adapts a geometry function to produce a west side triangle emitter.
+         * Produces a `(QuadEmitter) -> QuadEmitter` which emits the triangle.
+         */
         private fun westTri(shape: (Float) -> ((QuadEmitter, Float, Int, Float, Float, Float, Float, Float, Float) -> QuadEmitter) -> (QuadEmitter) -> QuadEmitter) =
             shape(0f)(QuadEmitter::westTriangle)
+        /**
+         * Adapts a geometry function to produce a north side triangle emitter.
+         * Produces a `(QuadEmitter) -> QuadEmitter` which emits the triangle.
+         */
         private fun northTri(shape: (Float) -> ((QuadEmitter, Float, Int, Float, Float, Float, Float, Float, Float) -> QuadEmitter) -> (QuadEmitter) -> QuadEmitter) =
             shape(0f)(QuadEmitter::northTriangle)
+        /**
+         * Adapts a geometry function to produce a south side triangle emitter.
+         * Produces a `(QuadEmitter) -> QuadEmitter` which emits the triangle.
+         */
         private fun southTri(shape: (Float) -> ((QuadEmitter, Float, Int, Float, Float, Float, Float, Float, Float) -> QuadEmitter) -> (QuadEmitter) -> QuadEmitter) =
             shape(1f)(QuadEmitter::southTriangle)
 
+        /**
+         * Map from [Direction] to one of [northTri], [eastTri], [southTri], and [westTri].
+         */
         val dirToTriEmitter = mapOf(
             Direction.NORTH to ::northTri,
             Direction.EAST to ::eastTri,
@@ -81,6 +123,10 @@ class SlopeFrameModel(
             Direction.WEST to ::westTri
         )
 
+        /**
+         * Map from [Direction] to [Direction.AxisDirection] to [Tuple6] of [Int]
+         * (geometry coordinates) for a triangle based on the two keys.
+         */
         val halfAndDirToTriVerts = mapOf(
             Direction.DOWN to mapOf(
                 Direction.AxisDirection.POSITIVE to Tuple6(0f, 0f, 1f, 1f, 1f, 0f),
@@ -92,15 +138,23 @@ class SlopeFrameModel(
             )
         )
 
+        /**
+         * Map from [Direction] to `(QuadEmitter) -> QuadEmitter` which
+         * emits a full sized quad along the direction used as the key.
+         */
         val dirToFull = mapOf(
-            Direction.DOWN to sizeToFull(QuadEmitter::downSquare, 0f),
-            Direction.UP to sizeToFull(QuadEmitter::upSquare, 1f),
-            Direction.NORTH to sizeToFull(QuadEmitter::northSquare, 0f),
-            Direction.EAST to sizeToFull(QuadEmitter::eastSquare, 1f),
-            Direction.SOUTH to sizeToFull(QuadEmitter::southSquare, 1f),
-            Direction.WEST to sizeToFull(QuadEmitter::westSquare, 0f)
+            Direction.DOWN to sizeToFull(QuadEmitter::downRect, 0f),
+            Direction.UP to sizeToFull(QuadEmitter::upRect, 1f),
+            Direction.NORTH to sizeToFull(QuadEmitter::northRect, 0f),
+            Direction.EAST to sizeToFull(QuadEmitter::eastRect, 1f),
+            Direction.SOUTH to sizeToFull(QuadEmitter::southRect, 1f),
+            Direction.WEST to sizeToFull(QuadEmitter::westRect, 0f)
         )
 
+        /**
+         * Map from two [Direction]s to `(QuadEmitter) -> QuadEmitter` which
+         * emits a straight slope quad with half = key 1 and facing = key 2.
+         */
         val halfAndDirToSlope = mapOf(
             Direction.DOWN to mapOf(
                 Direction.NORTH to nonCulledQuad(Direction.NORTH)(0f, 0f, 1f)(1f, 0f, 1f)(1f, 1f, 0f)(0f, 1f, 0f),
@@ -116,6 +170,10 @@ class SlopeFrameModel(
             )
         )
 
+        /**
+         * Map from two [Direction]s and [StairShape] to `(QuadEmitter) -> QuadEmitter`
+         * which emits a corner slope quad with half = key 1, facing = key 2, and shape = key 3.
+         */
         val halfAndDirAndShapeToSlope = mapOf(
             Direction.DOWN to mapOf(
                 Direction.NORTH to mapOf(
@@ -171,6 +229,9 @@ class SlopeFrameModel(
             )
         )
 
+        /**
+         * Converts [BlockHalf] to [Direction].
+         */
         val halfToDir = mapOf(
             BlockHalf.BOTTOM to Direction.DOWN,
             BlockHalf.TOP to Direction.UP

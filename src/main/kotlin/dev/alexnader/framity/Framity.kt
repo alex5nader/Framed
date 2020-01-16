@@ -74,15 +74,13 @@ fun <B: Block> registerModel(
     MODEL_VARIANT_PROVIDER.registerModels(
         ktBlock.block,
         ktBlock.block.defaultState,
-        model(ktBlock.block)(properties)(sprites[0])(VoxelTransformer.ofSprite(sprites[0])).uncurried(),
+        model(ktBlock.block)(properties)(sprites[0])(SpriteCopyTransformer.ofSprite(sprites[0])).uncurried(),
         sprites
     )
 }
 
 @Suppress("unused")
 fun clientInit() {
-    MOD.registerAllClient()
-
     ModelLoadingRegistry.INSTANCE.registerVariantProvider { MODEL_VARIANT_PROVIDER }
     registerModel(
         BLOCK_FRAME,

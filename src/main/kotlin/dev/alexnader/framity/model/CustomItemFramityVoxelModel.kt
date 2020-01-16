@@ -13,6 +13,11 @@ import java.util.*
 import java.util.function.Function
 import java.util.function.Supplier
 
+/**
+ * [FramityVoxelModel] subclass for all frames which require a custom item model.
+ *
+ * @
+ */
 class CustomItemFramityVoxelModel(
     private val itemMeshProvider: (Renderer) -> Mesh,
     block: Block,

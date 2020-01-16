@@ -10,6 +10,12 @@ import net.minecraft.client.util.SpriteIdentifier
 import net.minecraft.state.property.Property
 import java.util.function.Function
 
+/**
+ * [BaseFrameModel] subclass for all frames which derive their models from the state's outline shape.
+ *
+ * @param block The block to derive [BlockState]s from.
+ * @param properties All properties which alter [Mesh] generation. If a property does not affect [Mesh] generation, it should not be present.
+ */
 open class FramityVoxelModel(
     block: Block,
     properties: List<Property<out Comparable<*>>>,

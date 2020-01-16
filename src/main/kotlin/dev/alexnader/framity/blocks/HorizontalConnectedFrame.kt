@@ -19,6 +19,10 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 
+/**
+ * [WaterloggableFrame] subclass for all frames which can
+ * be connected horizontally (i.e., wall, fence, etc).
+ */
 abstract class HorizontalConnectedFrame(
     centerGeometry: VoxelShape,
     northGeometry: VoxelShape,
@@ -27,6 +31,9 @@ abstract class HorizontalConnectedFrame(
 ) : WaterloggableFrame() {
 
     companion object {
+        /**
+         * Maps a horizontal direction to its corresponding [HorizontalConnectedBlock] property.
+         */
         @JvmStatic
         protected val FACING_PROPERTIES: Map<Direction, BooleanProperty> = enumMapOf(
             Pair(Direction.NORTH, HorizontalConnectedBlock.NORTH),
@@ -35,6 +42,10 @@ abstract class HorizontalConnectedFrame(
             Pair(Direction.WEST, HorizontalConnectedBlock.WEST)
         )
 
+        /**
+         * Creates an array of voxel shapes with indices
+         * based on combinations of [Direction.mask].
+         */
         private fun createShapes(center: VoxelShape, north: VoxelShape): Array<VoxelShape> {
             val east = north.rotated(-90f)
             val south = east.rotated(-90f)
@@ -63,18 +74,27 @@ abstract class HorizontalConnectedFrame(
         }
     }
 
+    /**
+     * Lazily filled map from [BlockState] to [Int].
+     */
     private val shapeIndexCache = Object2IntOpenHashMap<BlockState>()
 
-    private val boundingShapes: Array<VoxelShape>
+    /**
+     * Geometry shapes for this frame.
+     */
+    private val geometryShapes: Array<VoxelShape>
+    /**
+     * Collision shapes for this frame.
+     */
     private val collisionShapes: Array<VoxelShape>
 
     init {
-        this.boundingShapes = createShapes(centerGeometry, northGeometry)
+        this.geometryShapes = createShapes(centerGeometry, northGeometry)
         this.collisionShapes = createShapes(centerCollision, northCollision)
     }
 
     override fun getOutlineShape(state: BlockState?, view: BlockView?, pos: BlockPos?, ePos: EntityContext?) =
-        this.boundingShapes[getShapeIndex(state)]
+        this.geometryShapes[getShapeIndex(state)]
 
     override fun getCollisionShape(state: BlockState?, view: BlockView?, pos: BlockPos?, ePos: EntityContext?) =
         this.collisionShapes[getShapeIndex(state)]

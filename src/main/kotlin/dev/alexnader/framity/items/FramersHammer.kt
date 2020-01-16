@@ -1,6 +1,8 @@
 package dev.alexnader.framity.items
 
 import net.minecraft.item.Item
-import net.minecraft.item.ItemGroup
 
+/**
+ * [Item] subclass for the framer's hammer.
+ */
 class FramersHammer : Item(Settings())

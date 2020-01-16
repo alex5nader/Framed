@@ -20,19 +20,41 @@ import java.lang.ref.WeakReference
 import java.util.*
 import java.util.function.Supplier
 
-abstract class StatefulModel(private val state: BlockState?, sprite: Sprite, transformation: ModelTransformation) : AbstractModel(
+/**
+ * [AbstractModel] subclass providing the ability to generate a [Mesh] based on a [BlockState].
+ *
+ * @param defaultState The default [BlockState] to use with [createMesh].
+ * @param sprite The sprite to expose via [BakedModel.getSprite].
+ * @param transformation The transformation to expose via [BakedModel.getTransformation].
+ */
+abstract class StatefulModel(private val defaultState: BlockState?, sprite: Sprite, transformation: ModelTransformation) : AbstractModel(
     sprite,
     transformation
 ) {
+    /**
+     * Creates a [Mesh] based on the given [BlockState].
+     */
     protected abstract fun createMesh(state: BlockState?): Mesh
 
+    /**
+     * This model's [Mesh]. Lazily initialized by [getMesh].
+     */
     private lateinit var mesh: Mesh
+    /**
+     * This model's quad lists. Not strongly maintained.
+     */
     private var quadLists: WeakReference<Array<MutableList<BakedQuad>>>? = null
+    /**
+     * This model's [ModelItemPropertyOverrideList] instance. Does nothing.
+     */
     private val itemProxy = ItemProxy()
 
     override fun isVanillaAdapter() = false
     override fun getItemPropertyOverrides() = this.itemProxy
 
+    /**
+     * Lazy getter for [mesh]. Generates value if not yet initialized.
+     */
     private fun getMesh(state: BlockState?): Mesh {
         if (!this::mesh.isInitialized)
             this.mesh = this.createMesh(state)
@@ -49,7 +71,7 @@ abstract class StatefulModel(private val state: BlockState?, sprite: Sprite, tra
     }
 
     override fun emitItemQuads(stack: ItemStack?, randomSupplier: Supplier<Random>?, context: RenderContext?) {
-        context?.meshConsumer()?.accept(this.getMesh(this.state))
+        context?.meshConsumer()?.accept(this.getMesh(this.defaultState))
     }
 
     override fun emitBlockQuads(
@@ -59,9 +81,12 @@ abstract class StatefulModel(private val state: BlockState?, sprite: Sprite, tra
         randomSupplier: Supplier<Random>?,
         context: RenderContext?
     ) {
-        context?.meshConsumer()?.accept(this.getMesh(this.state))
+        context?.meshConsumer()?.accept(this.getMesh(this.defaultState))
     }
 
+    /**
+     * [ModelItemPropertyOverrideList] subclass which does nothing.
+     */
     inner class ItemProxy : ModelItemPropertyOverrideList(null, null, null, emptyList()) {
         override fun apply(model: BakedModel?, stack: ItemStack?, world: World?, entity: LivingEntity?): BakedModel? {
             return this@StatefulModel

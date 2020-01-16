@@ -14,11 +14,17 @@ import net.minecraft.client.util.SpriteIdentifier
 import net.minecraft.util.registry.Registry
 import java.util.function.Function
 
+/**
+ * [ModelVariantProvider] implementation which enables usage of custom model classes.
+ */
 class FramityModelVariantProvider : ModelVariantProvider {
     private val variants: MutableMap<ModelIdentifier?, UnbakedModel> = mutableMapOf()
 
     override fun loadModelVariant(identifier: ModelIdentifier?, ctx: ModelProviderContext?) = variants[identifier]
 
+    /**
+     * Creates a new model for each block state of [block] and for [itemState].
+     */
     fun registerModels(
         block: Block,
         itemState: BlockState,

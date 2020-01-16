@@ -21,19 +21,37 @@ import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 import net.minecraft.world.IWorld
 
+/**
+ * [HorizontalConnectedFrame] subclass for fence frames.
+ */
 class FenceFrame : HorizontalConnectedFrame(CENTER_GEOMETRY, NORTH_GEOMETRY, CENTER_COLLISION, NORTH_COLLISION) {
     companion object {
+        /**
+         * Geometry for the center of a fence block.
+         */
         val CENTER_GEOMETRY: VoxelShape = VoxelShapes.cuboid(0.375, 0.0, 0.375, 0.625, 1.0, 0.625)
+        /**
+         * Geometry for the north of a fence block.
+         */
         val NORTH_GEOMETRY: VoxelShape = VoxelShapes.union(
             VoxelShapes.cuboid(0.4375, 0.75, 0.0, 0.5625, 0.9375, 0.5625),
             VoxelShapes.cuboid(0.4375, 0.375, 0.0, 0.5625, 0.5625, 0.5625)
         )
+        /**
+         * Collision for the center of a fence block.
+         */
         val CENTER_COLLISION: VoxelShape = VoxelShapes.cuboid(0.375, 0.0, 0.375, 0.625, 1.5, 0.625)
+        /**
+         * Collision for the north of a fence block.
+         */
         val NORTH_COLLISION: VoxelShape = VoxelShapes.union(
             VoxelShapes.cuboid(0.4375, 0.75, 0.0, 0.5625, 1.5, 0.5625),
             VoxelShapes.cuboid(0.4375, 0.375, 0.0, 0.5625, 0.5625, 0.5625)
         )
 
+        /**
+         * Generates the fence frame's item mesh.
+         */
         fun getItemMesh(renderer: Renderer) = renderer.buildMesh { qe ->
             qe.cube16(6f, 0f, 0f, 10f, 16f, 4f, -1)
                 .cube16(6f, 0f, 12f, 10f, 16f, 16f, -1)
@@ -64,6 +82,9 @@ class FenceFrame : HorizontalConnectedFrame(CENTER_GEOMETRY, NORTH_GEOMETRY, CEN
             ?.with(HorizontalConnectedBlock.WEST, this.canConnect(westState, westState.isSideSolidFullSquare(world, westPos, Direction.EAST), Direction.EAST))
     }
 
+    /**
+     * Fence frames can connect with any fence, gate, or full block.
+     */
     private fun canConnect(state: BlockState?, neighborIsFullSquare: Boolean?, dir: Direction): Boolean {
         return !canConnect(state?.block)
                 && (neighborIsFullSquare == true)

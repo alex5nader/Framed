@@ -16,6 +16,9 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 
+/**
+ * [WaterloggableFrame] subclass for slab frames.
+ */
 class SlabFrame : WaterloggableFrame() {
     companion object {
         val NORTH_SHAPE: VoxelShape = VoxelShapes.cuboid(0.0, 0.0, 0.0, 1.0, 1.0, 0.5)

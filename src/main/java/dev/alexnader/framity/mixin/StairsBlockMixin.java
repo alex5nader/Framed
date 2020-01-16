@@ -8,6 +8,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * Mixin for {@link StairsBlock} which enables modded blocks that don't extend
+ * from {@link StairsBlock} to be considered stairs. All classes which implement
+ * {@link IStairs} are considered stairs.
+ */
 @Mixin(StairsBlock.class)
 public class StairsBlockMixin {
     @Inject(method = "isStairs", at = @At(value = "HEAD"), cancellable = true)
