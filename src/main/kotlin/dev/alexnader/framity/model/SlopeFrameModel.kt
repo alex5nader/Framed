@@ -179,26 +179,26 @@ class SlopeFrameModel(
                 Direction.NORTH to mapOf(
                     StairShape.INNER_LEFT to nonCulledTri(Direction.NORTH)(1f, 0f, 1f)(1f, 1f, 0f)(0f, 1f, 0f),
                     StairShape.INNER_RIGHT to nonCulledTri(Direction.NORTH)(0f, 0f, 1f)(1f, 1f, 0f)(0f, 1f, 0f),
-                    StairShape.OUTER_LEFT to nonCulledTri(Direction.NORTH)(1f, 0f, 1f)(1f, 1f, 0f)(0f, 1f, 0f),
-                    StairShape.OUTER_RIGHT to nonCulledTri(Direction.NORTH)(0f, 0f, 1f)(1f, 1f, 0f)(0f, 1f, 0f)
+                    StairShape.OUTER_LEFT to nonCulledTri(Direction.NORTH)(0f, 1f, 0f)(1f, 1f, 0f)(1f, 0f, 1f),
+                    StairShape.OUTER_RIGHT to nonCulledTri(Direction.NORTH)(0f, 1f, 0f)(1f, 1f, 0f)(0f, 0f, 1f)
                 ),
                 Direction.EAST to mapOf(
                     StairShape.INNER_LEFT to nonCulledTri(Direction.EAST)(0f, 0f, 1f)(1f, 1f, 1f)(1f, 1f, 0f),
                     StairShape.INNER_RIGHT to nonCulledTri(Direction.EAST)(0f, 0f, 0f)(1f, 1f, 1f)(1f, 1f, 0f),
-                    StairShape.OUTER_LEFT to nonCulledTri(Direction.EAST)(0f, 0f, 1f)(1f, 1f, 1f)(1f, 1f, 0f),
-                    StairShape.OUTER_RIGHT to nonCulledTri(Direction.EAST)(0f, 0f, 0f)(1f, 1f, 1f)(1f, 1f, 0f)
+                    StairShape.OUTER_LEFT to nonCulledTri(Direction.EAST)(1f, 1f, 0f)(1f, 1f, 1f)(0f, 0f, 1f),
+                    StairShape.OUTER_RIGHT to nonCulledTri(Direction.EAST)(1f, 1f, 0f)(1f, 1f, 1f)(0f, 0f, 0f)
                 ),
                 Direction.SOUTH to mapOf(
                     StairShape.INNER_LEFT to nonCulledTri(Direction.SOUTH)(0f, 0f, 0f)(0f, 1f, 1f)(1f, 1f, 1f),
                     StairShape.INNER_RIGHT to nonCulledTri(Direction.SOUTH)(1f, 0f, 0f)(0f, 1f, 1f)(1f, 1f, 1f),
-                    StairShape.OUTER_LEFT to nonCulledTri(Direction.SOUTH)(0f, 0f, 0f)(0f, 1f, 1f)(1f, 1f, 1f),
-                    StairShape.OUTER_RIGHT to nonCulledTri(Direction.SOUTH)(1f, 0f, 0f)(0f, 1f, 1f)(1f, 1f, 1f)
+                    StairShape.OUTER_LEFT to nonCulledTri(Direction.SOUTH)(1f, 1f, 1f)(0f, 1f, 1f)(0f, 0f, 0f),
+                    StairShape.OUTER_RIGHT to nonCulledTri(Direction.SOUTH)(1f, 1f, 1f)(0f, 1f, 1f)(1f, 0f, 0f)
                 ),
                 Direction.WEST to mapOf(
                     StairShape.INNER_LEFT to nonCulledTri(Direction.WEST)(1f, 0f, 0f)(0f, 1f, 0f)(0f, 1f, 1f),
                     StairShape.INNER_RIGHT to nonCulledTri(Direction.WEST)(1f, 0f, 1f)(0f, 1f, 0f)(0f, 1f, 1f),
-                    StairShape.OUTER_LEFT to nonCulledTri(Direction.WEST)(1f, 0f, 0f)(0f, 1f, 0f)(0f, 1f, 1f),
-                    StairShape.OUTER_RIGHT to nonCulledTri(Direction.WEST)(1f, 0f, 1f)(0f, 1f, 0f)(0f, 1f, 1f)
+                    StairShape.OUTER_LEFT to nonCulledTri(Direction.WEST)(0f, 1f, 1f)(0f, 1f, 0f)(1f, 0f, 0f),
+                    StairShape.OUTER_RIGHT to nonCulledTri(Direction.WEST)(0f, 1f, 1f)(0f, 1f, 0f)(1f, 0f, 1f)
                 )
             ),
             Direction.UP to mapOf(
