@@ -3,6 +3,7 @@ package dev.alexnader.framity.block_entities
 import com.mojang.datafixers.Dynamic
 import dev.alexnader.framity.adapters.KtBlock
 import dev.alexnader.framity.adapters.KtBlockEntity
+import dev.alexnader.framity.data.OverlayKind
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity
 import net.fabricmc.fabric.api.server.PlayerStream
 import net.minecraft.block.Block
@@ -26,7 +27,7 @@ class FrameEntity<B: Block>(
     private val ktBlock: KtBlock<B>,
     type: KtBlockEntity<FrameEntity<B>>
 ): InventoryBlockEntity(
-    type.blockEntity, DefaultedList.ofSize(2, ItemStack.EMPTY)
+    type.blockEntity, DefaultedList.ofSize(3, ItemStack.EMPTY)
 ), RenderAttachmentBlockEntity {
     companion object {
         /**
@@ -37,7 +38,13 @@ class FrameEntity<B: Block>(
          * [Inventory][net.minecraft.inventory.Inventory] slot for glowstone dust.
          */
         const val GlowstoneSlot = 1
+        /**
+         * [Inventory][net.minecraft.inventory.Inventory] slot for overlay.
+         */
+        const val OverlaySlot = 2
     }
+
+    data class RenderAttachmentData(val containedState: BlockState, val overlayKind: OverlayKind)
 
     /**
      * The contained [BlockState].
@@ -71,6 +78,15 @@ class FrameEntity<B: Block>(
         }
 
     /**
+     * The [ItemStack] for the contained overlay.
+     */
+    var overlayStack
+        get() = this[OverlaySlot]
+        set(stack) {
+            this[OverlaySlot] = stack
+        }
+
+    /**
      * The index of the "rightmost" item in this frame which isn't empty.
      */
     val highestRemovePrioritySlot get() = this.items.indices.findLast { !this.items[it].isEmpty } ?: -1
@@ -87,7 +103,9 @@ class FrameEntity<B: Block>(
     /**
      * [RenderAttachmentBlockEntity] implementation returning the contained [BlockState].
      */
-    override fun getRenderAttachmentData() = this.containedState
+    override fun getRenderAttachmentData() = this.containedState?.let { containedState ->
+        RenderAttachmentData(containedState, OverlayKind.from(this.overlayStack.item) ?: OverlayKind.None)
+    }
 
     /**
      * Reads this frame's data from [tag].

@@ -11,7 +11,6 @@ import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView
 import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.texture.Sprite
@@ -25,6 +24,7 @@ import java.util.*
 import java.util.function.Supplier
 import arrow.syntax.function.andThen
 import dev.alexnader.framity.adapters.tag
+import dev.alexnader.framity.block_entities.FrameEntity
 
 /**
  * Flips a number in the range [0, 1] as if it were in the range [1, 0].
@@ -42,10 +42,11 @@ interface MeshTransformer : RenderContext.QuadTransform {
 
 /**
  * [MeshTransformer] implementor which copies the sprite data from a
- * [RenderAttachedBlockView] which returns [BlockState] and applies
- * them to the emitter being transformed.
+ * [RenderAttachedBlockView] which returns
+ * [RenderAttachmentData][dev.alexnader.framity.block_entities.FrameEntity.RenderAttachmentData]
+ * and applies them to the emitter being transformed.
  */
-class SpriteCopyTransformer(defaultSprite: Sprite) : MeshTransformer {
+class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
     companion object {
         private val CLIENT: MinecraftClient = MinecraftClient.getInstance()
         private val RENDERER: Renderer = RendererAccess.INSTANCE.renderer
@@ -73,10 +74,10 @@ class SpriteCopyTransformer(defaultSprite: Sprite) : MeshTransformer {
         }
 
         /**
-         * Lazily creates new [SpriteCopyTransformer] using [spriteId]'s sprite.
+         * Lazily creates new [FrameMeshTransformer] using [spriteId]'s sprite.
          */
         fun ofSprite(spriteId: SpriteIdentifier): () -> MeshTransformer = {
-            SpriteCopyTransformer(spriteId.sprite)
+            FrameMeshTransformer(spriteId.sprite)
         }
     }
 
@@ -91,19 +92,18 @@ class SpriteCopyTransformer(defaultSprite: Sprite) : MeshTransformer {
         pos: BlockPos?,
         randomSupplier: Supplier<Random>?
     ): MeshTransformer {
-        val attachment = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos)
+        val attachment = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as FrameEntity.RenderAttachmentData?
 
-        val template = (attachment ?: Blocks.AIR.defaultState) as BlockState
-        val block = template.block
-
-        if (block == Blocks.AIR) {
+        if (attachment == null) {
             sprites.clear()
             this.mat = MAT_FINDER.clear().blendMode(0, BlendMode.CUTOUT).find()
         } else {
+            val template = attachment.containedState
+
             this.mat = MAT_FINDER.clear().disableDiffuse(0, false).disableAo(0, false).blendMode(0, BlendMode.fromRenderLayer(RenderLayers.getBlockLayer(template))).find()
             val model = CLIENT.blockRenderManager.getModel(template)
             sprites.prepare(model, randomSupplier?.get())
-            val colorProvider = ColorProviderRegistry.BLOCK.get(block)
+            val colorProvider = ColorProviderRegistry.BLOCK.get(template.block)
             if (colorProvider != null) {
                 this.color = FULL_ALPHA or colorProvider.getColor(template, blockView, pos, 1)
             }

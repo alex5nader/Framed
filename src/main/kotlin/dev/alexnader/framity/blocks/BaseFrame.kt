@@ -2,21 +2,20 @@ package dev.alexnader.framity.blocks
 
 import dev.alexnader.framity.FRAMERS_HAMMER
 import dev.alexnader.framity.block_entities.FrameEntity
+import dev.alexnader.framity.data.OverlayKind
 import net.fabricmc.fabric.api.block.FabricBlockSettings
+import net.fabricmc.fabric.api.tag.TagRegistry
 import net.minecraft.block.*
 import net.minecraft.entity.EntityContext
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventory
-import net.minecraft.item.BlockItem
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.item.ItemUsageContext
-import net.minecraft.item.Items
+import net.minecraft.item.*
 import net.minecraft.sound.BlockSoundGroup
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.BooleanProperty
-import net.minecraft.util.ActionResult
-import net.minecraft.util.Hand
-import net.minecraft.util.ItemScatterer
+import net.minecraft.state.property.EnumProperty
+import net.minecraft.tag.Tag
+import net.minecraft.util.*
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
@@ -36,18 +35,29 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
         val HasGlowstone: BooleanProperty = BooleanProperty.of("has_glowstone")
 
         /**
+         * Property representing what overlay a frame has.
+         */
+        val OverlayKindProp: EnumProperty<OverlayKind> = EnumProperty.of("overlay", OverlayKind::class.java)
+
+        /**
          * Maps [BlockPos] to [PlayerEntity]. Should be empty except for when a frame is broken.
          */
         private val posToPlayer: MutableMap<BlockPos, PlayerEntity> = mutableMapOf()
+
+        /**
+         * The `framity:overlay_items` tag.
+         */
+        private val OverlayItemsTag: Tag<Item> = TagRegistry.item(Identifier("framity", "overlay_items"))
     }
 
     init {
-        this.defaultState = this.defaultState.with(HasGlowstone, false)
+        this.defaultState = this.defaultState.with(HasGlowstone, false).with(OverlayKindProp, OverlayKind.None)
     }
 
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>?) {
         super.appendProperties(builder)
         builder?.add(HasGlowstone)
+        builder?.add(OverlayKindProp)
     }
 
     /**
@@ -83,8 +93,20 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
     override fun onBlockRemoved(
         state: BlockState?, world: World?, pos: BlockPos?, newState: BlockState?, moved: Boolean
     ) {
-        if (state?.block != newState?.block) {
-            val blockEntity = world?.getBlockEntity(pos)
+        if (world == null || world.isClient || pos == null || pos !in posToPlayer || state == null) {
+            return
+        }
+
+        val player = posToPlayer[pos]!!
+
+        if (player.isSneaking && player.getStackInHand(player.activeHand).item == FRAMERS_HAMMER.item) {
+            if (onHammerRemove(world, world.getBlockEntity(pos) as FrameEntity<*>, state, player, false)) {
+                world.setBlockState(pos, state, 3)
+            }
+
+            posToPlayer.remove(pos)
+        } else if (state.block != newState?.block) {
+            val blockEntity = world.getBlockEntity(pos)
 
             if (blockEntity is Inventory) {
                 ItemScatterer.spawn(world, pos, blockEntity)
@@ -105,14 +127,17 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
     /**
      * Called on server when left clicked by a player holding a framer's hammer.
      * Removes the "rightmost" item from [frameEntity].
+     * Returns false if the frame should be removed, true otherwise.
      */
-    private fun onHammerRemove(world: World, frameEntity: FrameEntity<*>, frameState: BlockState, player: PlayerEntity, giveItem: Boolean) {
+    private fun onHammerRemove(world: World, frameEntity: FrameEntity<*>, frameState: BlockState, player: PlayerEntity, giveItem: Boolean): Boolean {
         val slot = frameEntity.highestRemovePrioritySlot
         val stackFromBlock = frameEntity.takeInvStack(slot, 1)
 
         when (slot) {
             FrameEntity.ContainedSlot -> frameEntity.containedState = null
             FrameEntity.GlowstoneSlot -> world.setBlockState(frameEntity.pos, frameState.with(HasGlowstone, false))
+            FrameEntity.OverlaySlot -> world.setBlockState(frameEntity.pos, frameState.with(OverlayKindProp, OverlayKind.None))
+            -1 -> return false
         }
 
         if (giveItem) {
@@ -120,6 +145,8 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
         }
 
         frameEntity.sync()
+
+        return true
     }
 
     /**
@@ -152,28 +179,6 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
     }
 
     /**
-     * Reads the player who broke a frame at [pos], calls [onHammerRemove]
-     * with that player, and replaces the block at [pos].
-     */
-    override fun onBroken(world: IWorld?, pos: BlockPos?, state: BlockState?) {
-        super.onBroken(world, pos, state)
-
-        if (world == null || world.isClient || pos == null || pos !in posToPlayer || state == null) {
-            return
-        }
-
-        val player = posToPlayer[pos]!!
-
-        if (player.isSneaking && player.getStackInHand(player.activeHand).item == FRAMERS_HAMMER.item) {
-            world.setBlockState(pos, state, 3)
-
-            onHammerRemove(world as World, world.getBlockEntity(pos) as FrameEntity<*>, state, player, false)
-
-            posToPlayer.remove(pos)
-        }
-    }
-
-    /**
      * Adds an item to the frame.
      */
     override fun onUse(
@@ -183,11 +188,15 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
 
         val frameEntity = world?.getBlockEntity(pos) as FrameEntity<*>
 
-        println("size: ${frameEntity.capacity}")
-
         val playerStack = player?.getStackInHand(hand)!!
 
-        return if (playerStack.item is BlockItem && playerStack.item != frameEntity.item && playerStack.item !is BaseFrame) {
+        return if (playerStack.item.isIn(OverlayItemsTag) && frameEntity.overlayStack.isEmpty) {
+            frameEntity.copyFrom(FrameEntity.OverlaySlot, playerStack, 1, !player.isCreative)
+
+            world.setBlockState(pos, state?.with(OverlayKindProp, OverlayKind.from(frameEntity.overlayStack.item)!!))
+
+            ActionResult.SUCCESS
+        } else if (playerStack.item is BlockItem && playerStack.item != frameEntity.item && playerStack.item !is BaseFrame) {
             val playerBlock = (playerStack.item as BlockItem).block
 
             if (!frameEntity.containedStack.isEmpty) {
@@ -210,12 +219,12 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
                 return ActionResult.CONSUME
             }
 
-            frameEntity.copyFrom(FrameEntity.ContainedSlot, playerStack, 1, take = !player.isCreative)
+            frameEntity.copyFrom(FrameEntity.ContainedSlot, playerStack, 1, !player.isCreative)
             frameEntity.containedState = containedState
 
             ActionResult.SUCCESS
         } else if (playerStack.item == Items.GLOWSTONE_DUST && frameEntity.glowstoneStack.isEmpty) {
-            frameEntity.copyFrom(FrameEntity.GlowstoneSlot, playerStack, 1, take = !player.isCreative)
+            frameEntity.copyFrom(FrameEntity.GlowstoneSlot, playerStack, 1, !player.isCreative)
 
             world.setBlockState(pos, state?.with(HasGlowstone, true))
 

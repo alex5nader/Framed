@@ -74,7 +74,7 @@ fun <B: Block> registerModel(
     MODEL_VARIANT_PROVIDER.registerModels(
         ktBlock.block,
         ktBlock.block.defaultState,
-        model(ktBlock.block)(properties)(sprites[0])(SpriteCopyTransformer.ofSprite(sprites[0])).uncurried(),
+        model(ktBlock.block)(properties)(sprites[0])(FrameMeshTransformer.ofSprite(sprites[0])).uncurried(),
         sprites
     )
 }
