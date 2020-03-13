@@ -93,15 +93,17 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
     override fun onBlockRemoved(
         state: BlockState?, world: World?, pos: BlockPos?, newState: BlockState?, moved: Boolean
     ) {
-        if (world == null || world.isClient || pos == null || pos !in posToPlayer || state == null) {
+        if (world == null || world.isClient || pos == null || state == null) {
             return
         }
 
-        val player = posToPlayer[pos]!!
+        if (pos in posToPlayer) {
+            val player = posToPlayer[pos]!!
 
-        if (player.isSneaking && player.getStackInHand(player.activeHand).item == FRAMERS_HAMMER.item) {
-            if (onHammerRemove(world, world.getBlockEntity(pos) as FrameEntity<*>, state, player, false)) {
-                world.setBlockState(pos, state, 3)
+            if (player.isCreative && player.isSneaking && player.getStackInHand(player.activeHand).item == FRAMERS_HAMMER.item) {
+                if (onHammerRemove(world, world.getBlockEntity(pos) as FrameEntity<*>, state, player, false)) {
+                    world.setBlockState(pos, state, 3)
+                }
             }
 
             posToPlayer.remove(pos)
