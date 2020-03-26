@@ -21,7 +21,6 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
-import net.minecraft.world.IWorld
 import net.minecraft.world.World
 
 /**
@@ -93,7 +92,7 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
     override fun onBlockRemoved(
         state: BlockState?, world: World?, pos: BlockPos?, newState: BlockState?, moved: Boolean
     ) {
-        if (world == null || world.isClient || pos == null || state == null) {
+        if (world == null || world.isClient || pos == null || state == null || state.block == newState?.block) {
             return
         }
 
@@ -101,13 +100,11 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
             val player = posToPlayer[pos]!!
 
             if (player.isCreative && player.isSneaking && player.getStackInHand(player.activeHand).item == FRAMERS_HAMMER.item) {
-                if (onHammerRemove(world, world.getBlockEntity(pos) as FrameEntity<*>, state, player, false)) {
-                    world.setBlockState(pos, state, 3)
-                }
+                onHammerRemove(world, world.getBlockEntity(pos) as FrameEntity<*>, state, player, false)
             }
 
             posToPlayer.remove(pos)
-        } else if (state.block != newState?.block) {
+        } else {
             val blockEntity = world.getBlockEntity(pos)
 
             if (blockEntity is Inventory) {
@@ -135,12 +132,22 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
         val slot = frameEntity.highestRemovePrioritySlot
         val stackFromBlock = frameEntity.takeInvStack(slot, 1)
 
-        when (slot) {
-            FrameEntity.ContainedSlot -> frameEntity.containedState = null
-            FrameEntity.GlowstoneSlot -> world.setBlockState(frameEntity.pos, frameState.with(HasGlowstone, false))
-            FrameEntity.OverlaySlot -> world.setBlockState(frameEntity.pos, frameState.with(OverlayKindProp, OverlayKind.None))
-            -1 -> return false
+        if (slot == -1) {
+            return false
         }
+
+        if (slot == FrameEntity.ContainedSlot) {
+            frameEntity.containedState = null
+        }
+
+        val changedState = when (slot) {
+            FrameEntity.ContainedSlot -> frameState
+            FrameEntity.GlowstoneSlot -> frameState.with(HasGlowstone, false)
+            FrameEntity.OverlaySlot -> frameState.with(OverlayKindProp, OverlayKind.None)
+            else -> throw RuntimeException("unreachable")
+        }
+
+        world.setBlockState(frameEntity.pos, changedState)
 
         if (giveItem) {
             player.inventory.offerOrDrop(world, stackFromBlock)
