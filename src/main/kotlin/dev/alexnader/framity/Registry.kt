@@ -87,7 +87,7 @@ class Mod(private val id: String) {
         for (ktBlockEntity in this.blockEntities) {
             val id = Identifier(this.id, ktBlockEntity.id)
             println("Registering $id")
-            Registry.register(Registry.BLOCK_ENTITY, id, ktBlockEntity.blockEntity)
+            Registry.register(Registry.BLOCK_ENTITY_TYPE, id, ktBlockEntity.blockEntity)
         }
 
         FabricItemGroupBuilder

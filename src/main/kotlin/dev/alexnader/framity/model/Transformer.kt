@@ -1,7 +1,7 @@
 package dev.alexnader.framity.model
 
 import dev.alexnader.framity.util.SpriteSet
-import net.fabricmc.fabric.api.client.render.ColorProviderRegistry
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
 import net.fabricmc.fabric.api.renderer.v1.Renderer
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode

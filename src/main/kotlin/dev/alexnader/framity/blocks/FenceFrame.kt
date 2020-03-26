@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.renderer.v1.Renderer
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.FenceGateBlock
-import net.minecraft.block.HorizontalConnectedBlock
+import net.minecraft.block.HorizontalConnectingBlock
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.Properties
@@ -76,17 +76,17 @@ class FenceFrame : HorizontalConnectedFrame(CENTER_GEOMETRY, NORTH_GEOMETRY, CEN
         val southState = world.getBlockState(southPos)
         val westState = world.getBlockState(westPos)
         return super.getPlacementState(ctx)
-            ?.with(HorizontalConnectedBlock.NORTH, this.canConnect(northState, northState.isSideSolidFullSquare(world, northPos, Direction.SOUTH), Direction.SOUTH))
-            ?.with(HorizontalConnectedBlock.EAST, this.canConnect(eastState, eastState.isSideSolidFullSquare(world, eastPos, Direction.WEST), Direction.WEST))
-            ?.with(HorizontalConnectedBlock.SOUTH, this.canConnect(southState, southState.isSideSolidFullSquare(world, southPos, Direction.NORTH), Direction.NORTH))
-            ?.with(HorizontalConnectedBlock.WEST, this.canConnect(westState, westState.isSideSolidFullSquare(world, westPos, Direction.EAST), Direction.EAST))
+            ?.with(HorizontalConnectingBlock.NORTH, this.canConnect(northState, northState.isSideSolidFullSquare(world, northPos, Direction.SOUTH), Direction.SOUTH))
+            ?.with(HorizontalConnectingBlock.EAST, this.canConnect(eastState, eastState.isSideSolidFullSquare(world, eastPos, Direction.WEST), Direction.WEST))
+            ?.with(HorizontalConnectingBlock.SOUTH, this.canConnect(southState, southState.isSideSolidFullSquare(world, southPos, Direction.NORTH), Direction.NORTH))
+            ?.with(HorizontalConnectingBlock.WEST, this.canConnect(westState, westState.isSideSolidFullSquare(world, westPos, Direction.EAST), Direction.EAST))
     }
 
     /**
      * Fence frames can connect with any fence, gate, or full block.
      */
     private fun canConnect(state: BlockState?, neighborIsFullSquare: Boolean?, dir: Direction): Boolean {
-        return !canConnect(state?.block)
+        return !cannotConnect(state?.block)
                 && (neighborIsFullSquare == true)
                 || (state?.block?.matches(BlockTags.FENCES) == true && state.material == this.material)
                 || (state?.block is FenceGateBlock && FenceGateBlock.canWallConnect(state, dir))
@@ -95,10 +95,10 @@ class FenceFrame : HorizontalConnectedFrame(CENTER_GEOMETRY, NORTH_GEOMETRY, CEN
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>?) {
         super.appendProperties(builder)
         builder?.add(Properties.UP)
-        builder?.add(HorizontalConnectedBlock.NORTH)
-        builder?.add(HorizontalConnectedBlock.EAST)
-        builder?.add(HorizontalConnectedBlock.SOUTH)
-        builder?.add(HorizontalConnectedBlock.WEST)
+        builder?.add(HorizontalConnectingBlock.NORTH)
+        builder?.add(HorizontalConnectingBlock.EAST)
+        builder?.add(HorizontalConnectingBlock.SOUTH)
+        builder?.add(HorizontalConnectingBlock.WEST)
     }
 
     override fun getStateForNeighborUpdate(

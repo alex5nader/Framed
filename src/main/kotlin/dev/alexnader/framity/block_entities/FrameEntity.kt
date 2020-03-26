@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.server.PlayerStream
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.client.MinecraftClient
-import net.minecraft.datafixers.NbtOps
+import net.minecraft.datafixer.NbtOps
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompoundTag

@@ -11,7 +11,7 @@ import grondag.fermion.client.models.AbstractModel
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
-import net.minecraft.block.HorizontalConnectedBlock
+import net.minecraft.block.HorizontalConnectingBlock
 import net.minecraft.block.StairsBlock
 import net.minecraft.client.texture.Sprite
 import net.minecraft.client.texture.SpriteAtlasTexture
@@ -103,7 +103,7 @@ fun clientInit() {
     registerModel(
         FENCE_FRAME,
         listOf(FULL_FRAME_ID),
-        listOf(HorizontalConnectedBlock.NORTH, HorizontalConnectedBlock.EAST, HorizontalConnectedBlock.SOUTH, HorizontalConnectedBlock.WEST),
+        listOf(HorizontalConnectingBlock.NORTH, HorizontalConnectingBlock.EAST, HorizontalConnectingBlock.SOUTH, HorizontalConnectingBlock.WEST),
         (::CustomItemFramityVoxelModel).curried()((FenceFrame)::getItemMesh)
     )
     registerModel(

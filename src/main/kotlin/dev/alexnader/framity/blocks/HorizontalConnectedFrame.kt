@@ -7,7 +7,7 @@ import dev.alexnader.framity.util.enumMapOf
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import net.minecraft.block.BlockPlacementEnvironment
 import net.minecraft.block.BlockState
-import net.minecraft.block.HorizontalConnectedBlock
+import net.minecraft.block.HorizontalConnectingBlock
 import net.minecraft.entity.EntityContext
 import net.minecraft.state.property.BooleanProperty
 import net.minecraft.state.property.Properties
@@ -32,14 +32,14 @@ abstract class HorizontalConnectedFrame(
 
     companion object {
         /**
-         * Maps a horizontal direction to its corresponding [HorizontalConnectedBlock] property.
+         * Maps a horizontal direction to its corresponding [HorizontalConnectingBlock] property.
          */
         @JvmStatic
         protected val FACING_PROPERTIES: Map<Direction, BooleanProperty> = enumMapOf(
-            Pair(Direction.NORTH, HorizontalConnectedBlock.NORTH),
-            Pair(Direction.EAST, HorizontalConnectedBlock.EAST),
-            Pair(Direction.SOUTH, HorizontalConnectedBlock.SOUTH),
-            Pair(Direction.WEST, HorizontalConnectedBlock.WEST)
+            Pair(Direction.NORTH, HorizontalConnectingBlock.NORTH),
+            Pair(Direction.EAST, HorizontalConnectingBlock.EAST),
+            Pair(Direction.SOUTH, HorizontalConnectingBlock.SOUTH),
+            Pair(Direction.WEST, HorizontalConnectingBlock.WEST)
         )
 
         /**
@@ -119,30 +119,30 @@ abstract class HorizontalConnectedFrame(
 
     override fun rotate(state: BlockState?, rotation: BlockRotation?) = when (rotation) {
         BlockRotation.CLOCKWISE_90 -> state
-            ?.with(HorizontalConnectedBlock.NORTH, state.get(HorizontalConnectedBlock.WEST))
-            ?.with(HorizontalConnectedBlock.EAST, state.get(HorizontalConnectedBlock.NORTH))
-            ?.with(HorizontalConnectedBlock.SOUTH, state.get(HorizontalConnectedBlock.EAST))
-            ?.with(HorizontalConnectedBlock.WEST, state.get(HorizontalConnectedBlock.SOUTH))
+            ?.with(HorizontalConnectingBlock.NORTH, state.get(HorizontalConnectingBlock.WEST))
+            ?.with(HorizontalConnectingBlock.EAST, state.get(HorizontalConnectingBlock.NORTH))
+            ?.with(HorizontalConnectingBlock.SOUTH, state.get(HorizontalConnectingBlock.EAST))
+            ?.with(HorizontalConnectingBlock.WEST, state.get(HorizontalConnectingBlock.SOUTH))
         BlockRotation.CLOCKWISE_180 -> state
-            ?.with(HorizontalConnectedBlock.NORTH, state.get(HorizontalConnectedBlock.SOUTH))
-            ?.with(HorizontalConnectedBlock.EAST, state.get(HorizontalConnectedBlock.WEST))
-            ?.with(HorizontalConnectedBlock.SOUTH, state.get(HorizontalConnectedBlock.NORTH))
-            ?.with(HorizontalConnectedBlock.WEST, state.get(HorizontalConnectedBlock.EAST))
+            ?.with(HorizontalConnectingBlock.NORTH, state.get(HorizontalConnectingBlock.SOUTH))
+            ?.with(HorizontalConnectingBlock.EAST, state.get(HorizontalConnectingBlock.WEST))
+            ?.with(HorizontalConnectingBlock.SOUTH, state.get(HorizontalConnectingBlock.NORTH))
+            ?.with(HorizontalConnectingBlock.WEST, state.get(HorizontalConnectingBlock.EAST))
         BlockRotation.COUNTERCLOCKWISE_90 -> state
-            ?.with(HorizontalConnectedBlock.NORTH, state.get(HorizontalConnectedBlock.EAST))
-            ?.with(HorizontalConnectedBlock.EAST, state.get(HorizontalConnectedBlock.SOUTH))
-            ?.with(HorizontalConnectedBlock.SOUTH, state.get(HorizontalConnectedBlock.WEST))
-            ?.with(HorizontalConnectedBlock.WEST, state.get(HorizontalConnectedBlock.NORTH))
+            ?.with(HorizontalConnectingBlock.NORTH, state.get(HorizontalConnectingBlock.EAST))
+            ?.with(HorizontalConnectingBlock.EAST, state.get(HorizontalConnectingBlock.SOUTH))
+            ?.with(HorizontalConnectingBlock.SOUTH, state.get(HorizontalConnectingBlock.WEST))
+            ?.with(HorizontalConnectingBlock.WEST, state.get(HorizontalConnectingBlock.NORTH))
         else -> state
     }
 
     override fun mirror(state: BlockState?, mirror: BlockMirror?) = when (mirror) {
         BlockMirror.LEFT_RIGHT -> state
-            ?.with(HorizontalConnectedBlock.NORTH, state.get(HorizontalConnectedBlock.SOUTH))
-            ?.with(HorizontalConnectedBlock.SOUTH, state.get(HorizontalConnectedBlock.NORTH))
+            ?.with(HorizontalConnectingBlock.NORTH, state.get(HorizontalConnectingBlock.SOUTH))
+            ?.with(HorizontalConnectingBlock.SOUTH, state.get(HorizontalConnectingBlock.NORTH))
         BlockMirror.FRONT_BACK -> state
-            ?.with(HorizontalConnectedBlock.EAST, state.get(HorizontalConnectedBlock.WEST))
-            ?.with(HorizontalConnectedBlock.WEST, state.get(HorizontalConnectedBlock.EAST))
+            ?.with(HorizontalConnectingBlock.EAST, state.get(HorizontalConnectingBlock.WEST))
+            ?.with(HorizontalConnectingBlock.WEST, state.get(HorizontalConnectingBlock.EAST))
         else -> @Suppress("deprecation") super.mirror(state, mirror)
     }
 
