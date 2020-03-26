@@ -11,17 +11,23 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventory
 import net.minecraft.item.*
 import net.minecraft.sound.BlockSoundGroup
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvents
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.BooleanProperty
 import net.minecraft.state.property.EnumProperty
 import net.minecraft.tag.Tag
-import net.minecraft.util.*
+import net.minecraft.util.ActionResult
+import net.minecraft.util.Hand
+import net.minecraft.util.Identifier
+import net.minecraft.util.ItemScatterer
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
+import kotlin.random.Random
 
 /**
  * Base class for frame blocks.
@@ -146,6 +152,10 @@ abstract class BaseFrame: BlockWithEntity(FabricBlockSettings.of(Material.WOOD).
             FrameEntity.OverlaySlot -> frameState.with(OverlayKindProp, OverlayKind.None)
             else -> throw RuntimeException("unreachable")
         }
+
+        world.playSound(null, frameEntity.pos, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS,
+            0.2f,
+            (Random.nextFloat() - Random.nextFloat()) * 1.4F + 2.0F)
 
         world.setBlockState(frameEntity.pos, changedState)
 
