@@ -24,9 +24,12 @@ The features below are in no particular order, and are not guaranteed to be adde
     - Hay
     - Vines
 - Frame blocks
-    - ✔ Fence
+    - ✔ Full block
+    - ✔ Slab
+    - ✔ Stairs
+    - Fence
     - Fence gate
-    - ✔ Slope
+    - Slope
     - Bed
     - Flower pot
     - Door
