@@ -1,14 +1,12 @@
 package dev.alexnader.framity
 
-import dev.alexnader.framity.adapters.WithId
+import dev.alexnader.framity.util.WithId
 import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.blocks.*
 import dev.alexnader.framity.items.FramersHammer
 import dev.alexnader.framity.mixin.AccessibleStairsBlock
 import dev.alexnader.framity.model.v2.FramityModelVariantProvider
 import net.fabricmc.fabric.api.`object`.builder.v1.block.FabricBlockSettings
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
-import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry
 import net.minecraft.block.*
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.texture.SpriteAtlasTexture
@@ -21,6 +19,7 @@ val MOD = Mod("framity", FramityModelVariantProvider())
     .itemGroup("framity") { ItemStack(FRAMERS_HAMMER.value) }
     .done()
 
+@Suppress("unused")
 val UV_TEST = MOD.block("uv_test", Block(FabricBlockSettings.of(Material.STONE)))
 
 @JvmField

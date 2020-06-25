@@ -1,9 +1,7 @@
 package dev.alexnader.framity.block_entities
 
 import com.mojang.serialization.Dynamic
-import dev.alexnader.framity.adapters.KtBlock
-import dev.alexnader.framity.adapters.KtBlockEntity
-import dev.alexnader.framity.adapters.WithId
+import dev.alexnader.framity.util.WithId
 import dev.alexnader.framity.data.OverlayKind
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity
@@ -13,7 +11,6 @@ import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.client.MinecraftClient
 import net.minecraft.datafixer.NbtOps
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompoundTag
@@ -31,7 +28,7 @@ class FrameEntity<B: Block>(
     private val ktBlock: WithId<B>,
     type: WithId<BlockEntityType<FrameEntity<B>>>
 ): InventoryBlockEntity(
-    type.value, DefaultedList.ofSize(3, ItemStack.EMPTY), ktBlock.value.defaultState
+    type.value, DefaultedList.ofSize(3, ItemStack.EMPTY)
 ), RenderAttachmentBlockEntity, BlockEntityClientSerializable {
     companion object {
         /**
@@ -92,15 +89,6 @@ class FrameEntity<B: Block>(
      * The index of the "rightmost" item in this frame which isn't empty.
      */
     val highestRemovePrioritySlot get() = this.items.indices.findLast { !this.items[it].isEmpty } ?: -1
-
-    /**
-     * The "rightmost" [ItemStack] in this frame which isn't empty.
-     */
-    var highestRemovePriority
-        get() = this[this.highestRemovePrioritySlot]
-        set(stack) {
-            this[this.highestRemovePrioritySlot] = stack
-        }
 
     /**
      * [RenderAttachmentBlockEntity] implementation returning the contained [BlockState].

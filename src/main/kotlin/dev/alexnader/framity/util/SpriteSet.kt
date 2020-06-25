@@ -43,8 +43,6 @@ class SpriteSet(private val defaultSprite: Sprite) {
         }
     }
 
-    fun getQuads(dir: Direction) = this.quads[dir]
-
     operator fun get(dir: Direction, index: Int): Sprite {
         return if (this.isDefault) {
             defaultSprite

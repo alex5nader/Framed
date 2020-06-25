@@ -1,4 +1,4 @@
-package dev.alexnader.framity.adapters
+package dev.alexnader.framity.util
 
 import net.minecraft.inventory.Inventories
 import net.minecraft.inventory.Inventory

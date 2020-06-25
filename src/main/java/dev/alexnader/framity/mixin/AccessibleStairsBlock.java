@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(StairsBlock.class)
 public interface AccessibleStairsBlock {
+    @SuppressWarnings("SameReturnValue")
     @Invoker("<init>")
     static StairsBlock create(@SuppressWarnings("unused") BlockState baseBlockState, @SuppressWarnings("unused") AbstractBlock.Settings settings) {
         return null;

@@ -1,11 +1,10 @@
 package dev.alexnader.framity
 
-import dev.alexnader.framity.adapters.WithId
+import dev.alexnader.framity.util.WithId
 import dev.alexnader.framity.model.v2.FramityModelVariantProvider
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry
-import net.fabricmc.fabric.api.client.model.ModelVariantProvider
 import net.minecraft.block.Block
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityType
@@ -33,7 +32,7 @@ class Mod(private val modId: String, private val modelVariantProvider: FramityMo
     private val blockItems: MutableMap<String, BlockItemInfo> = mutableMapOf()
     private val blockEntities: MutableMap<String, BlockEntityInfo<*>> = mutableMapOf()
 
-    inner class ItemGroupBuilder(private val id: String, private val icon: () -> ItemStack) {
+    inner class ItemGroupBuilder(private val id: String, icon: () -> ItemStack) {
         init {
             this@Mod.itemGroups[this.id] = ItemGroupInfo(mutableListOf(), icon)
         }
@@ -83,7 +82,10 @@ class Mod(private val modId: String, private val modelVariantProvider: FramityMo
     fun <E: BlockEntity> blockEntity(id: String, constructor: (WithId<Block>, WithId<BlockEntityType<E>>) -> E, block: WithId<Block>): WithId<BlockEntityType<E>> {
 
         lateinit var blockEntityType: WithId<BlockEntityType<E>>
-        blockEntityType = WithId(id, BlockEntityType.Builder.create(Supplier { constructor(block, blockEntityType) }).build(null))
+        blockEntityType = WithId(
+            id,
+            BlockEntityType.Builder.create(Supplier { constructor(block, blockEntityType) }).build(null)
+        )
         this.blockEntities[id] = BlockEntityInfo(blockEntityType.value)
         return blockEntityType
     }

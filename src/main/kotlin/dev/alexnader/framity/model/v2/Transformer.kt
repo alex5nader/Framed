@@ -24,16 +24,12 @@ import java.util.*
 import java.util.function.Supplier
 import dev.alexnader.framity.data.OverlayKind
 import dev.alexnader.framity.util.andThen
-import net.minecraft.client.render.model.BakedModel
 import net.minecraft.client.texture.SpriteAtlasTexture
 
 /**
  * Flips a number in the range [0, 1] as if it were in the range [1, 0].
  */
 fun flip(f: Float) = 1 - f
-
-private fun BakedModel.quadCount(state: BlockState, random: Random?): Int =
-    Direction.values().map { this.getQuads(state, it, random).size }.fold(this.getQuads(state, null, random).size, Int::plus)
 
 /**
  * [RenderContext.QuadTransform] sub-interface which gives the ability
@@ -46,9 +42,7 @@ interface MeshTransformer : RenderContext.QuadTransform {
 
 /**
  * [MeshTransformer] implementor which copies the sprite data from a
- * [RenderAttachedBlockView] which returns
- * [RenderAttachmentData][dev.alexnader.framity.block_entities.FrameEntity.RenderAttachmentData]
- * and applies them to the emitter being transformed.
+ * [RenderAttachedBlockView] and applies them to the emitter being transformed.
  */
 class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
     companion object {
@@ -110,13 +104,6 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
                         v(3)
                     ), sprite.minV, sprite.maxV))
         }
-
-        /**
-         * Lazily creates new [FrameMeshTransformer] using [spriteId]'s sprite.
-         */
-        fun ofSprite(spriteId: SpriteIdentifier): () -> MeshTransformer = {
-            FrameMeshTransformer(spriteId.sprite)
-        }
     }
 
     private val sprites = SpriteSet(defaultSprite)
@@ -128,6 +115,7 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
     private var color = 0
     private var mat: RenderMaterial? = null
 
+    @Suppress("UNCHECKED_CAST")
     override fun prepare(
         blockView: BlockRenderView?,
         state: BlockState?,
@@ -198,10 +186,12 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
             val sprite = when (direction) {
                 Direction.UP -> {
                     println("Getting top overlay texture")
+                    @Suppress("deprecation")
                     CLIENT.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX).apply(this.overlayKind.sprites?.top)
                 }
                 Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST -> {
                     println("Getting side overlay texture")
+                    @Suppress("deprecation")
                     CLIENT.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX).apply(this.overlayKind.sprites?.sides)
                 }
                 Direction.DOWN, null -> return false.also { println("3") }

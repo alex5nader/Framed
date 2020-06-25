@@ -9,11 +9,7 @@ import net.minecraft.client.render.model.UnbakedModel
 import net.minecraft.client.util.ModelIdentifier
 import net.minecraft.client.util.SpriteIdentifier
 import net.minecraft.state.property.Property
-import net.minecraft.util.Identifier
 import net.minecraft.util.registry.Registry
-
-private fun ModelIdentifier.applyPrefix(prefix: String): ModelIdentifier =
-    ModelIdentifier(Identifier(this.namespace, prefix + this.path), this.variant)
 
 class FramityModelVariantProvider : ModelVariantProvider {
     companion object {
@@ -38,11 +34,13 @@ class FramityModelVariantProvider : ModelVariantProvider {
 
         delegateBlock.stateManager.states.forEach { delegateState ->
             val importantState = delegateState.properties.fold(targetBlock.stateManager.defaultState, { acc, prop ->
+                @Suppress("UNCHECKED_CAST")
                 copyProperty(prop as Property<Comparable<Comparable<*>>>, delegateState, acc)
             })
 
             unimportantProduct.forEach { unimportantTargetState ->
                 val targetState = unimportantTargetState.fold(importantState, { acc, (prop, v) ->
+                    @Suppress("UNCHECKED_CAST")
                     acc.with(prop as Property<Comparable<Comparable<*>>>, v as Comparable<Comparable<*>>)
                 })
 

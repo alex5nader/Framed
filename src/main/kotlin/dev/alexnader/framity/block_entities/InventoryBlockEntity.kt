@@ -1,6 +1,6 @@
 package dev.alexnader.framity.block_entities
 
-import dev.alexnader.framity.adapters.KtInventory
+import dev.alexnader.framity.util.KtInventory
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
@@ -18,9 +18,9 @@ import kotlin.math.min
  */
 abstract class InventoryBlockEntity(
     type: BlockEntityType<out BlockEntity>,
-    override val items: DefaultedList<ItemStack>,
-    private val defaultState: BlockState
-): BlockEntity(type), BlockEntityClientSerializable, KtInventory<DefaultedList<ItemStack>> {
+    override val items: DefaultedList<ItemStack>
+): BlockEntity(type), BlockEntityClientSerializable,
+    KtInventory<DefaultedList<ItemStack>> {
     /**
      * Reads this inventory's contents from [tag].
      */
