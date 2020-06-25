@@ -7,6 +7,11 @@ import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
 
 /**
+ * Wrapper type for objects that stores an id.
+ */
+data class WithId<T>(val id: String, val value: T)
+
+/**
  * Wrapper type for [Item] subclasses which stores the item's id.
  */
 data class KtItem<out I: Item>(val item: I, val id: String)

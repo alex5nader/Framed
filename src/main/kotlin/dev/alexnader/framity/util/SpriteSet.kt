@@ -24,37 +24,40 @@ class SpriteSet(private val defaultSprite: Sprite) {
                 .apply(MissingSprite.getMissingSpriteId())
     }
 
-    private val quads = HashMap<Direction?, BakedQuad>()
-    private var default = true
+    private val quads = HashMap<Direction?, List<BakedQuad>>()
+    var isDefault = true
+        private set
 
     fun clear() {
-        default = true
+        isDefault = true
     }
 
     fun prepare(model: BakedModel, rand: Random?) {
         this.quads.clear()
-        default = false
+        isDefault = false
 
         (0..6).map(ModelHelper::faceFromIndex).forEach { dir ->
             model.getQuads(null, dir, rand)
                 ?.takeIf { it.isNotEmpty() }
-                ?.let { this.quads[dir] = it[0] }
+                ?.let { this.quads[dir] = mutableListOf<BakedQuad>().apply { this.addAll(it) } }
         }
     }
 
-    operator fun get(dir: Direction): Sprite {
-        return if (this.default) {
+    fun getQuads(dir: Direction) = this.quads[dir]
+
+    operator fun get(dir: Direction, index: Int): Sprite {
+        return if (this.isDefault) {
             defaultSprite
         } else {
-            (this.quads[dir] as AccessibleBakedQuad?)?.sprite ?: FALLBACK_SPRITE
+            (this.quads[dir]?.getOrNull(index) as AccessibleBakedQuad?)?.sprite ?: FALLBACK_SPRITE
         }
     }
 
-    fun hasColor(dir: Direction): Boolean {
-        return if (this.default) {
+    fun hasColor(dir: Direction, index: Int): Boolean {
+        return if (this.isDefault) {
             false
         } else {
-            this.quads[dir]?.hasColor() ?: false
+            this.quads[dir]?.getOrNull(index)?.hasColor() ?: false
         }
     }
 }

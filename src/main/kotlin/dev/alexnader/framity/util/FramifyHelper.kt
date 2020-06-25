@@ -1,0 +1,89 @@
+package dev.alexnader.framity.util
+
+import dev.alexnader.framity.block_entities.FrameEntity
+import dev.alexnader.framity.data.OverlayKind
+import net.fabricmc.fabric.api.tag.TagRegistry
+import net.minecraft.block.Block
+import net.minecraft.block.BlockState
+import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.Item
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvents
+import net.minecraft.state.property.BooleanProperty
+import net.minecraft.state.property.EnumProperty
+import net.minecraft.tag.Tag
+import net.minecraft.util.Identifier
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.World
+import kotlin.random.Random
+
+/**
+ * Property representing whether or not a frame should give off light.
+ */
+@JvmField
+val HasGlowstone: BooleanProperty = BooleanProperty.of("has_glowstone")
+
+/**
+ * Property representing what overlay a frame has.
+ */
+@JvmField
+val OverlayKindProp: EnumProperty<OverlayKind> = EnumProperty.of("overlay", OverlayKind::class.java)
+
+/**
+ * Maps [BlockPos] to [PlayerEntity]. Should be empty except for when a frame is broken.
+ */
+@JvmField
+val posToPlayer: MutableMap<BlockPos, PlayerEntity> = mutableMapOf()
+
+/**
+ * The `framity:overlay_items` tag.
+ */
+@JvmField
+val OverlayItemsTag: Tag<Item> = TagRegistry.item(Identifier("framity", "overlay_items"))
+
+/**
+ * The `framity:frames` tag.
+ */
+@JvmField
+val FramesTag: Tag<Block> = TagRegistry.block(Identifier("framity", "frames"))
+
+/**
+ * Called on server when left clicked by a player holding a framer's hammer.
+ * Removes the "rightmost" item from [frameEntity].
+ * Returns false if the frame should be removed, true otherwise.
+ */
+fun onHammerRemove(world: World, frameEntity: FrameEntity<*>?, frameState: BlockState, player: PlayerEntity, giveItem: Boolean) {
+    if (frameEntity == null) {
+        return
+    }
+
+    val slot = frameEntity.highestRemovePrioritySlot
+    val stackFromBlock = frameEntity.removeStack(slot, 1)
+
+    if (slot == -1) {
+        return
+    }
+
+    if (slot == FrameEntity.ContainedSlot) {
+        frameEntity.containedState = null
+    }
+
+    val changedState = when (slot) {
+        FrameEntity.ContainedSlot -> frameState
+        FrameEntity.GlowstoneSlot -> frameState.with(HasGlowstone, false)
+        FrameEntity.OverlaySlot -> frameState.with(OverlayKindProp, OverlayKind.None)
+        else -> throw RuntimeException("unreachable")
+    }
+
+    world.setBlockState(frameEntity.pos, changedState)
+
+    if (giveItem) {
+        player.inventory.offerOrDrop(world, stackFromBlock)
+
+        world.playSound(null, frameEntity.pos, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS,
+            0.2f,
+            (Random.nextFloat() - Random.nextFloat()) * 1.4F + 2.0F)
+    }
+
+    frameEntity.sync()
+}

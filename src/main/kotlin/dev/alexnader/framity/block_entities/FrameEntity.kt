@@ -1,20 +1,24 @@
 package dev.alexnader.framity.block_entities
 
-import com.mojang.datafixers.Dynamic
+import com.mojang.serialization.Dynamic
 import dev.alexnader.framity.adapters.KtBlock
 import dev.alexnader.framity.adapters.KtBlockEntity
+import dev.alexnader.framity.adapters.WithId
 import dev.alexnader.framity.data.OverlayKind
+import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity
 import net.fabricmc.fabric.api.server.PlayerStream
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.client.MinecraftClient
 import net.minecraft.datafixer.NbtOps
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.DefaultedList
+import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.Direction
 
 /**
@@ -24,11 +28,11 @@ import net.minecraft.util.math.Direction
  * @param type The block entity type to use.
  */
 class FrameEntity<B: Block>(
-    private val ktBlock: KtBlock<B>,
-    type: KtBlockEntity<FrameEntity<B>>
+    private val ktBlock: WithId<B>,
+    type: WithId<BlockEntityType<FrameEntity<B>>>
 ): InventoryBlockEntity(
-    type.blockEntity, DefaultedList.ofSize(3, ItemStack.EMPTY)
-), RenderAttachmentBlockEntity {
+    type.value, DefaultedList.ofSize(3, ItemStack.EMPTY), ktBlock.value.defaultState
+), RenderAttachmentBlockEntity, BlockEntityClientSerializable {
     companion object {
         /**
          * [Inventory][net.minecraft.inventory.Inventory] slot for the contained block.
@@ -43,8 +47,6 @@ class FrameEntity<B: Block>(
          */
         const val OverlaySlot = 2
     }
-
-    data class RenderAttachmentData(val containedState: BlockState, val overlayKind: OverlayKind)
 
     /**
      * The contained [BlockState].
@@ -103,21 +105,8 @@ class FrameEntity<B: Block>(
     /**
      * [RenderAttachmentBlockEntity] implementation returning the contained [BlockState].
      */
-    override fun getRenderAttachmentData() = this.containedState?.let { containedState ->
-        RenderAttachmentData(containedState, OverlayKind.from(this.overlayStack.item) ?: OverlayKind.None)
-    }
-
-    /**
-     * Reads this frame's data from [tag].
-     */
-    override fun fromTag(tag: CompoundTag?) {
-        super.fromTag(tag)
-        if (tag?.contains("state") == true) {
-            this.containedState = BlockState.deserialize(Dynamic(NbtOps.INSTANCE, tag.get("state")))
-        } else {
-            this.containedState = null
-        }
-    }
+    override fun getRenderAttachmentData() =
+        Pair(this.containedState, OverlayKind.from(this.overlayStack.item) ?: OverlayKind.None)
 
     /**
      * Marks this frame as dirty. Causes client to re-render the block when called.
@@ -129,24 +118,46 @@ class FrameEntity<B: Block>(
             for (obj in PlayerStream.watching(this)) {
                 (obj as ServerPlayerEntity).networkHandler.sendPacket(this.toUpdatePacket())
             }
-            this.world!!.updateNeighborsAlways(pos.offset(Direction.UP), this.ktBlock.block)
+            this.world!!.updateNeighborsAlways(pos.offset(Direction.UP), this.ktBlock.value)
             val state = this.world!!.getBlockState(pos)
             this.world!!.updateListeners(pos, state, state, 1)
         }
         if (this.world?.isClient == true) {
-            MinecraftClient.getInstance().worldRenderer.updateBlock(this.world, this.pos, this.ktBlock.block.defaultState, this.ktBlock.block.defaultState, 1)
+            MinecraftClient.getInstance().worldRenderer.updateBlock(this.world, this.pos, this.ktBlock.value.defaultState, this.ktBlock.value.defaultState, 1)
         }
+    }
+
+    /**
+     * Reads this frame's data from [tag].
+     */
+    override fun fromTag(state: BlockState?, tag: CompoundTag?) {
+        super.fromTag(state, tag)
+        this.fromClientTag(tag)
     }
 
     /**
      * Writes this frame's data to [tag].
      */
     override fun toTag(tag: CompoundTag?): CompoundTag {
+        val tag2 = this.toClientTag(tag)
+        return super.toTag(tag2)
+    }
+
+    override fun fromClientTag(tag: CompoundTag?) {
+        super.fromClientTag(tag)
+        if (tag?.contains("state") == true) {
+            this.containedState = BlockState.CODEC.decode(Dynamic(NbtOps.INSTANCE, tag.get("state"))).result().get().first
+        } else {
+            this.containedState = null
+        }
+    }
+
+    override fun toClientTag(tag: CompoundTag?): CompoundTag {
         if (this.containedState == null) {
             tag?.remove("state")
         } else {
-            tag?.put("state", BlockState.serialize(NbtOps.INSTANCE, this.containedState).value)
+            tag?.put("state", BlockState.CODEC.encode(this.containedState, NbtOps.INSTANCE, CompoundTag()).get().left().get())
         }
-        return super.toTag(tag)
+        return super.toClientTag(tag)
     }
 }

@@ -17,7 +17,7 @@ import java.util.function.Supplier
 /**
  * Auto-registration manager for a mod.
  */
-class Mod(private val id: String) {
+class OldMod(private val id: String) {
     private val items = ArrayList<KtItem<Item>>()
     private val blocks = ArrayList<KtBlock<Block>>()
     private val blockEntities = ArrayList<KtBlockEntity<*>>()
@@ -68,13 +68,11 @@ class Mod(private val id: String) {
     fun registerAll() {
         for (ktItem in this.items) {
             val id = Identifier(this.id, ktItem.id)
-            println("Registering $id")
             Registry.register(Registry.ITEM, id, ktItem.item)
         }
 
         for (ktBlock in this.blocks) {
             val id = Identifier(this.id, ktBlock.id)
-            println("Registering $id")
             Registry.register(Registry.BLOCK, id, ktBlock.block)
             val blockItem = BlockItem(ktBlock.block, Item.Settings())
             ktBlock.blockItem = blockItem
@@ -86,7 +84,6 @@ class Mod(private val id: String) {
 
         for (ktBlockEntity in this.blockEntities) {
             val id = Identifier(this.id, ktBlockEntity.id)
-            println("Registering $id")
             Registry.register(Registry.BLOCK_ENTITY_TYPE, id, ktBlockEntity.blockEntity)
         }
 

@@ -1,4 +1,4 @@
-package dev.alexnader.framity.blocks
-
-//TODO: implement.
-class WallFrame
+//package dev.alexnader.framity.blocks
+//
+////TODO: implement.
+//class WallFrame

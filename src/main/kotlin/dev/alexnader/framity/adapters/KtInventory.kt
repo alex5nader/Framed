@@ -34,30 +34,26 @@ interface KtInventory<I: MutableList<ItemStack>>: Inventory {
      * Number of slots in this inventory which are not empty.
      */
     val count get() = this.items.filter { !it.isEmpty }.size
-    /**
-     * Whether or not all slots in this inventory are empty.
-     */
-    val isEmpty get() = this.items.all { it.isEmpty }
 
     /**
      * [Inventory] implementation wrapping [capacity]
      */
-    override fun getInvSize() = this.capacity
+    override fun size() = this.capacity
 
     /**
      * [Inventory] implementation wrapping [isEmpty]
      */
-    override fun isInvEmpty() = this.isEmpty
+    override fun isEmpty() = this.items.all { it.isEmpty }
 
     /**
      * [Inventory] implementation wrapping [get]
      */
-    override fun getInvStack(slot: Int) = this[slot]
+    override fun getStack(slot: Int) = this[slot]
 
     /**
      * [Inventory] implementation for splitting a stack in this inventory by index.
      */
-    override fun takeInvStack(slot: Int, amount: Int): ItemStack {
+    override fun removeStack(slot: Int, amount: Int): ItemStack {
         val result = Inventories.splitStack(this.items, slot, amount)
 
         if (!result.isEmpty) this.markDirty()
@@ -68,7 +64,7 @@ interface KtInventory<I: MutableList<ItemStack>>: Inventory {
     /**
      * [Inventory] implementation for removing a stack from this inventory by index.
      */
-    override fun removeInvStack(slot: Int): ItemStack {
+    override fun removeStack(slot: Int): ItemStack {
         this.markDirty()
 
         return Inventories.removeStack(this.items, slot)
@@ -77,10 +73,10 @@ interface KtInventory<I: MutableList<ItemStack>>: Inventory {
     /**
      * [Inventory] implementation for setting a stack from this inventory by index.
      */
-    override fun setInvStack(slot: Int, stack: ItemStack?) {
+    override fun setStack(slot: Int, stack: ItemStack?) {
         this[slot] = stack!!
 
-        stack.count = max(stack.count, this.invMaxStackAmount)
+        stack.count = max(stack.count, this.maxCountPerStack)
 
         this.markDirty()
     }

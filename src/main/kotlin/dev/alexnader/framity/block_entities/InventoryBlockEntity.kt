@@ -2,13 +2,14 @@ package dev.alexnader.framity.block_entities
 
 import dev.alexnader.framity.adapters.KtInventory
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
+import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventories
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.util.DefaultedList
+import net.minecraft.util.collection.DefaultedList
 import kotlin.math.min
 
 /**
@@ -16,39 +17,45 @@ import kotlin.math.min
  * implementations needed to make inventory work.
  */
 abstract class InventoryBlockEntity(
-    type: BlockEntityType<out BlockEntity>, override val items: DefaultedList<ItemStack>
+    type: BlockEntityType<out BlockEntity>,
+    override val items: DefaultedList<ItemStack>,
+    private val defaultState: BlockState
 ): BlockEntity(type), BlockEntityClientSerializable, KtInventory<DefaultedList<ItemStack>> {
     /**
      * Reads this inventory's contents from [tag].
      */
-    override fun fromTag(tag: CompoundTag?) {
-        super.fromTag(tag)
-        this.items.clear()
-        Inventories.fromTag(tag, this.items)
+    override fun fromTag(state: BlockState?, tag: CompoundTag?) {
+        super.fromTag(state, tag)
+        this.fromClientTag(tag)
     }
 
     /**
      * Writes this inventory's contents to [tag].
      */
     override fun toTag(tag: CompoundTag?): CompoundTag {
-        Inventories.toTag(tag, this.items, true)
+        this.toClientTag(tag)
         return super.toTag(tag)
     }
 
     /**
      * Inventory is always usable. Override to change behaviour.
      */
-    override fun canPlayerUseInv(player: PlayerEntity?) = true
+    override fun canPlayerUse(player: PlayerEntity?) = true
 
     /**
      * Reads this inventory's contents from [tag]. Deferred to [fromTag].
      */
-    override fun fromClientTag(tag: CompoundTag?) = this.fromTag(tag)
+    override fun fromClientTag(tag: CompoundTag?) {
+        this.items.clear()
+        Inventories.fromTag(tag, this.items)
+    }
 
     /**
      * Writes this inventory's contents to [tag]. Deferred to [toTag].
      */
-    override fun toClientTag(tag: CompoundTag?) = this.toTag(tag)
+    override fun toClientTag(tag: CompoundTag?): CompoundTag {
+        return Inventories.toTag(tag, this.items, true)
+    }
 
     /**
      * Copies an [ItemStack] from this inventory, up to [count]. Will

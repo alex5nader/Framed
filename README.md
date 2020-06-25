@@ -17,7 +17,7 @@ its [CurseForge page](https://www.curseforge.com/minecraft/mc-mods/framity).
 The features below are in no particular order, and are not guaranteed to be added.
 
 - Overlay textures
-    - Grass
+    - ✔ Grass
     - Snow
     - Mycelium
     - Path

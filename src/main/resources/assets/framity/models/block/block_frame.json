@@ -1,0 +1,7 @@
+{
+  "parent": "framity:block/overlay_cube_all",
+  "textures": {
+    "all": "framity:block/hollow_frame",
+    "overlay": "#all"
+  }
+}

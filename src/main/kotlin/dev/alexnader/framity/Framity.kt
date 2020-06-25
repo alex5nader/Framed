@@ -1,115 +1,76 @@
 package dev.alexnader.framity
 
-import arrow.syntax.function.curried
-import arrow.syntax.function.uncurried
-import dev.alexnader.framity.adapters.KtBlock
+import dev.alexnader.framity.adapters.WithId
 import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.blocks.*
 import dev.alexnader.framity.items.FramersHammer
-import dev.alexnader.framity.model.*
-import grondag.fermion.client.models.AbstractModel
+import dev.alexnader.framity.mixin.AccessibleStairsBlock
+import dev.alexnader.framity.model.v2.FramityModelVariantProvider
+import net.fabricmc.fabric.api.`object`.builder.v1.block.FabricBlockSettings
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.HorizontalConnectingBlock
-import net.minecraft.block.StairsBlock
-import net.minecraft.client.texture.Sprite
+import net.minecraft.block.*
+import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.texture.SpriteAtlasTexture
 import net.minecraft.client.util.SpriteIdentifier
-import net.minecraft.state.property.Properties
-import net.minecraft.state.property.Property
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.util.Identifier
-import java.util.function.Function
 
-val MOD = Mod("framity")
+val MOD = Mod("framity", FramityModelVariantProvider())
+    .itemGroup("framity") { ItemStack(FRAMERS_HAMMER.value) }
+    .done()
 
-val FRAMERS_HAMMER = MOD.item(::FramersHammer, "framers_hammer")
+val UV_TEST = MOD.block("uv_test", Block(FabricBlockSettings.of(Material.STONE)))
 
-val BLOCK_FRAME = MOD.block(::BlockFrame, "block_frame")
-val BLOCK_FRAME_ENTITY = MOD.blockEntity(::FrameEntity, "block_frame_entity", BLOCK_FRAME)
+@JvmField
+val FRAMERS_HAMMER: WithId<Item> = MOD.item("framers_hammer", FramersHammer())
+    .itemGroup("framity")
+    .done()
 
-val SLAB_FRAME = MOD.block(::SlabFrame, "slab_frame")
-val SLAB_FRAME_ENTITY = MOD.blockEntity(::FrameEntity, "slab_frame_entity", SLAB_FRAME)
-
-val STAIRS_FRAME = MOD.block(::StairsFrame, "stairs_frame")
-val STAIRS_FRAME_ENTITY = MOD.blockEntity(::FrameEntity, "stairs_frame_entity", STAIRS_FRAME)
-
-val FENCE_FRAME = MOD.block(::FenceFrame, "fence_frame")
-val FENCE_FRAME_ENTITY = MOD.blockEntity(::FrameEntity, "fence_frame_entity", FENCE_FRAME)
-
-val SLOPE_FRAME = MOD.block(::SlopeFrame, "slope_frame")
-val SLOPE_FRAME_ENTITY = MOD.blockEntity(::FrameEntity, "slope_frame_entity", SLOPE_FRAME)
+val SHAPE_BLOCK_FRAME = MOD.block("shape_block_frame", Block(SHAPE_FRAME_SETTINGS))
+    .hasItem(Item.Settings())
+    .done()
+val SHAPE_SLAB_FRAME = MOD.block("shape_slab_frame", SlabBlock(SHAPE_FRAME_SETTINGS))
+    .hasItem(Item.Settings())
+    .done()
+val SHAPE_STAIRS_FRAME = MOD.block("shape_stairs_frame", AccessibleStairsBlock.create(SHAPE_BLOCK_FRAME.value.defaultState, SHAPE_FRAME_SETTINGS))
+    .hasItem(Item.Settings())
+    .done()
 
 @Suppress("deprecation")
 val HOLLOW_FRAME_ID = SpriteIdentifier(
     SpriteAtlasTexture.BLOCK_ATLAS_TEX,
     Identifier("framity", "block/hollow_frame")
 )
-@Suppress("deprecation")
-val FULL_FRAME_ID = SpriteIdentifier(
-    SpriteAtlasTexture.BLOCK_ATLAS_TEX,
-    Identifier("framity", "block/full_frame")
-)
-@Suppress("deprecation")
-val UV_ID = SpriteIdentifier(
-    SpriteAtlasTexture.BLOCK_ATLAS_TEX,
-    Identifier("framity", "block/uv")
-)
 
-val MODEL_VARIANT_PROVIDER = FramityModelVariantProvider()
+val BLOCK_FRAME = MOD.block("block_frame", BlockFrame())
+    .hasItem(Item.Settings(), "framity")
+    .renderLayer(RenderLayer.getCutout())
+    .modelsFrom(SHAPE_BLOCK_FRAME, listOf(HOLLOW_FRAME_ID))
+    .done()
+val BLOCK_FRAME_ENTITY = MOD.blockEntity("block_frame_entity", ::FrameEntity, BLOCK_FRAME)
+
+val SLAB_FRAME = MOD.block("slab_frame", SlabFrame())
+    .hasItem(Item.Settings(), "framity")
+    .renderLayer(RenderLayer.getCutout())
+    .modelsFrom(SHAPE_SLAB_FRAME, listOf(HOLLOW_FRAME_ID))
+    .done()
+val SLAB_FRAME_ENTITY = MOD.blockEntity("slab_frame_entity", ::FrameEntity, SLAB_FRAME)
+
+val STAIRS_FRAME = MOD.block("stairs_frame", StairsFrame())
+    .hasItem(Item.Settings(), "framity")
+    .renderLayer(RenderLayer.getCutout())
+    .modelsFrom(SHAPE_STAIRS_FRAME, listOf(HOLLOW_FRAME_ID))
+    .done()
+val STAIRS_FRAME_ENTITY = MOD.blockEntity("stairs_frame_entity", ::FrameEntity, STAIRS_FRAME)
 
 @Suppress("unused")
 fun init() {
-    MOD.creativeTab(BLOCK_FRAME)
-
-    MOD.registerAll()
-}
-
-fun <B: Block> registerModel(
-    ktBlock: KtBlock<B>,
-    sprites: List<SpriteIdentifier>,
-    properties: List<Property<out Comparable<*>>>,
-    model: (Block) -> (List<Property<out Comparable<*>>>) -> (SpriteIdentifier) -> (() -> MeshTransformer) -> (BlockState) -> (Function<SpriteIdentifier, Sprite>) -> AbstractModel
-) {
-    MODEL_VARIANT_PROVIDER.registerModels(
-        ktBlock.block,
-        ktBlock.block.defaultState,
-        model(ktBlock.block)(properties)(sprites[0])(FrameMeshTransformer.ofSprite(sprites[0])).uncurried(),
-        sprites
-    )
+    MOD.register()
 }
 
 @Suppress("unused")
 fun clientInit() {
-    ModelLoadingRegistry.INSTANCE.registerVariantProvider { MODEL_VARIANT_PROVIDER }
-    registerModel(
-        BLOCK_FRAME,
-        listOf(HOLLOW_FRAME_ID),
-        emptyList(),
-        (::FramityVoxelModel).curried()
-    )
-    registerModel(
-        SLAB_FRAME,
-        listOf(HOLLOW_FRAME_ID),
-        listOf(Properties.FACING),
-        (::FramityVoxelModel).curried()
-    )
-    registerModel(
-        STAIRS_FRAME,
-        listOf(HOLLOW_FRAME_ID),
-        listOf(StairsBlock.FACING, StairsBlock.HALF, StairsBlock.SHAPE),
-        (::FramityVoxelModel).curried()
-    )
-    registerModel(
-        FENCE_FRAME,
-        listOf(FULL_FRAME_ID),
-        listOf(HorizontalConnectingBlock.NORTH, HorizontalConnectingBlock.EAST, HorizontalConnectingBlock.SOUTH, HorizontalConnectingBlock.WEST),
-        (::CustomItemFramityVoxelModel).curried()((FenceFrame)::getItemMesh)
-    )
-    registerModel(
-        SLOPE_FRAME,
-        listOf(HOLLOW_FRAME_ID),
-        listOf(StairsBlock.SHAPE, StairsBlock.HALF, StairsBlock.FACING),
-        (::SlopeFrameModel).curried()
-    )
+    MOD.registerClient()
 }
