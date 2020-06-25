@@ -7,6 +7,27 @@ frame can have its texture changed to that of any full-size block in
 the game. While flowers, slabs, and similar items, are able to be
 placed into the world, they are not able to be placed into a frame.
 
+<p align="center">
+    <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api">
+        <img title="Requires Fabric API" height="50" src="https://i.imgur.com/Ol1Tcf8.png">
+    </a>
+</p>
+
+<p align="center">
+    <a title="Fabric Language Kotlin"
+       href="https://minecraft.curseforge.com/projects/fabric-language-kotlin"
+       target="_blank"
+       rel="noopener noreferrer"
+       >
+        <img style="display: block; margin-left: auto; margin-right: auto;"
+             src="https://i.imgur.com/c1DH9VL.png"
+             alt=""
+             width="171"
+             height="50"
+             />
+    </a>
+</p>
+
 ## Download
 
 Framity is not currently available, but when it is, it will be available through
