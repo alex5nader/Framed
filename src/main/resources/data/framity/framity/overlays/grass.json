@@ -1,5 +1,7 @@
 {
-  "item": "minecraft:wheat_seeds",
+  "trigger": {
+    "item": "minecraft:wheat_seeds"
+  },
   "overlay": {
     "textureSource": {
       "sided": [
@@ -16,7 +18,7 @@
     "coloredLike": "minecraft:grass_block",
     "textureOffsets": [
       {
-        "sides": ["north","south","east","west"],
+        "sides": ["north", "south", "east", "west"],
         "value": {
           "vOffsetter": {
             "remap": [

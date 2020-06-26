@@ -54,14 +54,9 @@ class SpriteSet(private val defaultSprite: Sprite) {
     }
 
     fun getQuad(dir: Direction, index: Int): BakedQuad? {
-        val quadList = this.quads[dir]
-        if (quadList == null) {
-            println("no quad list for $dir")
-            return null
-        }
+        val quadList = this.quads[dir] ?: return null
 
         if (index >= quadList.size) {
-            println("index $index larger than quad list size: ${quadList.size}")
             return null
         }
 

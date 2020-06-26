@@ -92,6 +92,7 @@ fun clientInit() {
 
     ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEX).register(ClientSpriteRegistryCallback { _, registry ->
         registry.register(Identifier("framity", "block/snow_side_overlay"))
+        registry.register(Identifier("framity", "block/mycelium_side_overlay"))
     })
 
     ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FramityResourceListener())

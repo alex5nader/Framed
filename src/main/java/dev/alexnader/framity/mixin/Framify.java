@@ -42,14 +42,12 @@ public class Framify extends Block {
     @SuppressWarnings("unused")
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void constructorProxy(CallbackInfo ci) {
-        System.out.println("Setting default state from framify");
         this.setDefaultState(this.getDefaultState().with(HasGlowstone, false));
     }
 
     @SuppressWarnings("unused")
     @Inject(method = "appendProperties", at = @At("HEAD"))
     private void appendPropertiesProxy(StateManager.Builder<Block, BlockState> builder, CallbackInfo ci) {
-        System.out.println("Default state in framify: " + this.getDefaultState());
         builder.add(HasGlowstone);
     }
 
@@ -150,7 +148,7 @@ public class Framify extends Block {
 
         ItemStack playerStack = player.getStackInHand(player.getActiveHand());
 
-        if (hasOverlay(playerStack.getItem()) && frameEntity.getOverlayStack().isEmpty()) {
+        if (hasOverlay(playerStack) && frameEntity.getOverlayStack().isEmpty()) {
             frameEntity.copyFrom(FrameEntity.OverlaySlot, playerStack, 1, !player.isCreative());
             frameEntity.markDirty();
 

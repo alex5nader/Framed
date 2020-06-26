@@ -1,17 +1,18 @@
 {
-  "trigger": {
-    "item": "minecraft:snowball"
-  },
+  "trigger": [
+    { "item": "minecraft:red_mushroom" },
+    { "item": "minecraft:brown_mushroom" }
+  ],
   "overlay": {
     "textureSource": {
       "sided": [
         {
           "sides": [ "up" ],
-          "value": "minecraft:block/snow"
+          "value": "minecraft:block/mycelium_top"
         },
         {
           "sides": [ "north", "south", "east", "west" ],
-          "value": "framity:block/snow_side_overlay"
+          "value": "framity:block/mycelium_side_overlay"
         }
       ]
     },

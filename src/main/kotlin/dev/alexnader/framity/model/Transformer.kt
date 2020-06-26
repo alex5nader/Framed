@@ -76,8 +76,6 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
     ): MeshTransformer {
         val (containedState, overlay) = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as Pair<BlockState?, OverlayInfo?>
 
-        println("overlay = $overlay")
-
         if (containedState == null) {
             sprites.clear()
             this.mat = MAT_FINDER.clear().blendMode(0, BlendMode.CUTOUT).find()
@@ -86,12 +84,8 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
             val model = CLIENT.blockRenderManager.getModel(containedState)
             sprites.prepare(model, randomSupplier?.get())
 
-            val colorProvider = ColorProviderRegistry.BLOCK.get(containedState.block)
-            if (colorProvider != null) {
-                println("Using color provider")
+            ColorProviderRegistry.BLOCK.get(containedState.block)?.let { colorProvider ->
                 this.color = FULL_ALPHA or colorProvider.getColor(containedState, blockView, pos, 1)
-            } else {
-                println("No color provider")
             }
         }
 
@@ -145,16 +139,12 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
                 return when (source) {
                     is TextureSource.Sided -> {
                         val spriteId = source[direction] ?: return null
-                        println("Using sided texture: $spriteId")
                         @Suppress("deprecation")
                         val sprite = CLIENT.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX).apply(spriteId)
-
-                        println("Using sprite: ${sprite.id}")
 
                         Pair(sprite, this.cachedOverlayColor)
                     }
                     is TextureSource.Single -> {
-                        println("Using single texture")
                         @Suppress("deprecation")
                         val sprite = CLIENT.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX).apply(source.spriteId)
 
@@ -192,14 +182,7 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
         }
 
         if (color != null) {
-            println("${if (shapeIndex % 2 == 0) "base" else "overlay"} $direction is colored")
             qe.spriteColor(0, color, color, color, color)
-        } else {
-            println("${"\u001B[33m"}${if (shapeIndex % 2 == 0) "base" else "overlay"} $direction has no color${"\u001B[0m"}")
-        }
-
-        if (sprite.id == MissingSprite.getMissingSpriteId()) {
-            println("$direction face #$shapeIndex is missing - provided by ${if (shapeIndex % 2 == 0) "base" else "overlay"}")
         }
 
         val (us, vs) = Pair(

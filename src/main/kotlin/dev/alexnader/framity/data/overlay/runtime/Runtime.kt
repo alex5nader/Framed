@@ -5,8 +5,10 @@ import dev.alexnader.framity.data.overlay.json.Offsetters as JsonOffsetters
 import dev.alexnader.framity.data.overlay.json.TextureOffsets as JsonTextureOffsets
 import dev.alexnader.framity.data.overlay.json.TextureSource as JsonTextureSource
 import dev.alexnader.framity.data.overlay.json.OverlayInfo as JsonOverlayInfo
+import dev.alexnader.framity.data.overlay.json.OverlayDefinition as JsonOverlayDefinition
 
 import net.minecraft.block.BlockState
+import net.minecraft.recipe.Ingredient
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction
 import net.minecraft.util.registry.Registry
@@ -21,6 +23,16 @@ private fun directionFromString(str: String) =
         "west" -> Direction.WEST
         else -> error("Invalid direction: $str")
     }
+
+data class OverlayDefinition(val trigger: Ingredient, val overlayInfo: OverlayInfo) {
+    companion object {
+        fun fromJson(jsonOverlayDefinition: JsonOverlayDefinition) =
+            OverlayDefinition(
+                jsonOverlayDefinition.trigger,
+                OverlayInfo.fromJson(jsonOverlayDefinition.overlay)
+            )
+    }
+}
 
 data class OverlayInfo(val textureSource: TextureSource, val coloredLike: ColoredLike? = null, val offsets: TextureOffsets? = null) {
     companion object {
@@ -113,6 +125,9 @@ sealed class Offsetters {
     data class UV(val uOffsetter: Offsetter, val vOffsetter: Offsetter) : Offsetters()
 }
 
+/**
+ * An [Offsetter] can offset the uv coordinates of the overlay.
+ */
 sealed class Offsetter {
     companion object {
         fun fromJson(jsonOffsetter: JsonOffsetter) =
@@ -121,6 +136,9 @@ sealed class Offsetter {
             }
     }
 
+    /**
+     * "Offets" by performing hard-coded value replacements.
+     */
     data class Remap(val map: Map<Float4, Float4>) : Offsetter(), Map<Float4, Float4> by map {
         companion object {
             fun fromJson(jsonRemap: JsonOffsetter.Remap): Remap? {

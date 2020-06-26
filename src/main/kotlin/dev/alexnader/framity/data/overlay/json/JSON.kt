@@ -1,9 +1,11 @@
 package dev.alexnader.framity.data.overlay.json
 
 import com.google.gson.*
+import net.minecraft.recipe.Ingredient
 import java.lang.reflect.Type
 
 fun GsonBuilder.registerOverlayHandlers() = this.apply {
+    registerTypeAdapter(Ingredient::class.java, JsonDeserializer<Ingredient> { json, _, _ -> Ingredient.fromJson(json) })
     registerTypeAdapter(TextureSource::class.java, TextureSource.Deserializer())
     registerTypeAdapter(TextureSource.Single::class.java, TextureSource.Single.Deserializer())
     registerTypeAdapter(TextureSource.Sided::class.java, TextureSource.Sided.Deserializer())
@@ -12,7 +14,7 @@ fun GsonBuilder.registerOverlayHandlers() = this.apply {
     registerTypeAdapter(Offsetter.Remap::class.java, Offsetter.Remap.Deserializer())
 }
 
-data class OverlayDefinition(val item: String, val overlay: OverlayInfo)
+data class OverlayDefinition(val trigger: Ingredient, val overlay: OverlayInfo)
 
 data class OverlayInfo(val textureSource: TextureSource, val coloredLike: String? = null, val textureOffsets: TextureOffsets? = null)
 

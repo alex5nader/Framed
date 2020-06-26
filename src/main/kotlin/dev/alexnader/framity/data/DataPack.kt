@@ -2,14 +2,13 @@ package dev.alexnader.framity.data
 
 import dev.alexnader.framity.GSON
 import dev.alexnader.framity.LOGGER
-import dev.alexnader.framity.data.overlay.json.OverlayDefinition
-import dev.alexnader.framity.data.overlay.runtime.OverlayInfo
+import dev.alexnader.framity.data.overlay.json.OverlayDefinition as JsonOverlayDefinition
+import dev.alexnader.framity.data.overlay.runtime.OverlayDefinition
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener
-import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.resource.ResourceManager
 import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
-import net.minecraft.util.registry.Registry
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -17,11 +16,12 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 import java.util.function.Supplier
 
-private val OverlaysMutable: MutableMap<Item, OverlayInfo> = mutableMapOf()
+private val OverlaysMutable: MutableList<OverlayDefinition> = mutableListOf()
 
-fun hasOverlay(item: Item) = Overlays.containsKey(item)
+fun hasOverlay(stack: ItemStack) = getOverlayInfo(stack) != null
 
-val Overlays: Map<Item, OverlayInfo> get() = OverlaysMutable
+fun getOverlayInfo(stack: ItemStack) =
+    OverlaysMutable.find { it.trigger.test(stack) }?.overlayInfo
 
 data class FramityResourceData(val overlays: Collection<Identifier>)
 
@@ -40,8 +40,7 @@ class FramityResourceListener : SimpleResourceReloadListener<FramityResourceData
         return CompletableFuture.supplyAsync(Supplier {
             OverlaysMutable.clear()
 
-            val overlays = manager.findResources("framity/overlays") { s -> s.also{println("Looking at $it")}.endsWith(".json") }
-            println("overlays = $overlays")
+            val overlays = manager.findResources("framity/overlays") { s -> s.endsWith(".json") }
 
             FramityResourceData(overlays)
         }, executor)
@@ -59,12 +58,9 @@ class FramityResourceListener : SimpleResourceReloadListener<FramityResourceData
                     val input = manager.getResource(id).inputStream
                     val reader = BufferedReader(InputStreamReader(input))
 
-                    val parsed = GSON.fromJson(reader, OverlayDefinition::class.java)
+                    val parsed = GSON.fromJson(reader, JsonOverlayDefinition::class.java)
 
-                    val item = Registry.ITEM.get(Identifier(parsed.item))
-                    val overlay = OverlayInfo.fromJson(parsed.overlay)
-
-                    OverlaysMutable[item] = overlay
+                    OverlaysMutable.add(OverlayDefinition.fromJson(parsed))
                 } catch (e: IOException) {
                     LOGGER.error("Error while loading a Framity Overlay JSON ($id): $e")
                 }

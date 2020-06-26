@@ -40,7 +40,7 @@ The features below are in no particular order, and are not guaranteed to be adde
 - Overlay textures
     - ✔ Grass
     - Snow
-    - Mycelium
+    - ✔ Mycelium
     - Path
     - Hay
     - ✔ Vines

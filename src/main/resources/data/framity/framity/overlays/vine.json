@@ -1,5 +1,7 @@
 {
-  "item": "minecraft:vine",
+  "trigger": {
+    "item": "minecraft:vine"
+  },
   "overlay": {
     "textureSource": {
       "single": "minecraft:block/vine"
