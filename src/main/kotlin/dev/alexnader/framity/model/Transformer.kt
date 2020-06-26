@@ -74,7 +74,9 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
         pos: BlockPos?,
         randomSupplier: Supplier<Random>?
     ): MeshTransformer {
-        val (containedState, overlayKind) = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as Pair<BlockState?, OverlayInfo?>
+        val (containedState, overlay) = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as Pair<BlockState?, OverlayInfo?>
+
+        println("overlay = $overlay")
 
         if (containedState == null) {
             sprites.clear()
@@ -98,13 +100,9 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
                 ?.getColor(coloredLike.colorSource, blockView, pos, 1)
                 ?.let { FULL_ALPHA or it }
 
-        this.cachedOverlayColor = if (overlayKind?.coloredLike != null) {
-            colorHandler(overlayKind.coloredLike)
-        } else {
-            null
-        }
+        this.cachedOverlayColor = overlay?.coloredLike?.let { colorHandler(it) }
 
-        this.overlay = overlayKind
+        this.overlay = overlay
 
         return this
     }
@@ -147,12 +145,16 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
                 return when (source) {
                     is TextureSource.Sided -> {
                         val spriteId = source[direction] ?: return null
+                        println("Using sided texture: $spriteId")
                         @Suppress("deprecation")
                         val sprite = CLIENT.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX).apply(spriteId)
+
+                        println("Using sprite: ${sprite.id}")
 
                         Pair(sprite, this.cachedOverlayColor)
                     }
                     is TextureSource.Single -> {
+                        println("Using single texture")
                         @Suppress("deprecation")
                         val sprite = CLIENT.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX).apply(source.spriteId)
 

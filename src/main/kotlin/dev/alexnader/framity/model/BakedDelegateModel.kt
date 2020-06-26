@@ -1,7 +1,6 @@
 package dev.alexnader.framity.model
 
 import dev.alexnader.framity.HOLLOW_FRAME_ID
-import dev.alexnader.framity.model.v2.FrameMeshTransformer
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
 import net.minecraft.block.BlockState

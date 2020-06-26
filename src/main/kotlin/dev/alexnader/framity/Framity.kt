@@ -10,6 +10,7 @@ import dev.alexnader.framity.data.overlay.json.registerOverlayHandlers
 import dev.alexnader.framity.items.FramersHammer
 import dev.alexnader.framity.model.FramityModelVariantProvider
 import net.fabricmc.fabric.api.`object`.builder.v1.block.FabricBlockSettings
+import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.minecraft.block.*
 import net.minecraft.client.render.RenderLayer
@@ -88,6 +89,10 @@ fun init() {
 @Suppress("unused")
 fun clientInit() {
     MOD.registerClient()
+
+    ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEX).register(ClientSpriteRegistryCallback { _, registry ->
+        registry.register(Identifier("framity", "block/snow_side_overlay"))
+    })
 
     ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FramityResourceListener())
 }
