@@ -39,7 +39,7 @@ The features below are in no particular order, and are not guaranteed to be adde
 
 - Overlay textures
     - ✔ Grass
-    - Snow
+    - ✔ Snow
     - ✔ Mycelium
     - Path
     - Hay
@@ -63,6 +63,21 @@ The features below are in no particular order, and are not guaranteed to be adde
 - Other
     - Independent sides → Each side of the frame can have a different texture  
     - ✔ Glowstone dust → Frame gains light level of 15
+    
+## Thanks
+Thanks to:
+- The members of the [Fabric Discord](https://discord.gg/v6v4pMv) for their
+incredible help and support throughout the creation of Framity.
+- [Grondag](https://www.curseforge.com/members/grondagthebarbarian)
+for immensely helping me understand the fabric rendering API.
+- [Yoghurt4c](https://www.curseforge.com/members/yoghurt4c) for providing
+an example of how to read assets/data (via
+[Lil Tater Reloaded](https://www.curseforge.com/minecraft/mc-mods/lil-tater-reloaded))
+- [Mineshopper](https://www.curseforge.com/members/mineshopper) for letting
+me use assets from the original
+[Carpenter's Blocks](https://www.curseforge.com/minecraft/mc-mods/carpenters-blocks).
+
+Without them, this project would never have become more than a dream.
 
 ## License
 
