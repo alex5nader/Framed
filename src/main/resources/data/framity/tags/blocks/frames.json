@@ -1,6 +1,7 @@
 {
   "values": [
     "framity:block_frame",
-    "framity:slab_frame"
+    "framity:slab_frame",
+    "framity:stairs_frame"
   ]
 }

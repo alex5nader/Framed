@@ -1,8 +1,0 @@
-{
-  "parent": "block/slab",
-  "textures": {
-    "bottom": "framity:block/hollow_frame",
-    "top": "framity:block/hollow_frame",
-    "side": "framity:block/hollow_frame"
-  }
-}

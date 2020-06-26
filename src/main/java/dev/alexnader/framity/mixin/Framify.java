@@ -4,7 +4,6 @@ import dev.alexnader.framity.block_entities.FrameEntity;
 import dev.alexnader.framity.blocks.BlockFrame;
 import dev.alexnader.framity.blocks.SlabFrame;
 import dev.alexnader.framity.blocks.StairsFrame;
-import dev.alexnader.framity.data.OverlayKind;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -30,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static dev.alexnader.framity.FramityKt.FRAMERS_HAMMER;
+import static dev.alexnader.framity.data.DataPackKt.hasOverlay;
 import static dev.alexnader.framity.util.FramifyHelperKt.*;
 
 @SuppressWarnings("unused")
@@ -43,15 +43,14 @@ public class Framify extends Block {
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void constructorProxy(CallbackInfo ci) {
         System.out.println("Setting default state from framify");
-        this.setDefaultState(this.getDefaultState().with(HasGlowstone, false).with(OverlayKindProp, OverlayKind.None));
+        this.setDefaultState(this.getDefaultState().with(HasGlowstone, false));
     }
 
     @SuppressWarnings("unused")
-    @Inject(method = "appendProperties(Lnet/minecraft/state/StateManager$Builder;)V", at = @At("HEAD"))
+    @Inject(method = "appendProperties", at = @At("HEAD"))
     private void appendPropertiesProxy(StateManager.Builder<Block, BlockState> builder, CallbackInfo ci) {
         System.out.println("Default state in framify: " + this.getDefaultState());
         builder.add(HasGlowstone);
-        builder.add(OverlayKindProp);
     }
 
     @Override
@@ -139,9 +138,8 @@ public class Framify extends Block {
     @SuppressWarnings("deprecation")
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        System.out.println("onUse from framify");
         if (world.isClient()) {
-            return ActionResult.SUCCESS;
+            return ActionResult.CONSUME;
         }
 
         FrameEntity<?> frameEntity = (FrameEntity<?>) world.getBlockEntity(pos);
@@ -152,16 +150,12 @@ public class Framify extends Block {
 
         ItemStack playerStack = player.getStackInHand(player.getActiveHand());
 
-        if (playerStack.getItem().isIn(OverlayItemsTag) && frameEntity.getOverlayStack().isEmpty()) {
-            System.out.println("Adding overlay item!");
+        if (hasOverlay(playerStack.getItem()) && frameEntity.getOverlayStack().isEmpty()) {
             frameEntity.copyFrom(FrameEntity.OverlaySlot, playerStack, 1, !player.isCreative());
             frameEntity.markDirty();
 
-            world.setBlockState(pos, state.with(OverlayKindProp, OverlayKind.Companion.from(frameEntity.getOverlayStack().getItem())));
-
             return ActionResult.SUCCESS;
         } else if (playerStack.getItem() instanceof BlockItem && playerStack.getItem() != frameEntity.getItem() && !FramesTag.contains(((BlockItem) (playerStack.getItem())).getBlock())) {
-            System.out.println("Adding contained item!");
             Block playerBlock = ((BlockItem) playerStack.getItem()).getBlock();
 
             if (!frameEntity.getContainedStack().isEmpty()) {
@@ -171,35 +165,33 @@ public class Framify extends Block {
             }
 
             BlockState containedState = playerBlock.getPlacementState(new ItemPlacementContext(new ItemUsageContext(player, hand, hit)));
-            System.out.println("New state: " + containedState);
+
+            if (containedState == null) {
+                return ActionResult.CONSUME;
+            }
 
             if (playerBlock instanceof BlockWithEntity && playerBlock.getRenderType(containedState) != BlockRenderType.MODEL) {
-                return ActionResult.SUCCESS;
+                return ActionResult.CONSUME;
             }
 
             VoxelShape outlineShape = playerBlock.getOutlineShape(containedState, world, pos, ShapeContext.absent());
-            System.out.println("Got outline shape");
 
             if (!VoxelShapes.fullCube().getBoundingBoxes().equals(outlineShape.getBoundingBoxes())) {
-                return ActionResult.SUCCESS;
+                return ActionResult.CONSUME;
             }
 
             frameEntity.copyFrom(FrameEntity.ContainedSlot, playerStack, 1, !player.isCreative());
-            System.out.println("Setting contained state");
             frameEntity.setContainedState(containedState);
 
-            System.out.println("Successfully set contained state");
             return ActionResult.SUCCESS;
         } else if (playerStack.getItem() == Items.GLOWSTONE_DUST && frameEntity.getGlowstoneStack().isEmpty()) {
-            System.out.println("Adding glowstone!");
             frameEntity.copyFrom(FrameEntity.GlowstoneSlot, playerStack, 1, !player.isCreative());
 
             world.setBlockState(pos, state.with(HasGlowstone, true));
 
             return ActionResult.SUCCESS;
         } else {
-            System.out.println("Adding nothing :(");
-            return ActionResult.FAIL;
+            return ActionResult.CONSUME;
         }
     }
 }

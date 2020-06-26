@@ -47,15 +47,35 @@ class SpriteSet(private val defaultSprite: Sprite) {
         return if (this.isDefault) {
             defaultSprite
         } else {
-            (this.quads[dir]?.getOrNull(index) as AccessibleBakedQuad?)?.sprite ?: FALLBACK_SPRITE
+            this.getQuad(dir, index)
+                ?.let { (it as AccessibleBakedQuad).sprite }
+                ?: FALLBACK_SPRITE
         }
+    }
+
+    fun getQuad(dir: Direction, index: Int): BakedQuad? {
+        val quadList = this.quads[dir]
+        if (quadList == null) {
+            println("no quad list for $dir")
+            return null
+        }
+
+        if (index >= quadList.size) {
+            println("index $index larger than quad list size: ${quadList.size}")
+            return null
+        }
+
+        return quadList[index]
     }
 
     fun hasColor(dir: Direction, index: Int): Boolean {
         return if (this.isDefault) {
             false
         } else {
-            this.quads[dir]?.getOrNull(index)?.hasColor() ?: false
+            this.getQuad(dir, index)?.hasColor() ?: false
         }
     }
+
+    fun getQuadCount(dir: Direction) =
+        this.quads[dir]?.size ?: -1
 }

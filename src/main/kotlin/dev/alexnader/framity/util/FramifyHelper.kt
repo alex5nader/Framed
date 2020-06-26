@@ -1,7 +1,6 @@
 package dev.alexnader.framity.util
 
 import dev.alexnader.framity.block_entities.FrameEntity
-import dev.alexnader.framity.data.OverlayKind
 import net.fabricmc.fabric.api.tag.TagRegistry
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
@@ -10,7 +9,6 @@ import net.minecraft.item.Item
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.EnumProperty
 import net.minecraft.tag.Tag
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
@@ -24,22 +22,10 @@ import kotlin.random.Random
 val HasGlowstone: BooleanProperty = BooleanProperty.of("has_glowstone")
 
 /**
- * Property representing what overlay a frame has.
- */
-@JvmField
-val OverlayKindProp: EnumProperty<OverlayKind> = EnumProperty.of("overlay", OverlayKind::class.java)
-
-/**
  * Maps [BlockPos] to [PlayerEntity]. Should be empty except for when a frame is broken.
  */
 @JvmField
 val posToPlayer: MutableMap<BlockPos, PlayerEntity> = mutableMapOf()
-
-/**
- * The `framity:overlay_items` tag.
- */
-@JvmField
-val OverlayItemsTag: Tag<Item> = TagRegistry.item(Identifier("framity", "overlay_items"))
 
 /**
  * The `framity:frames` tag.
@@ -69,10 +55,9 @@ fun onHammerRemove(world: World, frameEntity: FrameEntity<*>?, frameState: Block
     }
 
     val changedState = when (slot) {
-        FrameEntity.ContainedSlot -> frameState
+        FrameEntity.ContainedSlot, FrameEntity.OverlaySlot -> frameState
         FrameEntity.GlowstoneSlot -> frameState.with(HasGlowstone, false)
-        FrameEntity.OverlaySlot -> frameState.with(OverlayKindProp, OverlayKind.None)
-        else -> throw RuntimeException("unreachable")
+        else -> error("unreachable")
     }
 
     world.setBlockState(frameEntity.pos, changedState)

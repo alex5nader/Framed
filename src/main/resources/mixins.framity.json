@@ -3,7 +3,6 @@
   "package": "dev.alexnader.framity.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "AccessibleStairsBlock",
     "Framify"
   ],
   "client": [

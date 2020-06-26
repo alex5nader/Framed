@@ -1,4 +1,4 @@
-package dev.alexnader.framity.model.v2
+package dev.alexnader.framity.model
 
 import net.fabricmc.fabric.api.client.model.ModelProviderContext
 import net.fabricmc.fabric.api.client.model.ModelVariantProvider
@@ -30,12 +30,18 @@ class FramityModelVariantProvider : ModelVariantProvider {
     fun registerModelsFor(targetBlock: Block, delegateBlock: Block, sprites: List<SpriteIdentifier>) {
         val unimportantProps = targetBlock.stateManager.defaultState.properties subtract delegateBlock.stateManager.defaultState.properties
 
-        val unimportantProduct = cartesianProduct(unimportantProps.map { prop -> prop.getValues().map { v -> Pair(prop, v)}.toSet() })
+        val unimportantProduct =
+            cartesianProduct(
+                unimportantProps.map { prop -> prop.getValues().map { v -> Pair(prop, v) }.toSet() })
 
         delegateBlock.stateManager.states.forEach { delegateState ->
             val importantState = delegateState.properties.fold(targetBlock.stateManager.defaultState, { acc, prop ->
                 @Suppress("UNCHECKED_CAST")
-                copyProperty(prop as Property<Comparable<Comparable<*>>>, delegateState, acc)
+                (copyProperty(
+        prop as Property<Comparable<Comparable<*>>>,
+        delegateState,
+        acc
+    ))
             })
 
             unimportantProduct.forEach { unimportantTargetState ->
@@ -46,7 +52,8 @@ class FramityModelVariantProvider : ModelVariantProvider {
 
                 val targetId = BlockModels.getModelId(targetState)
                 val delegateId = BlockModels.getModelId(delegateState)
-                this.variants[targetId] = UnbakedDelegatedModel(delegateId, sprites)
+                this.variants[targetId] =
+                    UnbakedDelegatedModel(delegateId, sprites)
             }
         }
         val targetItemId = Registry.ITEM.getId(targetBlock.asItem())
@@ -56,7 +63,8 @@ class FramityModelVariantProvider : ModelVariantProvider {
         }
         val targetId = ModelIdentifier(targetItemId, "inventory")
         val delegateId = ModelIdentifier(delegateItemId, "inventory")
-        this.variants[targetId] = UnbakedDelegatedModel(delegateId, sprites)
+        this.variants[targetId] =
+            UnbakedDelegatedModel(delegateId, sprites)
     }
 
     override fun loadModelVariant(modelId: ModelIdentifier?, context: ModelProviderContext?) =

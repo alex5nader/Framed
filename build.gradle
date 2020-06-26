@@ -17,6 +17,7 @@ minecraft {
 
 repositories {
     maven { url = "http://maven.fabricmc.net/" }
+    jcenter()
 //    maven {
 //        name = "grondag"
 //        url = "https://grondag-repo.appspot.com"
@@ -37,6 +38,8 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
+
+    implementation 'com.google.code.gson:gson:2.8.6'
 }
 
 processResources {

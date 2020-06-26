@@ -1,6 +1,7 @@
-package dev.alexnader.framity.model.v2
+package dev.alexnader.framity.model
 
 import dev.alexnader.framity.HOLLOW_FRAME_ID
+import dev.alexnader.framity.model.v2.FrameMeshTransformer
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
 import net.minecraft.block.BlockState
@@ -24,7 +25,10 @@ class BakedDelegateModel(private val delegateModel: BakedModel) : BakedModel by 
     }
 
     override fun emitItemQuads(stack: ItemStack?, randomSupplier: Supplier<Random>?, context: RenderContext?) {
-        transformed(context, makeTransformer().prepare(stack, randomSupplier)) {
+        transformed(context,
+            makeTransformer()
+                .prepare(stack, randomSupplier)
+        ) {
             (delegateModel as FabricBakedModel).emitItemQuads(stack, randomSupplier, context)
         }
     }
@@ -36,7 +40,10 @@ class BakedDelegateModel(private val delegateModel: BakedModel) : BakedModel by 
         randomSupplier: Supplier<Random>?,
         context: RenderContext?
     ) {
-        transformed(context, makeTransformer().prepare(blockView, state, pos, randomSupplier)) {
+        transformed(context,
+            makeTransformer()
+                .prepare(blockView, state, pos, randomSupplier)
+        ) {
             (delegateModel as FabricBakedModel).emitBlockQuads(blockView, state, pos, randomSupplier, context)
         }
     }

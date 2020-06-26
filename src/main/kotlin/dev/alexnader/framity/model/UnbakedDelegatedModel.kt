@@ -1,4 +1,4 @@
-package dev.alexnader.framity.model.v2
+package dev.alexnader.framity.model
 
 import com.mojang.datafixers.util.Pair
 import net.minecraft.client.render.model.BakedModel

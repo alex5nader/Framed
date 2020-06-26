@@ -1,5 +1,5 @@
 {
-  "parent": "framity:block/overlay_cube",
+  "parent": "framity:block/overlay/cube",
   "textures": {
     "particle": "#all",
     "down": "#all",

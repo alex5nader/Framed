@@ -1,0 +1,33 @@
+{
+  "item": "minecraft:wheat_seeds",
+  "overlay": {
+    "textureSource": {
+      "sided": [
+        {
+          "sides": ["up"],
+          "value": "minecraft:block/grass_block_top"
+        },
+        {
+          "sides": ["north", "south", "east", "west"],
+          "value": "minecraft:block/grass_block_side_overlay"
+        }
+      ]
+    },
+    "coloredLike": "minecraft:grass_block",
+    "textureOffsets": [
+      {
+        "sides": ["north","south","east","west"],
+        "value": {
+          "vOffsetter": {
+            "remap": [
+              {
+                "from": [0.5, 1.0, 1.0, 0.5],
+                "to": [0.0, 0.5, 0.5, 0.0]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
