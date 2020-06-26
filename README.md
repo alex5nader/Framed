@@ -43,7 +43,7 @@ The features below are in no particular order, and are not guaranteed to be adde
     - Mycelium
     - Path
     - Hay
-    - Vines
+    - ✔ Vines
 - Frame blocks
     - ✔ Full block
     - ✔ Slab
