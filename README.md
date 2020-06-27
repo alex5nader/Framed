@@ -63,6 +63,8 @@ The features below are in no particular order, and are not guaranteed to be adde
 - Other
     - Independent sides → Each side of the frame can have a different texture  
     - ✔ Glowstone dust → Frame gains light level of 15
+    - Redstone dust → Frame outputs redstone signal of 15
+    - Ice shard (via cotton) → Frame is slippery
     
 ## Thanks
 Thanks to:
