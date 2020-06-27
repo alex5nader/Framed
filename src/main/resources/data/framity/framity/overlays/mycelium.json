@@ -2,34 +2,5 @@
   "trigger": [
     { "item": "minecraft:red_mushroom" },
     { "item": "minecraft:brown_mushroom" }
-  ],
-  "overlay": {
-    "textureSource": {
-      "sided": [
-        {
-          "sides": [ "up" ],
-          "value": "minecraft:block/mycelium_top"
-        },
-        {
-          "sides": [ "north", "south", "east", "west" ],
-          "value": "framity:block/mycelium_side_overlay"
-        }
-      ]
-    },
-    "textureOffsets": [
-      {
-        "sides": [ "north", "south", "east", "west" ],
-        "value": {
-          "vOffsetter": {
-            "remap": [
-              {
-                "from": [ 0.5, 1.0, 1.0, 0.5 ],
-                "to": [ 0.0, 0.5, 0.5, 0.0 ]
-              }
-            ]
-          }
-        }
-      }
-    ]
-  }
+  ]
 }

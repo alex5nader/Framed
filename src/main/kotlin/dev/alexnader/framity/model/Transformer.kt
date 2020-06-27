@@ -1,6 +1,7 @@
 package dev.alexnader.framity.model
 
-import dev.alexnader.framity.data.overlay.runtime.*
+import dev.alexnader.framity.data.getOverlay
+import dev.alexnader.framity.data.overlay.*
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
 import net.fabricmc.fabric.api.renderer.v1.Renderer
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess
@@ -22,8 +23,8 @@ import net.minecraft.world.BlockRenderView
 import java.util.*
 import java.util.function.Supplier
 import dev.alexnader.framity.util.*
-import net.minecraft.client.texture.MissingSprite
 import net.minecraft.client.texture.SpriteAtlasTexture
+import net.minecraft.util.Identifier
 
 /**
  * Flips a number in the range [0, 1] as if it were in the range [1, 0].
@@ -74,7 +75,8 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
         pos: BlockPos?,
         randomSupplier: Supplier<Random>?
     ): MeshTransformer {
-        val (containedState, overlay) = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as Pair<BlockState?, OverlayInfo?>
+        val (containedState, overlayId) = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as Pair<BlockState?, Identifier?>
+        val overlay = getOverlay(overlayId)
 
         if (containedState == null) {
             sprites.clear()

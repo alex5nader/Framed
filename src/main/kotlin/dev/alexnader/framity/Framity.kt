@@ -1,12 +1,11 @@
 package dev.alexnader.framity
 
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import dev.alexnader.framity.util.WithId
 import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.blocks.*
-import dev.alexnader.framity.data.FramityResourceListener
-import dev.alexnader.framity.data.overlay.json.registerOverlayHandlers
+import dev.alexnader.framity.data.FramityAssetsListener
+import dev.alexnader.framity.data.FramityDataListener
 import dev.alexnader.framity.items.FramersHammer
 import dev.alexnader.framity.model.FramityModelVariantProvider
 import net.fabricmc.fabric.api.`object`.builder.v1.block.FabricBlockSettings
@@ -23,7 +22,7 @@ import net.minecraft.util.Identifier
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
-val GSON: Gson = GsonBuilder().registerOverlayHandlers().create()
+val GSON = Gson()
 
 val LOGGER: Logger = LogManager.getLogger("Framity")
 
@@ -84,16 +83,19 @@ val STAIRS_FRAME_ENTITY = MOD.blockEntity("stairs_frame_entity", ::FrameEntity, 
 @Suppress("unused")
 fun init() {
     MOD.register()
+
+    ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FramityDataListener())
 }
 
 @Suppress("unused")
 fun clientInit() {
     MOD.registerClient()
 
+    @Suppress("deprecation")
     ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEX).register(ClientSpriteRegistryCallback { _, registry ->
         registry.register(Identifier("framity", "block/snow_side_overlay"))
         registry.register(Identifier("framity", "block/mycelium_side_overlay"))
     })
 
-    ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FramityResourceListener())
+    ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(FramityAssetsListener())
 }

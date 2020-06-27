@@ -2,7 +2,7 @@ package dev.alexnader.framity.block_entities
 
 import com.mojang.serialization.Dynamic
 import dev.alexnader.framity.util.WithId
-import dev.alexnader.framity.data.getOverlayInfo
+import dev.alexnader.framity.data.getOverlayId
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity
 import net.fabricmc.fabric.api.server.PlayerStream
@@ -94,7 +94,7 @@ class FrameEntity<B: Block>(
      * [RenderAttachmentBlockEntity] implementation returning the contained [BlockState].
      */
     override fun getRenderAttachmentData() =
-        Pair(this.containedState, getOverlayInfo(this.overlayStack))
+        Pair(this.containedState, getOverlayId(this.overlayStack))
 
     /**
      * Marks this frame as dirty. Causes client to re-render the block when called.
