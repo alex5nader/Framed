@@ -1,8 +1,8 @@
 package dev.alexnader.framity.block_entities
 
 import com.mojang.serialization.Dynamic
-import dev.alexnader.framity.util.WithId
 import dev.alexnader.framity.data.getOverlayId
+import dev.alexnader.framity.util.*
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity
 import net.fabricmc.fabric.api.server.PlayerStream
@@ -13,10 +13,12 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.datafixer.NbtOps
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.item.Items
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.Direction
+import net.minecraft.world.World
 
 /**
  * Block entity for all frames.
@@ -28,62 +30,95 @@ class FrameEntity<B: Block>(
     private val ktBlock: WithId<B>,
     type: WithId<BlockEntityType<FrameEntity<B>>>
 ): InventoryBlockEntity(
-    type.value, DefaultedList.ofSize(3, ItemStack.EMPTY)
+    type.value, DefaultedList.ofSize(2 + OTHER_ITEM_DATA.size, ItemStack.EMPTY)
 ), RenderAttachmentBlockEntity, BlockEntityClientSerializable {
     companion object {
         /**
-         * [Inventory][net.minecraft.inventory.Inventory] slot for the contained block.
+         * [Inventory][net.minecraft.inventory.Inventory] slot for the base block.
          */
-        const val ContainedSlot = 0
-        /**
-         * [Inventory][net.minecraft.inventory.Inventory] slot for glowstone dust.
-         */
-        const val GlowstoneSlot = 1
+        const val BASE_SLOT = 0
         /**
          * [Inventory][net.minecraft.inventory.Inventory] slot for overlay.
          */
-        const val OverlaySlot = 2
+        const val OVERLAY_SLOT = 1
+
+        /**
+         * [Inventory][net.minecraft.inventory.Inventory] slot for glowstone dust.
+         */
+        const val OTHER_SLOTS_START = 2
+
+        @JvmStatic
+        fun getSlotForOtherItem(otherItem: Item): Int =
+            OTHER_SLOTS_START + (OTHER_ITEM_DATA[otherItem]?.offset ?: error("Invalid other item: $otherItem"))
+
+        sealed class OtherItem(val offset: Int) {
+            class Glowstone(offset: Int) : OtherItem(offset) {
+                override fun onAdd(world: World, frameEntity: FrameEntity<*>) {
+                    world.setBlockState(frameEntity.pos, frameEntity.cachedState.with(HasGlowstone, true))
+                }
+
+                override fun onRemove(world: World, frameEntity: FrameEntity<*>) {
+                    world.setBlockState(frameEntity.pos, frameEntity.cachedState.with(HasGlowstone, false))
+                }
+            }
+
+            class Dummy(offset: Int) : OtherItem(offset) {
+                override fun onAdd(world: World, frameEntity: FrameEntity<*>) {}
+                override fun onRemove(world: World, frameEntity: FrameEntity<*>) {}
+            }
+
+            abstract fun onAdd(world: World, frameEntity: FrameEntity<*>)
+            abstract fun onRemove(world: World, frameEntity: FrameEntity<*>)
+        }
+
+        @JvmField
+        val OTHER_ITEM_DATA = mapOf(
+            Items.GLOWSTONE_DUST to OtherItem.Glowstone(0),
+//            Items.REDSTONE,
+            Items.APPLE to OtherItem.Dummy(1),
+            Items.WHEAT to OtherItem.Dummy(2)
+        )
     }
 
     /**
-     * The contained [BlockState].
+     * The base [BlockState].
      */
-    var containedState: BlockState? = null
+    var baseState: BlockState? = null
         set(v) {
             field = v
             this.markDirty()
         }
 
-    /**
-     * The [ItemStack] for the contained block.
-     */
-    var containedStack
-        get() = this[ContainedSlot]
-        set(stack) {
-            this[ContainedSlot] = stack
-        }
-    /**
-     * The [Item] for the contained block.
-     */
-    val item: Item get() = this.containedStack.item
-
-    /**
-     * The [ItemStack] for the contained glowstone dust.
-     */
-    var glowstoneStack
-        get() = this[GlowstoneSlot]
-        set(stack) {
-            this[GlowstoneSlot] = stack
-        }
-
-    /**
-     * The [ItemStack] for the contained overlay.
-     */
-    var overlayStack
-        get() = this[OverlaySlot]
-        set(stack) {
-            this[OverlaySlot] = stack
-        }
+//    /**
+//     * The [ItemStack] for the contained block.
+//     */
+    val baseStack
+        get() = this[BASE_SLOT]
+//        set(stack) {
+//            this[ContainedSlot] = stack
+//        }
+//    /**
+//     * The [Item] for the contained block.
+//     */
+//    val item: Item get() = this.containedStack.item
+//
+//    /**
+//     * The [ItemStack] for the contained glowstone dust.
+//     */
+    val glowstoneStack
+        get() = this[OTHER_SLOTS_START]
+//        set(stack) {
+//            this[GlowstoneSlot] = stack
+//        }
+//
+//    /**
+//     * The [ItemStack] for the contained overlay.
+//     */
+    val overlayStack
+        get() = this[OVERLAY_SLOT]
+//        set(stack) {
+//            this[OverlaySlot] = stack
+//        }
 
     /**
      * The index of the "rightmost" item in this frame which isn't empty.
@@ -91,10 +126,10 @@ class FrameEntity<B: Block>(
     val highestRemovePrioritySlot get() = this.items.indices.findLast { !this.items[it].isEmpty } ?: -1
 
     /**
-     * [RenderAttachmentBlockEntity] implementation returning the contained [BlockState].
+     * [RenderAttachmentBlockEntity] implementation returning the base [BlockState] and the overlay ID.
      */
     override fun getRenderAttachmentData() =
-        Pair(this.containedState, getOverlayId(this.overlayStack))
+        Pair(this.baseState, getOverlayId(this.overlayStack))
 
     /**
      * Marks this frame as dirty. Causes client to re-render the block when called.
@@ -134,18 +169,28 @@ class FrameEntity<B: Block>(
     override fun fromClientTag(tag: CompoundTag?) {
         super.fromClientTag(tag)
         if (tag?.contains("state") == true) {
-            this.containedState = BlockState.CODEC.decode(Dynamic(NbtOps.INSTANCE, tag.get("state"))).result().get().first
+            this.baseState = BlockState.CODEC.decode(Dynamic(NbtOps.INSTANCE, tag.get("state"))).result().get().first
         } else {
-            this.containedState = null
+            this.baseState = null
         }
     }
 
     override fun toClientTag(tag: CompoundTag?): CompoundTag {
-        if (this.containedState == null) {
+        if (this.baseState == null) {
             tag?.remove("state")
         } else {
-            tag?.put("state", BlockState.CODEC.encode(this.containedState, NbtOps.INSTANCE, CompoundTag()).get().left().get())
+            tag?.put("state", BlockState.CODEC.encode(this.baseState, NbtOps.INSTANCE, CompoundTag()).get().left().get())
         }
         return super.toClientTag(tag)
     }
+
+    override fun getMaxCountPerStack() =
+        1
+
+    override fun isValid(slot: Int, stack: ItemStack) =
+        when (slot) {
+            BASE_SLOT -> validForBase(stack, { s -> s.block.defaultState }, this.world!!, this.pos) != null
+            OVERLAY_SLOT -> validForOverlay(stack)
+            else -> validForOther(stack)
+        }
 }

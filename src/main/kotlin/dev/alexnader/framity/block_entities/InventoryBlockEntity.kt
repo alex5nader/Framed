@@ -1,6 +1,6 @@
 package dev.alexnader.framity.block_entities
 
-import dev.alexnader.framity.util.KtInventory
+import dev.alexnader.framity.util.ListInventory
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
@@ -19,8 +19,10 @@ import kotlin.math.min
 abstract class InventoryBlockEntity(
     type: BlockEntityType<out BlockEntity>,
     override val items: DefaultedList<ItemStack>
-): BlockEntity(type), BlockEntityClientSerializable,
-    KtInventory<DefaultedList<ItemStack>> {
+): BlockEntity(type),
+    BlockEntityClientSerializable,
+    ListInventory<DefaultedList<ItemStack>>
+{
     /**
      * Reads this inventory's contents from [tag].
      */
@@ -57,22 +59,28 @@ abstract class InventoryBlockEntity(
         return Inventories.toTag(tag, this.items, true)
     }
 
-    /**
-     * Copies an [ItemStack] from this inventory, up to [count]. Will
-     * remove from the inventory if [take] is true.
-     */
-    fun copyFrom(slot: Int, stack: ItemStack, count: Int, take: Boolean) {
-        val newStack = stack.copy()
-        val realCount = min(count, stack.count)
-
-        newStack.count = realCount
-
-        if (take) {
-            stack.count -= realCount
+    override fun copyFrom(slot: Int, stack: ItemStack, count: Int, take: Boolean) =
+        super.copyFrom(slot, stack, count, take).also {
+            this.sync()
         }
 
-        this[slot] = newStack
+    override fun clear() =
+        super.clear().also {
+            this.sync()
+        }
 
-        this.sync()
-    }
+    override fun setStack(slot: Int, stack: ItemStack?) =
+        super.setStack(slot, stack).also {
+            this.sync()
+        }
+
+    override fun removeStack(slot: Int, amount: Int) =
+        super.removeStack(slot, amount).also {
+            this.sync()
+        }
+
+    override fun removeStack(slot: Int) =
+        super.removeStack(slot).also {
+            this.sync()
+        }
 }

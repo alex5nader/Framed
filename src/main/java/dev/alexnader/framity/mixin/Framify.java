@@ -19,8 +19,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,9 +26,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Map;
+
 import static dev.alexnader.framity.FramityKt.FRAMERS_HAMMER;
-import static dev.alexnader.framity.data.DataPackKt.hasOverlay;
 import static dev.alexnader.framity.util.FramifyHelperKt.*;
+import static dev.alexnader.framity.util.FrameContentsKt.*;
 
 @SuppressWarnings("unused")
 @Mixin({BlockFrame.class, SlabFrame.class, StairsFrame.class})
@@ -148,48 +148,48 @@ public class Framify extends Block {
 
         ItemStack playerStack = player.getStackInHand(player.getActiveHand());
 
-        if (hasOverlay(playerStack) && frameEntity.getOverlayStack().isEmpty()) {
-            frameEntity.copyFrom(FrameEntity.OverlaySlot, playerStack, 1, !player.isCreative());
+        if (frameEntity.getOverlayStack().isEmpty() && validForOverlay(playerStack)) {
+            frameEntity.copyFrom(FrameEntity.OVERLAY_SLOT, playerStack, 1, !player.isCreative());
             frameEntity.markDirty();
 
             return ActionResult.SUCCESS;
-        } else if (playerStack.getItem() instanceof BlockItem && playerStack.getItem() != frameEntity.getItem() && !FramesTag.contains(((BlockItem) (playerStack.getItem())).getBlock())) {
-            Block playerBlock = ((BlockItem) playerStack.getItem()).getBlock();
-
-            if (!frameEntity.getContainedStack().isEmpty()) {
-                if (!player.isCreative()) {
-                    player.inventory.offerOrDrop(world, frameEntity.getContainedStack());
-                }
-            }
-
-            BlockState containedState = playerBlock.getPlacementState(new ItemPlacementContext(new ItemUsageContext(player, hand, hit)));
-
-            if (containedState == null) {
-                return ActionResult.CONSUME;
-            }
-
-            if (playerBlock instanceof BlockWithEntity && playerBlock.getRenderType(containedState) != BlockRenderType.MODEL) {
-                return ActionResult.CONSUME;
-            }
-
-            VoxelShape outlineShape = playerBlock.getOutlineShape(containedState, world, pos, ShapeContext.absent());
-
-            if (!VoxelShapes.fullCube().getBoundingBoxes().equals(outlineShape.getBoundingBoxes())) {
-                return ActionResult.CONSUME;
-            }
-
-            frameEntity.copyFrom(FrameEntity.ContainedSlot, playerStack, 1, !player.isCreative());
-            frameEntity.setContainedState(containedState);
-
-            return ActionResult.SUCCESS;
-        } else if (playerStack.getItem() == Items.GLOWSTONE_DUST && frameEntity.getGlowstoneStack().isEmpty()) {
-            frameEntity.copyFrom(FrameEntity.GlowstoneSlot, playerStack, 1, !player.isCreative());
-
-            world.setBlockState(pos, state.with(HasGlowstone, true));
-
-            return ActionResult.SUCCESS;
-        } else {
-            return ActionResult.CONSUME;
         }
+
+        BlockState maybeBaseState = validForBase(
+                playerStack,
+                (bi) -> bi.getBlock().getPlacementState(new ItemPlacementContext(new ItemUsageContext(player, hand, hit))),
+                world,
+                pos
+        );
+
+        if (playerStack.getItem() != frameEntity.getBaseStack().getItem() && maybeBaseState != null) {
+            if (!frameEntity.getBaseStack().isEmpty() && !player.isCreative()) {
+                player.inventory.offerOrDrop(world, frameEntity.getBaseStack());
+            }
+
+            frameEntity.copyFrom(FrameEntity.BASE_SLOT, playerStack, 1, !player.isCreative());
+            frameEntity.setBaseState(maybeBaseState);
+
+            return ActionResult.SUCCESS;
+        }
+
+        if (validForOther(playerStack)) {
+            int slot = FrameEntity.getSlotForOtherItem(playerStack.getItem());
+
+            if (frameEntity.getStack(slot).isEmpty()) {
+                frameEntity.copyFrom(slot, playerStack, 1, !player.isCreative());
+
+                return ActionResult.SUCCESS;
+            } else {
+                return ActionResult.CONSUME;
+            }
+        }
+
+        if (playerStack.isEmpty()) {
+            player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
+            return ActionResult.SUCCESS;
+        }
+
+        return ActionResult.CONSUME;
     }
 }

@@ -90,6 +90,8 @@ class Mod(private val modId: String, private val modelVariantProvider: FramityMo
         return blockEntityType
     }
 
+    fun id(id: String): Identifier = Identifier(this.modId, id)
+
     fun register() {
         for ((id, itemGroup) in this.itemGroups) {
             FabricItemGroupBuilder.create(id.withNamespace(this.modId))

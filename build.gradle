@@ -17,15 +17,6 @@ minecraft {
 
 repositories {
     maven { url = "http://maven.fabricmc.net/" }
-    jcenter()
-//    maven {
-//        name = "grondag"
-//        url = "https://grondag-repo.appspot.com"
-//        credentials {
-//            username "guest"
-//            password ""
-//        }
-//    }
 }
 
 dependencies {

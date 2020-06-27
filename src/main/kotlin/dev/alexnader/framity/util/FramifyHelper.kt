@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.tag.TagRegistry
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.Item
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.state.property.BooleanProperty
@@ -50,13 +49,13 @@ fun onHammerRemove(world: World, frameEntity: FrameEntity<*>?, frameState: Block
         return
     }
 
-    if (slot == FrameEntity.ContainedSlot) {
-        frameEntity.containedState = null
+    if (slot == FrameEntity.BASE_SLOT) {
+        frameEntity.baseState = null
     }
 
     val changedState = when (slot) {
-        FrameEntity.ContainedSlot, FrameEntity.OverlaySlot -> frameState
-        FrameEntity.GlowstoneSlot -> frameState.with(HasGlowstone, false)
+        FrameEntity.BASE_SLOT, FrameEntity.OVERLAY_SLOT -> frameState
+        FrameEntity.OTHER_SLOTS_START -> frameState.with(HasGlowstone, false)
         else -> error("unreachable")
     }
 

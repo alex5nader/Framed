@@ -4,11 +4,12 @@ import net.minecraft.inventory.Inventories
 import net.minecraft.inventory.Inventory
 import net.minecraft.item.ItemStack
 import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Wrapper interface for [Inventory] which provides default behaviour and adds some kotlin-idiomatic accessors.
  */
-interface KtInventory<I: MutableList<ItemStack>>: Inventory {
+interface ListInventory<I: MutableList<ItemStack>>: Inventory {
     /**
      * The items contained in this inventory.
      */
@@ -86,5 +87,24 @@ interface KtInventory<I: MutableList<ItemStack>>: Inventory {
      */
     override fun clear() {
         this.items.clear()
+    }
+
+
+
+    /**
+     * Copies an [ItemStack] from this inventory, up to [count]. Will
+     * remove from the inventory if [take] is true.
+     */
+    fun copyFrom(slot: Int, stack: ItemStack, count: Int, take: Boolean) {
+        val newStack = stack.copy()
+        val realCount = min(count, stack.count)
+
+        newStack.count = realCount
+
+        if (take) {
+            stack.count -= realCount
+        }
+
+        this[slot] = newStack
     }
 }

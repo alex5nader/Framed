@@ -75,19 +75,19 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
         pos: BlockPos?,
         randomSupplier: Supplier<Random>?
     ): MeshTransformer {
-        val (containedState, overlayId) = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as Pair<BlockState?, Identifier?>
+        val (baseState, overlayId) = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as Pair<BlockState?, Identifier?>
         val overlay = getOverlay(overlayId)
 
-        if (containedState == null) {
+        if (baseState == null) {
             sprites.clear()
             this.mat = MAT_FINDER.clear().blendMode(0, BlendMode.CUTOUT).find()
         } else {
-            this.mat = MAT_FINDER.clear().disableDiffuse(0, false).disableAo(0, false).blendMode(0, BlendMode.fromRenderLayer(RenderLayers.getBlockLayer(containedState))).find()
-            val model = CLIENT.blockRenderManager.getModel(containedState)
+            this.mat = MAT_FINDER.clear().disableDiffuse(0, false).disableAo(0, false).blendMode(0, BlendMode.fromRenderLayer(RenderLayers.getBlockLayer(baseState))).find()
+            val model = CLIENT.blockRenderManager.getModel(baseState)
             sprites.prepare(model, randomSupplier?.get())
 
-            ColorProviderRegistry.BLOCK.get(containedState.block)?.let { colorProvider ->
-                this.color = FULL_ALPHA or colorProvider.getColor(containedState, blockView, pos, 1)
+            ColorProviderRegistry.BLOCK.get(baseState.block)?.let { colorProvider ->
+                this.color = FULL_ALPHA or colorProvider.getColor(baseState, blockView, pos, 1)
             }
         }
 
