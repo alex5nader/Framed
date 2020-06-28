@@ -2,7 +2,9 @@ package dev.alexnader.framity.util
 
 import net.minecraft.inventory.Inventories
 import net.minecraft.inventory.Inventory
+import net.minecraft.inventory.SidedInventory
 import net.minecraft.item.ItemStack
+import net.minecraft.util.math.Direction
 import kotlin.math.max
 import kotlin.math.min
 
@@ -18,14 +20,14 @@ interface ListInventory<I: MutableList<ItemStack>>: Inventory {
     /**
      * Gets an ItemStack from this inventory by index.
      */
-    operator fun get(slot: Int) = this.items[slot]
+    operator fun get(slot: Int) =
+        this.getStack(slot)
 
     /**
      * Sets an ItemStack in this inventory by index.
      */
-    operator fun set(slot: Int, stack: ItemStack) {
-        this.items[slot] = stack
-    }
+    operator fun set(slot: Int, stack: ItemStack) =
+        this.setStack(slot, stack)
 
     /**
      * This inventory's number of slots, including empty.
@@ -49,7 +51,7 @@ interface ListInventory<I: MutableList<ItemStack>>: Inventory {
     /**
      * [Inventory] implementation wrapping [get]
      */
-    override fun getStack(slot: Int) = this[slot]
+    override fun getStack(slot: Int) = this.items[slot]
 
     /**
      * [Inventory] implementation for splitting a stack in this inventory by index.
@@ -75,7 +77,7 @@ interface ListInventory<I: MutableList<ItemStack>>: Inventory {
      * [Inventory] implementation for setting a stack from this inventory by index.
      */
     override fun setStack(slot: Int, stack: ItemStack?) {
-        this[slot] = stack!!
+        this.items[slot] = stack!!
 
         stack.count = max(stack.count, this.maxCountPerStack)
 
@@ -88,8 +90,6 @@ interface ListInventory<I: MutableList<ItemStack>>: Inventory {
     override fun clear() {
         this.items.clear()
     }
-
-
 
     /**
      * Copies an [ItemStack] from this inventory, up to [count]. Will

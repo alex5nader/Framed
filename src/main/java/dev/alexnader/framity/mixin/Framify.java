@@ -26,8 +26,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Map;
-
 import static dev.alexnader.framity.FramityKt.FRAMERS_HAMMER;
 import static dev.alexnader.framity.util.FramifyHelperKt.*;
 import static dev.alexnader.framity.util.FrameContentsKt.*;
@@ -85,8 +83,8 @@ public class Framify extends Block {
 
     @SuppressWarnings("deprecation")
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (world == null || world.isClient() || pos == null || state == null || state.getBlock() == newState.getBlock()) {
+    public void onStateReplaced(BlockState oldState, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (world == null || world.isClient() || pos == null || oldState == null || oldState.getBlock() == newState.getBlock()) {
             return;
         }
 
@@ -94,7 +92,9 @@ public class Framify extends Block {
             PlayerEntity player = posToPlayer.remove(pos);
 
             if (player.isSneaking() && player.getStackInHand(player.getActiveHand()).getItem() == FRAMERS_HAMMER.getValue()) {
-                onHammerRemove(world, (FrameEntity<?>) world.getBlockEntity(pos), state, player, false);
+                onHammerRemove(world, (FrameEntity<?>) world.getBlockEntity(pos), oldState, player, false);
+            } else {
+                super.onStateReplaced(oldState, world, pos, newState, moved);
             }
         } else {
             BlockEntity blockEntity = world.getBlockEntity(pos);
@@ -104,7 +104,7 @@ public class Framify extends Block {
                 world.updateComparators(pos, this);
             }
 
-            super.onStateReplaced(state, world, pos, newState, moved);
+            super.onStateReplaced(oldState, world, pos, newState, moved);
         }
     }
 
@@ -174,10 +174,12 @@ public class Framify extends Block {
         }
 
         if (validForOther(playerStack)) {
-            int slot = FrameEntity.getSlotForOtherItem(playerStack.getItem());
+            FrameEntity.Companion.OtherItem otherItem = FrameEntity.OTHER_ITEM_DATA.get(playerStack.getItem());
 
-            if (frameEntity.getStack(slot).isEmpty()) {
-                frameEntity.copyFrom(slot, playerStack, 1, !player.isCreative());
+            if (frameEntity.getStack(otherItem.getSlot()).isEmpty()) {
+                frameEntity.copyFrom(otherItem.getSlot(), playerStack, 1, !player.isCreative());
+                System.out.println("Running onAdd");
+                otherItem.onAdd(world, frameEntity);
 
                 return ActionResult.SUCCESS;
             } else {
