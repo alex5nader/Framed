@@ -38,12 +38,12 @@ its [CurseForge page](https://www.curseforge.com/minecraft/mc-mods/framity).
 The features below are in no particular order, and are not guaranteed to be added.
 
 - Overlay textures
-    - ✔ Grass
-    - ✔ Snow
-    - ✔ Mycelium
-    - Path
-    - Hay
-    - ✔ Vines
+    - ✔ Grass (via wheat seeds)
+    - ✔ Snow (via snowball)
+    - ✔ Mycelium (via red/brown mushroom)
+    - ✔ Path (via dead bush)
+    - ✔ Hay (via wheat)
+    - ✔ Vines (via vine)
 - Frame blocks
     - ✔ Full block
     - ✔ Slab
@@ -63,7 +63,7 @@ The features below are in no particular order, and are not guaranteed to be adde
 - Other
     - Independent sides → Each side of the frame can have a different texture  
     - ✔ Glowstone dust → Frame gains light level of 15
-    - Redstone dust → Frame outputs redstone signal of 15
+    - ✔ Redstone dust → Frame outputs redstone signal of 15
     - Ice shard (via cotton) → Frame is slippery
     
 ## Thanks
