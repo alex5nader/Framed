@@ -35,31 +35,20 @@ val FramesTag: Tag<Block> = TagRegistry.block(Identifier("framity", "frames"))
 /**
  * Called on server when left clicked by a player holding a framer's hammer.
  * Removes the "rightmost" item from [frameEntity].
- * Returns false if the frame should be removed, true otherwise.
  */
-fun onHammerRemove(world: World, frameEntity: FrameEntity<*>?, frameState: BlockState, player: PlayerEntity, giveItem: Boolean) {
+fun onHammerRemove(world: World, frameEntity: FrameEntity<*>?, state: BlockState, player: PlayerEntity, giveItem: Boolean) {
     if (frameEntity == null) {
         return
     }
 
     val slot = frameEntity.highestRemovePrioritySlot
-    val stackFromBlock = frameEntity.removeStack(slot, 1)
 
     if (slot == -1) {
         return
     }
 
-    if (slot == FrameEntity.BASE_SLOT) {
-        frameEntity.baseState = null
-    }
-
-    val changedState = when (slot) {
-        FrameEntity.BASE_SLOT, FrameEntity.OVERLAY_SLOT -> frameState
-        FrameEntity.OTHER_SLOTS_START -> frameState.with(HasGlowstone, false)
-        else -> error("unreachable")
-    }
-
-    world.setBlockState(frameEntity.pos, changedState)
+    world.setBlockState(frameEntity.pos, state)
+    val stackFromBlock = frameEntity.removeStack(slot, 1)
 
     if (giveItem) {
         player.inventory.offerOrDrop(world, stackFromBlock)

@@ -11,11 +11,17 @@ import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.client.MinecraftClient
 import net.minecraft.datafixer.NbtOps
-import net.minecraft.item.Item
+import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.entity.player.PlayerInventory
+import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.screen.NamedScreenHandlerFactory
+import net.minecraft.screen.ScreenHandlerContext
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.state.property.BooleanProperty
+import net.minecraft.text.TranslatableText
 import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
@@ -30,7 +36,7 @@ class FrameEntity<B: Block>(
     private val ktBlock: WithId<B>,
     type: WithId<BlockEntityType<FrameEntity<B>>>
 ): InventoryBlockEntity(
-    type.value, DefaultedList.ofSize(2 + OTHER_ITEM_DATA.size, ItemStack.EMPTY)
+    type.value, DefaultedList.ofSize(SLOT_COUNT, ItemStack.EMPTY)
 ), RenderAttachmentBlockEntity, BlockEntityClientSerializable {
     companion object {
         /**
@@ -47,18 +53,26 @@ class FrameEntity<B: Block>(
          */
         const val OTHER_SLOTS_START = 2
 
-        @JvmStatic
-        fun getSlotForOtherItem(otherItem: Item): Int =
-            OTHER_SLOTS_START + (OTHER_ITEM_DATA[otherItem]?.offset ?: error("Invalid other item: $otherItem"))
-
         sealed class OtherItem(val offset: Int) {
-            class Glowstone(offset: Int) : OtherItem(offset) {
+            class BindsProperty(offset: Int, private val property: BooleanProperty) : OtherItem(offset) {
                 override fun onAdd(world: World, frameEntity: FrameEntity<*>) {
-                    world.setBlockState(frameEntity.pos, frameEntity.cachedState.with(HasGlowstone, true))
+                    println("Setting $property to true")
+                    world.setBlockState(frameEntity.pos, frameEntity.cachedState.with(property, true))
                 }
 
                 override fun onRemove(world: World, frameEntity: FrameEntity<*>) {
-                    world.setBlockState(frameEntity.pos, frameEntity.cachedState.with(HasGlowstone, false))
+                    println("Setting $property to false")
+                    world.setBlockState(frameEntity.pos, frameEntity.cachedState.with(property, false))
+                }
+            }
+
+            class Many(offset: Int, private vararg val others: OtherItem) : OtherItem(offset) {
+                override fun onAdd(world: World, frameEntity: FrameEntity<*>) {
+                    this.others.forEach { it.onAdd(world, frameEntity) }
+                }
+
+                override fun onRemove(world: World, frameEntity: FrameEntity<*>) {
+                    this.others.forEach { it.onRemove(world, frameEntity) }
                 }
             }
 
@@ -67,17 +81,21 @@ class FrameEntity<B: Block>(
                 override fun onRemove(world: World, frameEntity: FrameEntity<*>) {}
             }
 
+            val slot get() = OTHER_SLOTS_START + this.offset
+
             abstract fun onAdd(world: World, frameEntity: FrameEntity<*>)
             abstract fun onRemove(world: World, frameEntity: FrameEntity<*>)
         }
 
         @JvmField
         val OTHER_ITEM_DATA = mapOf(
-            Items.GLOWSTONE_DUST to OtherItem.Glowstone(0),
-//            Items.REDSTONE,
-            Items.APPLE to OtherItem.Dummy(1),
-            Items.WHEAT to OtherItem.Dummy(2)
+            Items.GLOWSTONE_DUST to OtherItem.BindsProperty(0, HasGlowstone),
+            Items.REDSTONE to OtherItem.Dummy(1),
+            Items.APPLE to OtherItem.Dummy(2),
+            Items.WHEAT to OtherItem.Dummy(3)
         )
+
+        val SLOT_COUNT = 2 + OTHER_ITEM_DATA.size
     }
 
     /**
@@ -89,36 +107,14 @@ class FrameEntity<B: Block>(
             this.markDirty()
         }
 
-//    /**
-//     * The [ItemStack] for the contained block.
-//     */
     val baseStack
         get() = this[BASE_SLOT]
-//        set(stack) {
-//            this[ContainedSlot] = stack
-//        }
-//    /**
-//     * The [Item] for the contained block.
-//     */
-//    val item: Item get() = this.containedStack.item
-//
-//    /**
-//     * The [ItemStack] for the contained glowstone dust.
-//     */
+
     val glowstoneStack
         get() = this[OTHER_SLOTS_START]
-//        set(stack) {
-//            this[GlowstoneSlot] = stack
-//        }
-//
-//    /**
-//     * The [ItemStack] for the contained overlay.
-//     */
+
     val overlayStack
         get() = this[OVERLAY_SLOT]
-//        set(stack) {
-//            this[OverlaySlot] = stack
-//        }
 
     /**
      * The index of the "rightmost" item in this frame which isn't empty.
@@ -130,6 +126,42 @@ class FrameEntity<B: Block>(
      */
     override fun getRenderAttachmentData() =
         Pair(this.baseState, getOverlayId(this.overlayStack))
+
+    override fun setStack(slot: Int, stack: ItemStack?) {
+        val isOtherItem = slot >= OTHER_SLOTS_START
+
+        if (isOtherItem) {
+            OTHER_ITEM_DATA[this.getStack(slot).item]?.onRemove(this.world!!, this)
+        }
+
+        super.setStack(slot, stack)
+
+        if (slot == BASE_SLOT) {
+            this.baseState = (this.baseStack.item as? BlockItem)?.block?.defaultState
+        } else if (isOtherItem) {
+            OTHER_ITEM_DATA[stack?.item]?.onAdd(this.world!!, this)
+        }
+    }
+
+    override fun removeStack(slot: Int): ItemStack {
+        if (slot == BASE_SLOT) {
+            this.baseState = null
+        } else if (slot >= OTHER_SLOTS_START) {
+            OTHER_ITEM_DATA[this.getStack(slot).item]?.onRemove(this.world!!, this)
+        }
+
+        return super.removeStack(slot)
+    }
+
+    override fun removeStack(slot: Int, amount: Int): ItemStack {
+        if (slot == BASE_SLOT) {
+            this.baseState = null
+        } else if (slot >= OTHER_SLOTS_START) {
+            OTHER_ITEM_DATA[this.getStack(slot).item]?.onRemove(this.world!!, this)
+        }
+
+        return super.removeStack(slot, amount)
+    }
 
     /**
      * Marks this frame as dirty. Causes client to re-render the block when called.
@@ -143,9 +175,8 @@ class FrameEntity<B: Block>(
             }
             this.world!!.updateNeighborsAlways(pos.offset(Direction.UP), this.ktBlock.value)
             val state = this.world!!.getBlockState(pos)
-            this.world!!.updateListeners(pos, state, state, 1)
-        }
-        if (this.world?.isClient == true) {
+            this.world!!.updateListeners(pos, this.cachedState, state, 1)
+        } else if (this.world?.isClient == true) {
             MinecraftClient.getInstance().worldRenderer.updateBlock(this.world, this.pos, this.ktBlock.value.defaultState, this.ktBlock.value.defaultState, 1)
         }
     }

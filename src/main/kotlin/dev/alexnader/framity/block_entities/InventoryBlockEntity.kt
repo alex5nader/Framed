@@ -10,7 +10,6 @@ import net.minecraft.inventory.Inventories
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.collection.DefaultedList
-import kotlin.math.min
 
 /**
  * Base class for block entities with an inventory. Handles some common
