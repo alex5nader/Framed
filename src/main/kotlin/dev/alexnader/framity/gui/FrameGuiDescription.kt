@@ -24,7 +24,7 @@ class FrameGuiDescription(
     syncId: Int,
     playerInventory: PlayerInventory?,
     context: ScreenHandlerContext
-) : SyncedGuiDescription(FRAME_SCREEN_HANDLER_TYPE, syncId, playerInventory, getBlockInventory(context), getBlockPropertyDelegate(context)) {
+) : SyncedGuiDescription(FRAME_SCREEN_HANDLER_TYPE, syncId, playerInventory, getBlockInventory(context, FrameEntity.SLOT_COUNT), getBlockPropertyDelegate(context)) {
     companion object : ScreenHandlerRegistry.SimpleClientHandlerFactory<FrameGuiDescription> {
         override fun create(syncId: Int, inventory: PlayerInventory) =
             FrameGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY)
