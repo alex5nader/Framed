@@ -51,21 +51,21 @@ class FramityDataListener : SimpleResourceReloadListener<FramityData> {
         manager: ResourceManager,
         profiler: Profiler,
         executor: Executor
-    ): CompletableFuture<Void> {
-        return CompletableFuture.runAsync {
-            data.overlayIds.forEach { overlayId ->
-                try {
-                    val input = manager.getResource(overlayId).inputStream
-                    val reader = BufferedReader(InputStreamReader(input))
+    ): CompletableFuture<Void> = CompletableFuture.runAsync {
+        data.overlayIds.forEach { overlayId ->
+            try {
+                val input = manager.getResource(overlayId).inputStream
+                val reader = BufferedReader(InputStreamReader(input))
 
-                    val element = GSON.fromJson(reader, JsonElement::class.java)
+                val element = GSON.fromJson(reader, JsonElement::class.java)
 
-                    val ctx = JsonParseContext(overlayId.toString(), element)
+                val ctx = JsonParseContext(overlayId.toString(), element)
 
-                    OverlayTriggers.add(Pair(OverlayTrigger.fromJson(ctx), overlayId))
-                } catch (e: IOException) {
-                    LOGGER.error("Error while loading an Ingredient JSON ($overlayId): $e")
-                }
+                OverlayTriggers.add(Pair(OverlayTrigger.fromJson(ctx), overlayId))
+            } catch (e: IOException) {
+                LOGGER.error("Error while loading a Framity overlay: $e")
+            } catch (e: JsonParseException) {
+                LOGGER.error("Error while parsing a Framity overlay: $e")
             }
         }
     }

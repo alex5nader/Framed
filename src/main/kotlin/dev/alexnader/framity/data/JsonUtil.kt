@@ -6,15 +6,12 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import kotlin.error as ktError
 
+class JsonParseException(message: String) : Exception(message)
+
 fun floatFromJson(ctx: JsonParseContext) =
     ctx.float
 
 class JsonParseContext private constructor(private val label: String, val json: JsonElement, private val path: String) {
-    companion object {
-        fun <T> ((JsonElement) -> T).useContext() =
-            { ctx: JsonParseContext -> this(ctx.json) }
-    }
-
     constructor(label: String, json: JsonElement) : this(label, json, "")
 
     private fun accessArray(index: Int): JsonParseContext {
@@ -62,7 +59,7 @@ class JsonParseContext private constructor(private val label: String, val json: 
     val short get() = getAsOrNull(JsonPrimitive::getAsShort, this.primitive, "Expected a short.")
 
     fun error(msg: String): Nothing =
-        ktError("Error from ${this.label} at ${if (this.path.isEmpty()) "<root>" else this.path}: $msg")
+        throw JsonParseException("Error from ${this.label} at ${if (this.path.isEmpty()) "<root>" else this.path}: $msg")
 
     fun <T> getChildWith(key: String, fromJson: FromJson<T>): T =
         fromJson(this.getChild(key))

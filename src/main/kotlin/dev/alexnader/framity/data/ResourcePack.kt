@@ -59,7 +59,9 @@ class FramityAssetsListener : SimpleResourceReloadListener<FramityAssets> {
 
                 OverlayInfoMap[overlayId] = OverlayInfo.fromJson(ctx)
             } catch (e: IOException) {
-                LOGGER.error("Error while loading a Framity OverlayInfo JSON ($overlayId): $e")
+                LOGGER.error("Error while loading a Framity overlay: $e")
+            } catch (e: JsonParseException) {
+                LOGGER.error("Error while parsing a Framity overlay: $e")
             }
         }
     }
