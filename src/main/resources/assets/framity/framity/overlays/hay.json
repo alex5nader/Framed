@@ -1,0 +1,29 @@
+{
+  "textureSource": {
+    "sided": [
+      {
+        "sides": [ "up" ],
+        "value": "minecraft:block/hay_block_top"
+      },
+      {
+        "sides": [ "north", "south", "east", "west" ],
+        "value": "framity:block/hay_side_overlay"
+      }
+    ]
+  },
+  "offsets": [
+    {
+      "sides": [ "north", "south", "east", "west" ],
+      "value": {
+        "vOffsetter": {
+          "remap": [
+            {
+              "from": [ 0.5, 1.0, 1.0, 0.5 ],
+              "to": [ 0.0, 0.5, 0.5, 0.0 ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 package dev.alexnader.framity.blocks
 
-import dev.alexnader.framity.util.HasGlowstone
 import net.fabricmc.fabric.api.`object`.builder.v1.block.FabricBlockSettings
 import net.minecraft.block.AbstractBlock
 import net.minecraft.block.Material
 import net.minecraft.sound.BlockSoundGroup
+import net.minecraft.state.property.Properties
 
 val SHAPE_FRAME_SETTINGS: AbstractBlock.Settings =
     FabricBlockSettings
@@ -17,4 +17,4 @@ val SHAPE_FRAME_SETTINGS: AbstractBlock.Settings =
 @JvmField
 val FRAME_SETTINGS: AbstractBlock.Settings =
     SHAPE_FRAME_SETTINGS
-        .lightLevel { state -> if (state.contains(HasGlowstone) && state[HasGlowstone]) 15 else 0 }
+        .lightLevel { state -> if (state.contains(Properties.LIT) && state[Properties.LIT]) 15 else 0 }

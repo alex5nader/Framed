@@ -92,10 +92,12 @@ fun clientInit() {
     MOD.registerClient()
 
     @Suppress("deprecation")
-    ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEX).register(ClientSpriteRegistryCallback { _, registry ->
-        registry.register(Identifier("framity", "block/snow_side_overlay"))
-        registry.register(Identifier("framity", "block/mycelium_side_overlay"))
-    })
+    ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEX).register(ClientSpriteRegistryCallback { _, registry -> with(registry) {
+        register(MOD.id("block/snow_side_overlay"))
+        register(MOD.id("block/mycelium_side_overlay"))
+        register(MOD.id("block/hay_side_overlay"))
+        register(MOD.id("block/path_side_overlay"))
+    }})
 
     ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(FramityAssetsListener())
 }

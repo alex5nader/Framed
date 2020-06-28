@@ -11,17 +11,13 @@ import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.client.MinecraftClient
 import net.minecraft.datafixer.NbtOps
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.screen.NamedScreenHandlerFactory
-import net.minecraft.screen.ScreenHandlerContext
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.state.property.BooleanProperty
-import net.minecraft.text.TranslatableText
+import net.minecraft.state.property.Properties
 import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
@@ -89,10 +85,8 @@ class FrameEntity<B: Block>(
 
         @JvmField
         val OTHER_ITEM_DATA = mapOf(
-            Items.GLOWSTONE_DUST to OtherItem.BindsProperty(0, HasGlowstone),
-            Items.REDSTONE to OtherItem.Dummy(1),
-            Items.APPLE to OtherItem.Dummy(2),
-            Items.WHEAT to OtherItem.Dummy(3)
+            Items.GLOWSTONE_DUST to OtherItem.BindsProperty(0, Properties.LIT),
+            Items.REDSTONE to OtherItem.BindsProperty(1, Properties.POWERED)
         )
 
         val SLOT_COUNT = 2 + OTHER_ITEM_DATA.size

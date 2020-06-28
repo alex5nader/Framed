@@ -14,11 +14,13 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.*;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,13 +42,14 @@ public class Framify extends Block {
     @SuppressWarnings("unused")
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void constructorProxy(CallbackInfo ci) {
-        this.setDefaultState(this.getDefaultState().with(HasGlowstone, false));
+        this.setDefaultState(this.getDefaultState().with(Properties.LIT, false).with(Properties.POWERED, false));
     }
 
     @SuppressWarnings("unused")
     @Inject(method = "appendProperties", at = @At("HEAD"))
     private void appendPropertiesProxy(StateManager.Builder<Block, BlockState> builder, CallbackInfo ci) {
-        builder.add(HasGlowstone);
+        builder.add(Properties.LIT);
+        builder.add(Properties.POWERED);
     }
 
     @Override
@@ -64,6 +67,22 @@ public class Framify extends Block {
     @Environment(EnvType.CLIENT)
     public float getAmbientOcclusionLightLevel(BlockState state, BlockView world, BlockPos pos) {
         return 1.0F;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean emitsRedstonePower(BlockState state) {
+        return state.contains(Properties.POWERED) && state.get(Properties.POWERED);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        if (state.contains(Properties.POWERED) && state.get(Properties.POWERED)) {
+            return 15;
+        } else {
+            return 0;
+        }
     }
 
     @SuppressWarnings("deprecation")

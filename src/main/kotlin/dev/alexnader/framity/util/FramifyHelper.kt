@@ -7,18 +7,11 @@ import net.minecraft.block.BlockState
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
-import net.minecraft.state.property.BooleanProperty
 import net.minecraft.tag.Tag
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import kotlin.random.Random
-
-/**
- * Property representing whether or not a frame should give off light.
- */
-@JvmField
-val HasGlowstone: BooleanProperty = BooleanProperty.of("has_glowstone")
 
 /**
  * Maps [BlockPos] to [PlayerEntity]. Should be empty except for when a frame is broken.
