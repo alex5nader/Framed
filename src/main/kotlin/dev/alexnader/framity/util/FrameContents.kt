@@ -38,10 +38,12 @@ fun validForBase(stack: ItemStack, toState: (BlockItem) -> BlockState, world: Wo
 }
 
 fun validStateForBase(state: BlockState, world: World, pos: BlockPos): Boolean {
+    @Suppress("deprecation")
     if (state.block is BlockWithEntity && state.block.getRenderType(state) != BlockRenderType.MODEL) {
         return false
     }
 
+    @Suppress("deprecation")
     val outlineShape = state.block.getOutlineShape(state, world, pos, ShapeContext.absent())
 
     if (VoxelShapes.fullCube().boundingBoxes != outlineShape.boundingBoxes) {

@@ -3,8 +3,8 @@ package dev.alexnader.framity.block_entities
 import com.mojang.serialization.Dynamic
 import dev.alexnader.framity.data.getOverlayId
 import dev.alexnader.framity.gui.FrameGuiDescription
+import dev.alexnader.framity.mixin.GetItemBeforeEmpty
 import dev.alexnader.framity.util.*
-import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity
 import net.fabricmc.fabric.api.server.PlayerStream
 import net.minecraft.block.Block
@@ -12,13 +12,18 @@ import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.client.MinecraftClient
 import net.minecraft.datafixer.NbtOps
+import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.screen.NamedScreenHandlerFactory
+import net.minecraft.screen.ScreenHandlerContext
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.state.property.BooleanProperty
 import net.minecraft.state.property.Properties
+import net.minecraft.text.TranslatableText
 import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
@@ -53,12 +58,10 @@ class FrameEntity<B: Block>(
         sealed class OtherItem(val offset: Int) {
             class BindsProperty(offset: Int, private val property: BooleanProperty) : OtherItem(offset) {
                 override fun onAdd(world: World, frameEntity: FrameEntity<*>) {
-                    println("Setting $property to true")
                     world.setBlockState(frameEntity.pos, frameEntity.cachedState.with(property, true))
                 }
 
                 override fun onRemove(world: World, frameEntity: FrameEntity<*>) {
-                    println("Setting $property to false")
                     world.setBlockState(frameEntity.pos, frameEntity.cachedState.with(property, false))
                 }
             }
@@ -122,11 +125,18 @@ class FrameEntity<B: Block>(
     override fun getRenderAttachmentData() =
         Pair(this.baseState, getOverlayId(this.overlayStack))
 
+    override fun clear() {
+        OTHER_ITEM_DATA.forEach { (_, data) -> data.onRemove(this.world!!, this) }
+        super.clear()
+    }
+
     override fun setStack(slot: Int, stack: ItemStack?) {
         val isOtherItem = slot >= OTHER_SLOTS_START
 
         if (isOtherItem) {
-            OTHER_ITEM_DATA[this.getStack(slot).item]?.onRemove(this.world!!, this)
+            @Suppress("CAST_NEVER_SUCCEEDS")
+            val existing = this.getStack(slot) as GetItemBeforeEmpty
+            OTHER_ITEM_DATA[existing.itemBeforeEmpty]?.onRemove(this.world!!, this)
         }
 
         super.setStack(slot, stack)
@@ -142,7 +152,9 @@ class FrameEntity<B: Block>(
         if (slot == BASE_SLOT) {
             this.baseState = null
         } else if (slot >= OTHER_SLOTS_START) {
-            OTHER_ITEM_DATA[this.getStack(slot).item]?.onRemove(this.world!!, this)
+            @Suppress("CAST_NEVER_SUCCEEDS")
+            val existing = this.getStack(slot) as GetItemBeforeEmpty
+            OTHER_ITEM_DATA[existing.itemBeforeEmpty]?.onRemove(this.world!!, this)
         }
 
         return super.removeStack(slot)
@@ -152,7 +164,9 @@ class FrameEntity<B: Block>(
         if (slot == BASE_SLOT) {
             this.baseState = null
         } else if (slot >= OTHER_SLOTS_START) {
-            OTHER_ITEM_DATA[this.getStack(slot).item]?.onRemove(this.world!!, this)
+            @Suppress("CAST_NEVER_SUCCEEDS")
+            val existing = this.getStack(slot) as GetItemBeforeEmpty
+            OTHER_ITEM_DATA[existing.itemBeforeEmpty]?.onRemove(this.world!!, this)
         }
 
         return super.removeStack(slot, amount)

@@ -5,7 +5,7 @@ import io.github.cottonmc.cotton.gui.widget.WItemSlot
 import net.minecraft.inventory.Inventory
 import net.minecraft.item.ItemStack
 
-class SingleItemSlot(
+open class SingleItemSlot(
     inventory: Inventory,
     startIndex: Int,
     slotsWide: Int = 1,
