@@ -4,11 +4,16 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
+//noinspection GroovyUnusedAssignment
 sourceCompatibility = JavaVersion.VERSION_1_8
+//noinspection GroovyUnusedAssignment
 targetCompatibility = JavaVersion.VERSION_1_8
 
+//noinspection GroovyUnusedAssignment
 archivesBaseName = project.archives_base_name
+//noinspection GroovyAssignabilityCheck
 version = project.mod_version
+//noinspection GroovyAssignabilityCheck
 group = project.maven_group
 
 minecraft {
@@ -17,6 +22,10 @@ minecraft {
 
 repositories {
     maven { url = "http://maven.fabricmc.net/" }
+    maven {
+        name = "CottonMC"
+        url = "https://server.bbkr.space/artifactory/libs-release"
+    }
 }
 
 dependencies {
@@ -31,6 +40,8 @@ dependencies {
     modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
 
     implementation 'com.google.code.gson:gson:2.8.6'
+
+    modImplementation "io.github.cottonmc:LibGui:${project.libgui_version}"
 }
 
 processResources {

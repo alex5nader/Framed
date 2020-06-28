@@ -2,6 +2,7 @@ package dev.alexnader.framity.block_entities
 
 import com.mojang.serialization.Dynamic
 import dev.alexnader.framity.data.getOverlayId
+import dev.alexnader.framity.gui.FrameGuiDescription
 import dev.alexnader.framity.util.*
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity
@@ -33,7 +34,7 @@ class FrameEntity<B: Block>(
     type: WithId<BlockEntityType<FrameEntity<B>>>
 ): InventoryBlockEntity(
     type.value, DefaultedList.ofSize(SLOT_COUNT, ItemStack.EMPTY)
-), RenderAttachmentBlockEntity, BlockEntityClientSerializable {
+), RenderAttachmentBlockEntity, NamedScreenHandlerFactory {
     companion object {
         /**
          * [Inventory][net.minecraft.inventory.Inventory] slot for the base block.
@@ -218,4 +219,10 @@ class FrameEntity<B: Block>(
             OVERLAY_SLOT -> validForOverlay(stack)
             else -> validForOther(stack)
         }
+
+    override fun getDisplayName() =
+        TranslatableText(cachedState.block.translationKey)
+
+    override fun createMenu(syncId: Int, inv: PlayerInventory, player: PlayerEntity) =
+        FrameGuiDescription(syncId, inv, ScreenHandlerContext.create(this.world, this.pos))
 }
