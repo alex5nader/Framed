@@ -49,7 +49,7 @@ The features below are in no particular order, and are not guaranteed to be adde
     - ✔ Slab
     - ✔ Stairs
     - ✔ Fence
-    - Fence gate
+    - ✔ Fence gate
     - Slope
     - Bed
     - Flower pot
@@ -72,9 +72,10 @@ Thanks to:
 incredible help and support throughout the creation of Framity.
 - [Grondag](https://www.curseforge.com/members/grondagthebarbarian)
 for immensely helping me understand the fabric rendering API.
+- [LibGui](https://github.com/CottonMC/LibGui) for making GUI creation so easy.
 - [Yoghurt4c](https://www.curseforge.com/members/yoghurt4c) for providing
 an example of how to read assets/data (via
-[Lil Tater Reloaded](https://www.curseforge.com/minecraft/mc-mods/lil-tater-reloaded))
+[Lil Tater Reloaded](https://www.curseforge.com/minecraft/mc-mods/lil-tater-reloaded)).
 - [Mineshopper](https://www.curseforge.com/members/mineshopper) for letting
 me use assets from the original
 [Carpenter's Blocks](https://www.curseforge.com/minecraft/mc-mods/carpenters-blocks).
