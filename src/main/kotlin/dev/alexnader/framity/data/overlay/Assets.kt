@@ -161,13 +161,6 @@ sealed class Offsetter {
      * Offsets by converting from the range a..b to 0..(b-a)
      */
     object Zero : Offsetter()
-
-//    data class Zero : Offsetter() {
-//        companion object {
-//            fun fromJson(ctx: JsonParseContext) =
-//                Zero.takeIf { ctx.string == "zero" } ?: ctx.error("Invalid ")
-//        }
-//    }
 }
 
 data class Float4(val a: Float, val b: Float, val c: Float, val d: Float) {

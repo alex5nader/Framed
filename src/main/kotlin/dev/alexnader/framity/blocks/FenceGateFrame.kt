@@ -9,7 +9,6 @@ import net.minecraft.block.BlockState
 import net.minecraft.block.FenceGateBlock
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.state.StateManager
-import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
@@ -46,6 +45,12 @@ class FenceGateFrame : FenceGateBlock(FRAME_SETTINGS), BlockEntityProvider {
         direction: Direction
     ) =
         frame_getWeakRedstonePower(state, world, pos, direction)
+
+    override fun isSideInvisible(state: BlockState, stateFrom: BlockState, direction: Direction) =
+        frame_isSideInvisible(state, stateFrom, direction, this) {
+            @Suppress("DEPRECATION")
+            super.isSideInvisible(state, stateFrom, direction)
+        }
 
     override fun onSyncedBlockEvent(state: BlockState, world: World, pos: BlockPos, type: Int, data: Int) =
         frame_onSyncedBlockEvent(state, world, pos, type, data) {

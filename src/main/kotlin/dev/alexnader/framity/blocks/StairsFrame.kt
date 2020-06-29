@@ -44,6 +44,12 @@ class StairsFrame : StairsBlock(SHAPE_BLOCK_FRAME.value.defaultState, FRAME_SETT
     ) =
         frame_getWeakRedstonePower(state, world, pos, direction)
 
+    override fun isSideInvisible(state: BlockState, stateFrom: BlockState, direction: Direction) =
+        frame_isSideInvisible(state, stateFrom, direction, this) {
+            @Suppress("DEPRECATION")
+            super.isSideInvisible(state, stateFrom, direction)
+        }
+
     override fun onSyncedBlockEvent(state: BlockState, world: World, pos: BlockPos, type: Int, data: Int) =
         frame_onSyncedBlockEvent(state, world, pos, type, data) {
             @Suppress("DEPRECATION")

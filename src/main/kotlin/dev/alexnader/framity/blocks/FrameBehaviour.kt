@@ -1,9 +1,12 @@
+@file:Suppress("FunctionName", "UNUSED_PARAMETER")
+
 package dev.alexnader.framity.blocks
 
 import dev.alexnader.framity.FRAMERS_HAMMER
 import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.block_entities.FrameEntity.Companion.OtherItem
 import dev.alexnader.framity.data.hasOverlay
+import dev.alexnader.framity.util.equalsIgnoring
 import net.fabricmc.fabric.api.tag.TagRegistry
 import net.minecraft.block.*
 import net.minecraft.entity.player.PlayerEntity
@@ -42,6 +45,8 @@ val posToPlayer: MutableMap<BlockPos, PlayerEntity> = mutableMapOf()
  * The `framity:frames` tag.
  */
 val FramesTag: Tag<Block> = TagRegistry.block(Identifier("framity", "frames"))
+
+fun frameStatesEqual(a: BlockState, b: BlockState) = equalsIgnoring<Block, BlockState>(setOf(Properties.LIT, HAS_REDSTONE))(a, b)
 
 /**
  * Called on server when left clicked by a player holding a framer's hammer.
@@ -130,11 +135,19 @@ const val AMBIENT_OCCLUSION_LIGHT_LEVEL = 1f
 fun frame_emitsRedstonePower(state: BlockState): Boolean =
     state[HAS_REDSTONE]
 
-@Suppress("UNUSED_PARAMETER")
 fun frame_getWeakRedstonePower(state: BlockState, world: BlockView, pos: BlockPos, direction: Direction) =
     if (state[HAS_REDSTONE]) 15 else 0
 
-@Suppress("UNUSED_PARAMETER")
+fun frame_isSideInvisible(
+    state: BlockState,
+    stateFrom: BlockState,
+    direction: Direction,
+    `this`: Block,
+    callSuper: () -> Boolean
+): Boolean {
+    return stateFrom.isOf(`this`) && frameStatesEqual(state, stateFrom) || callSuper()
+}
+
 fun frame_onSyncedBlockEvent(state: BlockState, world: World, pos: BlockPos, type: Int, data: Int, callSuper: () -> Boolean): Boolean {
     callSuper()
     return world.getBlockEntity(pos)?.onSyncedBlockEvent(type, data) ?: false
@@ -189,7 +202,6 @@ fun frame_onBlockBreakStart(state: BlockState, world: World, pos: BlockPos, play
     }
 }
 
-@Suppress("UNUSED_PARAMETER")
 fun frame_onBreak(world: World, pos: BlockPos, state: BlockState, player: PlayerEntity, callSuper: () -> Unit) {
     callSuper()
 

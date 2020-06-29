@@ -6,9 +6,7 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockEntityProvider
 import net.minecraft.block.BlockState
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.screen.NamedScreenHandlerFactory
 import net.minecraft.state.StateManager
-import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
@@ -35,6 +33,12 @@ class BlockFrame : Block(FRAME_SETTINGS), BlockEntityProvider {
 
     override fun emitsRedstonePower(state: BlockState) =
         frame_emitsRedstonePower(state)
+
+    override fun isSideInvisible(state: BlockState, stateFrom: BlockState, direction: Direction) =
+        frame_isSideInvisible(state, stateFrom, direction, this) {
+            @Suppress("DEPRECATION")
+            super.isSideInvisible(state, stateFrom, direction)
+        }
 
     override fun getWeakRedstonePower(
         state: BlockState,

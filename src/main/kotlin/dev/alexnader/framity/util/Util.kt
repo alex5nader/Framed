@@ -1,6 +1,7 @@
 package dev.alexnader.framity.util
 
-import net.minecraft.util.Identifier
+import net.minecraft.state.State
+import net.minecraft.state.property.Property
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import java.util.*
@@ -22,4 +23,20 @@ fun <N> minMax(a: N, b: N) where N: Number, N: Comparable<N> =
         Pair(a, b)
     } else {
         Pair(b, a)
+    }
+
+/**
+ * Checks if the value of [prop] for [a] and [b] is equal. Assumes [prop] in [a], checks [prop] in [b].
+ */
+fun <O, S, T: Comparable<T>> propEq(prop: Property<T>, a: State<O, S>, b: State<O, S>) =
+    prop in b && a[prop] == b[prop]
+
+/**
+ * Returns a function that checks if all properties, except for those in [toIgnore], are equal for two states.
+ */
+fun <O, S> equalsIgnoring(toIgnore: Set<Property<*>>) =
+    @Suppress("UNCHECKED_CAST")
+    { a: State<O, S>, b: State<O, S> -> a.properties.asSequence()
+        .filter { it !in toIgnore }
+        .all { propEq(it as Property<Comparable<Comparable<*>>>, a, b) }
     }
