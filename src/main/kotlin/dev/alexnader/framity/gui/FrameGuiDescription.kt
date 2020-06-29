@@ -2,9 +2,9 @@ package dev.alexnader.framity.gui
 
 import dev.alexnader.framity.FRAME_SCREEN_HANDLER_TYPE
 import dev.alexnader.framity.block_entities.FrameEntity
+import dev.alexnader.framity.blocks.validForBase
+import dev.alexnader.framity.blocks.validForOverlay
 import dev.alexnader.framity.util.orNull
-import dev.alexnader.framity.util.validForBase
-import dev.alexnader.framity.util.validForOverlay
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription
 import io.github.cottonmc.cotton.gui.widget.WGridPanel
 import io.github.cottonmc.cotton.gui.widget.WLabel

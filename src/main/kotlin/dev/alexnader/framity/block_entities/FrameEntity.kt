@@ -1,6 +1,9 @@
 package dev.alexnader.framity.block_entities
 
 import com.mojang.serialization.Dynamic
+import dev.alexnader.framity.blocks.validForBase
+import dev.alexnader.framity.blocks.validForOther
+import dev.alexnader.framity.blocks.validForOverlay
 import dev.alexnader.framity.data.getOverlayId
 import dev.alexnader.framity.gui.FrameGuiDescription
 import dev.alexnader.framity.mixin.GetItemBeforeEmpty
