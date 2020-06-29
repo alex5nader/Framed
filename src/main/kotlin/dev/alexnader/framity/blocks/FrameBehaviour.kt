@@ -16,6 +16,7 @@ import net.minecraft.screen.NamedScreenHandlerFactory
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.state.StateManager
+import net.minecraft.state.property.BooleanProperty
 import net.minecraft.state.property.Properties
 import net.minecraft.tag.Tag
 import net.minecraft.util.ActionResult
@@ -30,16 +31,16 @@ import net.minecraft.world.BlockView
 import net.minecraft.world.World
 import kotlin.random.Random
 
+val HAS_REDSTONE: BooleanProperty = BooleanProperty.of("has_redstone")
+
 /**
  * Maps [BlockPos] to [PlayerEntity]. Should be empty except for when a frame is broken.
  */
-@JvmField
 val posToPlayer: MutableMap<BlockPos, PlayerEntity> = mutableMapOf()
 
 /**
  * The `framity:frames` tag.
  */
-@JvmField
 val FramesTag: Tag<Block> = TagRegistry.block(Identifier("framity", "frames"))
 
 /**
@@ -114,12 +115,12 @@ fun validStateForBase(state: BlockState, world: World, pos: BlockPos): Boolean {
 
 fun frameDefaultState(base: BlockState): BlockState =
     base.with(Properties.LIT, false)
-        .with(Properties.POWERED, false)
+        .with(HAS_REDSTONE, false)
 
 fun frame_appendProperties(builder: StateManager.Builder<Block, BlockState>, callSuper: () -> Unit) {
     callSuper()
     builder.add(Properties.LIT)
-    builder.add(Properties.POWERED)
+    builder.add(HAS_REDSTONE)
 }
 
 const val IS_TRANSLUCENT = true
@@ -127,11 +128,11 @@ const val HAS_DYNAMIC_BOUNDS = true
 const val AMBIENT_OCCLUSION_LIGHT_LEVEL = 1f
 
 fun frame_emitsRedstonePower(state: BlockState): Boolean =
-    state[Properties.POWERED]
+    state[HAS_REDSTONE]
 
 @Suppress("UNUSED_PARAMETER")
 fun frame_getWeakRedstonePower(state: BlockState, world: BlockView, pos: BlockPos, direction: Direction) =
-    if (state[Properties.POWERED]) 15 else 0
+    if (state[HAS_REDSTONE]) 15 else 0
 
 @Suppress("UNUSED_PARAMETER")
 fun frame_onSyncedBlockEvent(state: BlockState, world: World, pos: BlockPos, type: Int, data: Int, callSuper: () -> Boolean): Boolean {
@@ -208,52 +209,56 @@ fun frame_onUse(
     hit: BlockHitResult,
     callSuper: () -> ActionResult?
 ): ActionResult? {
-    if (world.isClient()) {
-        return ActionResult.CONSUME
-    }
-    
     val frameEntity = world.getBlockEntity(pos) as FrameEntity<*>? ?: return ActionResult.CONSUME
     
-    val playerStack = player.getStackInHand(player.activeHand)
-    
-    if (frameEntity.overlayStack.isEmpty && validForOverlay(playerStack)) {
-        frameEntity.copyFrom(FrameEntity.OVERLAY_SLOT, playerStack, 1, !player.isCreative)
-        frameEntity.markDirty()
-        return ActionResult.SUCCESS
-    }
-    
-    val maybeBaseState = validForBase(
-        playerStack,
-        { bi -> bi.block.getPlacementState(ItemPlacementContext(ItemUsageContext(player, hand, hit))) },
-        world,
-        pos
-    )
-    
-    if (playerStack.item !== frameEntity.baseStack.item && maybeBaseState != null) {
-        if (!frameEntity.baseStack.isEmpty && !player.isCreative) {
-            player.inventory.offerOrDrop(world, frameEntity.baseStack)
+    val playerStack = player.mainHandStack
+
+    if (!world.isClient && playerStack != null) {
+        if (frameEntity.overlayStack.isEmpty && validForOverlay(playerStack)) {
+            frameEntity.copyFrom(FrameEntity.OVERLAY_SLOT, playerStack, 1, !player.isCreative)
+            frameEntity.markDirty()
+            return ActionResult.SUCCESS
         }
-        frameEntity.copyFrom(FrameEntity.BASE_SLOT, playerStack, 1, !player.isCreative)
-        frameEntity.baseState = maybeBaseState
-        return ActionResult.SUCCESS
-    }
-    
-    if (validForOther(playerStack)) {
-        val otherItem: OtherItem? = FrameEntity.OTHER_ITEM_DATA[playerStack.item]
-        return if (frameEntity.getStack(otherItem!!.slot).isEmpty) {
-            frameEntity.copyFrom(otherItem.slot, playerStack, 1, !player.isCreative)
-            println("Running onAdd")
-            otherItem.onAdd(world, frameEntity)
-            ActionResult.SUCCESS
-        } else {
-            ActionResult.CONSUME
+
+        val maybeBaseState = validForBase(
+            playerStack,
+            { bi -> bi.block.getPlacementState(ItemPlacementContext(ItemUsageContext(player, hand, hit))) },
+            world,
+            pos
+        )
+
+        if (playerStack.item !== frameEntity.baseStack.item && maybeBaseState != null) {
+            if (!frameEntity.baseStack.isEmpty && !player.isCreative) {
+                player.inventory.offerOrDrop(world, frameEntity.baseStack)
+            }
+            frameEntity.copyFrom(FrameEntity.BASE_SLOT, playerStack, 1, !player.isCreative)
+            frameEntity.baseState = maybeBaseState
+            return ActionResult.SUCCESS
+        }
+
+        if (validForOther(playerStack)) {
+            val otherItem: OtherItem? = FrameEntity.OTHER_ITEM_DATA[playerStack.item]
+            return if (frameEntity.getStack(otherItem!!.slot).isEmpty) {
+                frameEntity.copyFrom(otherItem.slot, playerStack, 1, !player.isCreative)
+                println("Running onAdd")
+                otherItem.onAdd(world, frameEntity)
+                ActionResult.SUCCESS
+            } else {
+                ActionResult.CONSUME
+            }
         }
     }
     
-    if (playerStack.isEmpty) {
+    if (playerStack.isEmpty && player.isSneaking) {
         player.openHandledScreen(state.createScreenHandlerFactory(world, pos))
         return ActionResult.SUCCESS
     }
     
-    return callSuper()
+    return callSuper().let {
+        if (it == ActionResult.PASS) {
+            ActionResult.CONSUME
+        } else {
+            it
+        }
+    }
 }

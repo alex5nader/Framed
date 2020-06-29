@@ -1,6 +1,7 @@
 package dev.alexnader.framity.model
 
-import dev.alexnader.framity.data.getOverlay
+import dev.alexnader.framity.LOGGER
+import dev.alexnader.framity.data.getValidOverlay
 import dev.alexnader.framity.data.overlay.*
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
 import net.fabricmc.fabric.api.renderer.v1.Renderer
@@ -62,7 +63,7 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
     private val sprites = SpriteSet(defaultSprite)
     private val transformedIndex: EnumMap<Direction, Int> = EnumMap(Direction::class.java)
 
-    private var overlay: OverlayInfo? = null
+    private var overlay: OverlayInfo.Valid? = null
     private var cachedOverlayColor: Int? = null
 
     private var color = 0
@@ -76,7 +77,11 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
         randomSupplier: Supplier<Random>?
     ): MeshTransformer {
         val (baseState, overlayId) = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as Pair<BlockState?, Identifier?>
-        val overlay = getOverlay(overlayId)
+        val overlay = getValidOverlay(overlayId)
+
+        if (overlayId != null && overlay == null) {
+            LOGGER.warn("Trying to access invalid overlay: $overlayId")
+        }
 
         if (baseState == null) {
             sprites.clear()
@@ -205,6 +210,16 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
                 when (offsetter) {
                     is Offsetter.Remap ->
                         offsetter[orig] ?: orig
+                    Offsetter.Zero -> {
+                        val (min, max) = minMax(orig.a, orig.b)
+                        val delta = max - min
+
+                        if (orig.a == min) {
+                            Float4(0f, delta, delta, 0f)
+                        } else {
+                            Float4(delta, 0f, 0f, delta)
+                        }
+                    }
                 }
 
             val overlay = this.overlay

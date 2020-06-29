@@ -1,0 +1,12 @@
+{
+  "offsets": [
+    {
+      "sides": [ "north", "south", "east", "west" ],
+      "value": {
+        "vOffsetter": {
+          "zero": {}
+        }
+      }
+    }
+  ]
+}

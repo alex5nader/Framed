@@ -1,6 +1,7 @@
 package dev.alexnader.framity.block_entities
 
 import com.mojang.serialization.Dynamic
+import dev.alexnader.framity.blocks.HAS_REDSTONE
 import dev.alexnader.framity.blocks.validForBase
 import dev.alexnader.framity.blocks.validForOther
 import dev.alexnader.framity.blocks.validForOverlay
@@ -93,7 +94,7 @@ class FrameEntity<B: Block>(
         @JvmField
         val OTHER_ITEM_DATA = mapOf(
             Items.GLOWSTONE_DUST to OtherItem.BindsProperty(0, Properties.LIT),
-            Items.REDSTONE to OtherItem.BindsProperty(1, Properties.POWERED)
+            Items.REDSTONE to OtherItem.BindsProperty(1, HAS_REDSTONE)
         )
 
         val SLOT_COUNT = 2 + OTHER_ITEM_DATA.size

@@ -3,7 +3,8 @@
   "package": "dev.alexnader.framity.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "GetItemBeforeEmpty"
+    "GetItemBeforeEmpty",
+    "IsFenceMixin"
   ],
   "client": [
     "AccessibleBakedQuad"

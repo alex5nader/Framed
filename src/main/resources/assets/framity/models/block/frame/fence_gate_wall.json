@@ -1,0 +1,6 @@
+{
+  "parent": "framity:block/overlay/fence_gate_wall",
+  "textures": {
+    "texture": "framity:block/solid_frame"
+  }
+}

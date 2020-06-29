@@ -57,6 +57,14 @@ val SHAPE_STAIRS_FRAME = MOD.block("shape_stairs_frame", Stairs(SHAPE_BLOCK_FRAM
     .hasItem(Item.Settings())
     .renderLayer(RenderLayer.getCutout())
     .done()
+val SHAPE_FENCE_FRAME = MOD.block("shape_fence_frame", FenceBlock(SHAPE_FRAME_SETTINGS))
+    .hasItem(Item.Settings())
+    .renderLayer(RenderLayer.getCutout())
+    .done()
+val SHAPE_FENCE_GATE_FRAME = MOD.block("shape_fence_gate_frame", FenceGateBlock(SHAPE_FRAME_SETTINGS))
+    .hasItem(Item.Settings())
+    .renderLayer(RenderLayer.getCutout())
+    .done()
 
 @Suppress("deprecation")
 val HOLLOW_FRAME_ID = SpriteIdentifier(
@@ -84,6 +92,20 @@ val STAIRS_FRAME = MOD.block("stairs_frame", StairsFrame())
     .modelsFrom(SHAPE_STAIRS_FRAME, listOf(HOLLOW_FRAME_ID))
     .done()
 val STAIRS_FRAME_ENTITY = MOD.blockEntity("stairs_frame_entity", ::FrameEntity, STAIRS_FRAME)
+
+val FENCE_FRAME = MOD.block("fence_frame", FenceFrame())
+    .hasItem(Item.Settings(), "framity")
+    .renderLayer(RenderLayer.getCutout())
+    .modelsFrom(SHAPE_FENCE_FRAME, listOf(HOLLOW_FRAME_ID))
+    .done()
+val FENCE_FRAME_ENTITY = MOD.blockEntity("fence_frame_entity", ::FrameEntity, FENCE_FRAME)
+
+val FENCE_GATE_FRAME = MOD.block("fence_gate_frame", FenceGateFrame())
+    .hasItem(Item.Settings(), "framity")
+    .renderLayer(RenderLayer.getCutout())
+    .modelsFrom(SHAPE_FENCE_GATE_FRAME, listOf(HOLLOW_FRAME_ID))
+    .done()
+val FENCE_GATE_FRAME_ENTITY = MOD.blockEntity("fence_gate_frame_entity", ::FrameEntity, FENCE_GATE_FRAME)
 
 lateinit var FRAME_SCREEN_HANDLER_TYPE: ScreenHandlerType<FrameGuiDescription>
 

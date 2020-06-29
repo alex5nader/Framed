@@ -19,6 +19,8 @@ private val OverlayInfoMap: MutableMap<Identifier, OverlayInfo> = mutableMapOf()
 
 fun getOverlay(id: Identifier?) =
     id?.let { OverlayInfoMap[it] }
+fun getValidOverlay(id: Identifier?) =
+    id?.let { OverlayInfoMap[it] as? OverlayInfo.Valid? }
 
 data class FramityAssets(val overlayIds: Collection<Identifier>)
 
@@ -42,6 +44,27 @@ class FramityAssetsListener : SimpleResourceReloadListener<FramityAssets> {
             FramityAssets(overlayIds)
         }, executor)
 
+    private fun loadOverlay(manager: ResourceManager, overlayId: Identifier) {
+        val dependencies = mutableSetOf<Identifier>()
+
+        fun loadOverlayRec(overlayId: Identifier) {
+            val element = GSON.fromJson(manager.getResource(overlayId).inputStream.buffered().reader(), JsonElement::class.java)
+
+            val ctx = JsonParseContext(overlayId.toString(), element)
+
+            OverlayInfo.dependencies(ctx).forEach {
+                if (!dependencies.add(it)) {
+                    ctx.error("Circular dependency: $it and $overlayId")
+                }
+                loadOverlayRec(it)
+            }
+
+            OverlayInfoMap[overlayId] = OverlayInfo.fromJson(ctx)
+        }
+
+        loadOverlayRec(overlayId)
+    }
+
     override fun apply(
         assets: FramityAssets,
         manager: ResourceManager,
@@ -50,14 +73,7 @@ class FramityAssetsListener : SimpleResourceReloadListener<FramityAssets> {
     ): CompletableFuture<Void> = CompletableFuture.runAsync {
         assets.overlayIds.forEach { overlayId ->
             try {
-                val input = manager.getResource(overlayId).inputStream
-                val reader = BufferedReader(InputStreamReader(input))
-
-                val element = GSON.fromJson(reader, JsonElement::class.java)
-
-                val ctx = JsonParseContext(overlayId.toString(), element)
-
-                OverlayInfoMap[overlayId] = OverlayInfo.fromJson(ctx)
+                loadOverlay(manager, overlayId)
             } catch (e: IOException) {
                 LOGGER.error("Error while loading a Framity overlay: $e")
             } catch (e: JsonParseException) {

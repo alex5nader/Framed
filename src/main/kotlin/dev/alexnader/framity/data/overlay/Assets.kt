@@ -32,15 +32,39 @@ private fun <T> makeSidedMapFromJson(fromJson: FromJson<T>) =
         }.toMap()
     }
 
-data class OverlayInfo(val textureSource: TextureSource, val coloredLike: ColoredLike? = null, val offsets: TextureOffsets? = null) {
+sealed class OverlayInfo {
     companion object {
-        fun fromJson(ctx: JsonParseContext) =
-            OverlayInfo(
-                ctx.getChildWith("textureSource", TextureSource.Companion::fromJson),
-                ctx.getChildOrNullWith("coloredLike", ColoredLike.Companion::fromJson),
-                ctx.getChildOrNullWith("offsets", TextureOffsets.Companion::fromJson)
-            )
+        fun dependencies(ctx: JsonParseContext): List<Identifier> {
+            val parent = ctx.getChildOrNullWith("parent", ::identifierFromJson)
+
+            return parent?.let { listOf(it) } ?: listOf()
+        }
+
+        fun fromJson(ctx: JsonParseContext): OverlayInfo {
+            val parent = ctx.getChildOrNullWith("parent", ::identifierFromJson)
+            val parentInfo = parent?.let { getOverlay(it) }
+
+            val textureSource = ctx.getChildOrNullWith("textureSource", TextureSource.Companion::fromJson)
+                ?: parentInfo?.textureSource
+            val coloredLike = ctx.getChildOrNullWith("coloredLike", ColoredLike.Companion::fromJson)
+                ?: parentInfo?.coloredLike
+            val offsets = ctx.getChildOrNullWith("offsets", TextureOffsets.Companion::fromJson)
+                ?: parentInfo?.offsets
+
+            return if (textureSource == null) {
+                Parent(textureSource, coloredLike, offsets)
+            } else {
+                Valid(textureSource, coloredLike, offsets)
+            }
+        }
     }
+
+    data class Valid(public override val textureSource: TextureSource, public override val coloredLike: ColoredLike?, public override val offsets: TextureOffsets?) : OverlayInfo()
+    data class Parent(override val textureSource: TextureSource?, override val coloredLike: ColoredLike?, override val offsets: TextureOffsets?) : OverlayInfo()
+
+    protected abstract val textureSource: TextureSource?
+    protected abstract val coloredLike: ColoredLike?
+    protected abstract val offsets: TextureOffsets?
 }
 
 sealed class TextureSource {
@@ -112,8 +136,9 @@ sealed class Offsetters {
 sealed class Offsetter {
     companion object {
         fun fromJson(ctx: JsonParseContext) =
-            ctx.sumType(
-                "remap" to Remap.Companion::fromJson
+            ctx.sumType<Offsetter>(
+                "remap" to Remap.Companion::fromJson,
+                "zero" to { _ -> Zero }
             )
     }
 
@@ -131,6 +156,18 @@ sealed class Offsetter {
                 }.toMap())
         }
     }
+
+    /**
+     * Offsets by converting from the range a..b to 0..(b-a)
+     */
+    object Zero : Offsetter()
+
+//    data class Zero : Offsetter() {
+//        companion object {
+//            fun fromJson(ctx: JsonParseContext) =
+//                Zero.takeIf { ctx.string == "zero" } ?: ctx.error("Invalid ")
+//        }
+//    }
 }
 
 data class Float4(val a: Float, val b: Float, val c: Float, val d: Float) {

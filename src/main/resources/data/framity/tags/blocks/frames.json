@@ -2,6 +2,8 @@
   "values": [
     "framity:block_frame",
     "framity:slab_frame",
-    "framity:stairs_frame"
+    "framity:stairs_frame",
+    "framity:fence_frame",
+    "framity:fence_gate_frame"
   ]
 }

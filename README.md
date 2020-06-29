@@ -48,7 +48,7 @@ The features below are in no particular order, and are not guaranteed to be adde
     - ✔ Full block
     - ✔ Slab
     - ✔ Stairs
-    - Fence
+    - ✔ Fence
     - Fence gate
     - Slope
     - Bed
@@ -84,7 +84,7 @@ Without them, this project would never have become more than a dream.
 ## License
 
 - All assets from and inspired by Carpenter's Blocks are licensed under the [LGPL v2.1](LICENSE_LGPL.md). This includes the following paths:
-  - `src/main/resources/assets/framity/textures/block/full_frame.png`
+  - `src/main/resources/assets/framity/textures/block/solid_frame.png`
   - `src/main/resources/assets/framity/textures/block/hollow_frame.ase`
   - `src/main/resources/assets/framity/textures/block/hollow_frame.png`
   - `src/main/resources/assets/framity/textures/item/hammer.png`
