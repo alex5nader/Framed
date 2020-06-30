@@ -11,6 +11,8 @@ import dev.alexnader.framity.gui.FrameScreen
 import dev.alexnader.framity.items.FramersHammer
 import dev.alexnader.framity.model.FramityModelVariantProvider
 import net.fabricmc.fabric.api.`object`.builder.v1.block.FabricBlockSettings
+import net.fabricmc.fabric.api.`object`.builder.v1.client.model.FabricModelPredicateProviderRegistry
+import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
@@ -18,6 +20,7 @@ import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry
 import net.minecraft.block.*
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.texture.SpriteAtlasTexture
+import net.minecraft.client.util.ModelIdentifier
 import net.minecraft.client.util.SpriteIdentifier
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -31,6 +34,7 @@ val GSON = Gson()
 
 val LOGGER: Logger = LogManager.getLogger("Framity")
 
+@JvmField
 val MOD = Mod("framity", FramityModelVariantProvider())
     .itemGroup("framity") { ItemStack(FRAMERS_HAMMER.value) }
     .done()
@@ -132,5 +136,11 @@ fun clientInit() {
         register(MOD.id("block/path_side_overlay"))
     }})
 
+    ModelLoadingRegistry.INSTANCE.registerAppender { manager, out ->
+        out.accept(ModelIdentifier(MOD.id("framers_hammer_none"), "inventory"))
+    }
+
     ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(FramityAssetsListener())
+
+    FabricModelPredicateProviderRegistry.register(FRAMERS_HAMMER.value, MOD.id("hammer_mode"), FramersHammer.Companion.ModelPredicate)
 }

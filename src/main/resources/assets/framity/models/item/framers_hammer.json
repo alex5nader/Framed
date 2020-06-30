@@ -1,6 +1,7 @@
 {
-  "parent": "item/generated",
-  "textures": {
-    "layer0": "framity:item/hammer"
-  }
+  "overrides": [
+    { "predicate": { "framity:hammer_mode": 0 }, "model": "framity:item/framers_hammer_none" },
+    { "predicate": { "framity:hammer_mode": 1 }, "model": "framity:item/framers_hammer_partial" },
+    { "predicate": { "framity:hammer_mode": 2 }, "model": "framity:item/framers_hammer_whole" }
+  ]
 }

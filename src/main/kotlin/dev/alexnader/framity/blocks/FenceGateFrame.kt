@@ -97,5 +97,5 @@ class FenceGateFrame : FenceGateBlock(FRAME_SETTINGS), BlockEntityProvider {
         frame_onUse(state, world, pos, player, hand, hit) {
             @Suppress("DEPRECATION")
             super.onUse(state, world, pos, player, hand, hit)
-        }.also{println("onUse returns $it")}
+        }
 }

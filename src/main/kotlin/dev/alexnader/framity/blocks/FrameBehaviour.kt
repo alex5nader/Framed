@@ -252,7 +252,6 @@ fun frame_onUse(
             val otherItem: OtherItem? = FrameEntity.OTHER_ITEM_DATA[playerStack.item]
             return if (frameEntity.getStack(otherItem!!.slot).isEmpty) {
                 frameEntity.copyFrom(otherItem.slot, playerStack, 1, !player.isCreative)
-                println("Running onAdd")
                 otherItem.onAdd(world, frameEntity)
                 ActionResult.SUCCESS
             } else {
@@ -266,11 +265,5 @@ fun frame_onUse(
         return ActionResult.SUCCESS
     }
     
-    return callSuper().let {
-        if (it == ActionResult.PASS) {
-            ActionResult.CONSUME
-        } else {
-            it
-        }
-    }
+    return callSuper()
 }

@@ -29,6 +29,7 @@ import net.minecraft.state.property.BooleanProperty
 import net.minecraft.state.property.Properties
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.collection.DefaultedList
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
 
@@ -42,7 +43,7 @@ class FrameEntity<B: Block>(
     private val ktBlock: WithId<B>,
     type: WithId<BlockEntityType<FrameEntity<B>>>
 ): InventoryBlockEntity(
-    type.value, DefaultedList.ofSize(SLOT_COUNT, ItemStack.EMPTY)
+    type.value
 ), RenderAttachmentBlockEntity, NamedScreenHandlerFactory {
     companion object {
         /**
@@ -100,12 +101,17 @@ class FrameEntity<B: Block>(
         val SLOT_COUNT = 2 + OTHER_ITEM_DATA.size
     }
 
+    var data = FrameData(DefaultedList.ofSize(SLOT_COUNT, ItemStack.EMPTY), null)
+
+    override val items get() = data.items
+
     /**
      * The base [BlockState].
      */
-    var baseState: BlockState? = null
+    var baseState: BlockState?
+        get() = data.baseState
         set(v) {
-            field = v
+            data.baseState = v
             this.markDirty()
         }
 

@@ -16,8 +16,7 @@ import net.minecraft.util.collection.DefaultedList
  * implementations needed to make inventory work.
  */
 abstract class InventoryBlockEntity(
-    type: BlockEntityType<out BlockEntity>,
-    override val items: DefaultedList<ItemStack>
+    type: BlockEntityType<out BlockEntity>
 ): BlockEntity(type),
     BlockEntityClientSerializable,
     ListInventory<DefaultedList<ItemStack>>
