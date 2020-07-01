@@ -6,7 +6,9 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockEntityProvider
 import net.minecraft.block.BlockState
 import net.minecraft.block.StairsBlock
+import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.ItemStack
 import net.minecraft.state.StateManager
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
@@ -87,4 +89,13 @@ class StairsFrame : StairsBlock(SHAPE_BLOCK_FRAME.value.defaultState, FRAME_SETT
         hit: BlockHitResult
     ) =
         frame_onUse(state, world, pos, player, hand, hit) { super.onUse(state, world, pos, player, hand, hit) }
+
+    override fun onPlaced(
+        world: World,
+        pos: BlockPos,
+        state: BlockState,
+        placer: LivingEntity?,
+        itemStack: ItemStack
+    ) =
+        frame_onPlaced(world, pos, state, placer, itemStack) { super.onPlaced(world, pos, state, placer, itemStack) }
 }

@@ -5,7 +5,9 @@ import dev.alexnader.framity.block_entities.FrameEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockEntityProvider
 import net.minecraft.block.BlockState
+import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.ItemStack
 import net.minecraft.state.StateManager
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
@@ -94,6 +96,15 @@ class BlockFrame : Block(FRAME_SETTINGS), BlockEntityProvider {
             @Suppress("DEPRECATION")
             super.onUse(state, world, pos, player, hand, hit)
         }
+
+    override fun onPlaced(
+        world: World,
+        pos: BlockPos,
+        state: BlockState,
+        placer: LivingEntity?,
+        itemStack: ItemStack
+    ) =
+        frame_onPlaced(world, pos, state, placer, itemStack) { super.onPlaced(world, pos, state, placer, itemStack) }
 
     override fun createBlockEntity(view: BlockView) = FrameEntity(BLOCK_FRAME, BLOCK_FRAME_ENTITY)
 }

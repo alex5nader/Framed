@@ -60,6 +60,61 @@ data class HammerData(val storedData: FrameData?, val mode: HammerMode) {
             this@HammerData.storedData?.let { this.put("storedData", it.toTag()) }
             this.putString("mode", this@HammerData.mode.toString())
         }
+
+    /**
+     * Returns null on success, onFail() on fail
+     */
+    fun <T> applySettings(frameEntity: FrameEntity<*>, player: PlayerEntity, world: World, onFail: () -> T): T? {
+        val storedData = this.storedData ?: return onFail()
+        val playerInventory = player.inventory ?: return onFail()
+
+        if (!player.isCreative) {
+            val requireAllItems = when (mode) {
+                HammerMode.NONE -> return onFail()
+                HammerMode.WHOLE_COPY -> true
+                HammerMode.PARTIAL_COPY -> false
+            }
+
+            val itemToFrameSlot = storedData.items
+                .mapIndexed { slot, storedStack -> Pair(storedStack.item, slot) }
+                .toMap()
+
+            @Suppress("MapGetWithNotNullAssertionOperator")
+            val playerSlotToFrameSlot = (0 until playerInventory.size())
+                .asSequence()
+                .map { slot -> Pair(slot, playerInventory.getStack(slot)) }
+                .filter { (_, playerStack) ->
+                    !playerStack.isEmpty && playerStack.item in itemToFrameSlot
+                }
+                .map { (slot, playerStack) -> Pair(slot, itemToFrameSlot[playerStack.item]!!) }
+                .toMap()
+
+            if (requireAllItems && playerSlotToFrameSlot.size != storedData.items.count { !it.isEmpty }) {
+                return onFail()
+            }
+
+            if (!world.isClient) {
+                playerSlotToFrameSlot.forEach { (playerSlot, frameSlot) ->
+                    if (frameEntity[frameSlot].item != playerInventory.getStack(playerSlot).item) {
+                        if (!frameEntity[frameSlot].isEmpty) {
+                            player.inventory.offerOrDrop(world, frameEntity.removeStack(frameSlot))
+                        }
+                        frameEntity.setStack(frameSlot, playerInventory.removeStack(playerSlot, 1))
+                    }
+                }
+            }
+        } else {
+            if (!world.isClient) {
+                storedData.items.forEachIndexed { slot, storedStack ->
+                    frameEntity.setStack(slot, storedStack.copy())
+                }
+            }
+        }
+
+        player.sendMessage(TranslatableText("gui.framity.framers_hammer.apply_settings"), true)
+
+        return null
+    }
 }
 
 /**
@@ -90,68 +145,20 @@ class FramersHammer : Item(Settings().maxCount(1)) {
             stack.tag = DEFAULT_TAG
         }
         val tag = stack.tag ?: error("Tag is null")
-        val (storedData, mode) = HammerData.fromTag(tag)
-        if (storedData == null) {
-            return super.useOnBlock(context)
-        }
+        val hammerData = HammerData.fromTag(tag)
         val player = context.player ?: return super.useOnBlock(context)
-        val playerInventory = player.inventory ?: return super.useOnBlock(context)
         val world = context.world ?: return super.useOnBlock(context)
         val pos = context.blockPos ?: return super.useOnBlock(context)
         val frameEntity = world.getBlockEntity(pos) as? FrameEntity<*> ?: return super.useOnBlock(context)
 
-        if (player.isSneaking) {
+        return if (player.isSneaking) {
             player.sendMessage(TranslatableText("gui.framity.framers_hammer.copy_settings"), true)
             tag.put("storedData", frameEntity.data.toTag())
 
-            return ActionResult.SUCCESS
+            ActionResult.SUCCESS
         } else {
-            if (!player.isCreative) {
-                val requireAllItems = when (mode) {
-                    HammerMode.NONE -> return super.useOnBlock(context)
-                    HammerMode.WHOLE_COPY -> true
-                    HammerMode.PARTIAL_COPY -> false
-                }
-
-                val itemToFrameSlot = storedData.items
-                    .mapIndexed { slot, storedStack -> Pair(storedStack.item, slot) }
-                    .toMap()
-
-                @Suppress("MapGetWithNotNullAssertionOperator")
-                val playerSlotToFrameSlot = (0 until playerInventory.size())
-                    .asSequence()
-                    .map { slot -> Pair(slot, playerInventory.getStack(slot)) }
-                    .filter { (_, playerStack) ->
-                        !playerStack.isEmpty && playerStack.item in itemToFrameSlot
-                    }
-                    .map { (slot, playerStack) -> Pair(slot, itemToFrameSlot[playerStack.item]!!) }
-                    .toMap()
-
-                if (requireAllItems && playerSlotToFrameSlot.size != storedData.items.count { !it.isEmpty }) {
-                    return super.useOnBlock(context)
-                }
-
-                if (!world.isClient) {
-                    playerSlotToFrameSlot.forEach { (playerSlot, frameSlot) ->
-                        if (frameEntity[frameSlot].item != playerInventory.getStack(playerSlot).item) {
-                            if (!frameEntity[frameSlot].isEmpty) {
-                                player.inventory.offerOrDrop(world, frameEntity.removeStack(frameSlot))
-                            }
-                            frameEntity.setStack(frameSlot, playerInventory.removeStack(playerSlot, 1))
-                        }
-                    }
-                }
-            } else {
-                if (!world.isClient) {
-                    storedData.items.forEachIndexed { slot, storedStack ->
-                        frameEntity.setStack(slot, storedStack.copy())
-                    }
-                }
-            }
-
-            player.sendMessage(TranslatableText("gui.framity.framers_hammer.apply_settings"), true)
-
-            return ActionResult.SUCCESS
+            hammerData.applySettings(frameEntity, player, world) { super.useOnBlock(context) }
+                ?: ActionResult.SUCCESS
         }
     }
 

@@ -6,9 +6,11 @@ import dev.alexnader.framity.FRAMERS_HAMMER
 import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.block_entities.FrameEntity.Companion.OtherItem
 import dev.alexnader.framity.data.hasOverlay
+import dev.alexnader.framity.items.HammerData
 import dev.alexnader.framity.util.equalsIgnoring
 import net.fabricmc.fabric.api.tag.TagRegistry
 import net.minecraft.block.*
+import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventory
 import net.minecraft.item.BlockItem
@@ -264,6 +266,27 @@ fun frame_onUse(
         player.openHandledScreen(state.createScreenHandlerFactory(world, pos))
         return ActionResult.SUCCESS
     }
-    
-    return callSuper()
+
+    return if (world.isClient) {
+        ActionResult.CONSUME
+    } else {
+        callSuper()
+    }
+}
+
+fun frame_onPlaced(
+    world: World,
+    pos: BlockPos,
+    state: BlockState,
+    placer: LivingEntity?,
+    itemStack: ItemStack,
+    callSuper: () -> Unit
+) {
+    val player = placer as? PlayerEntity ?: return callSuper()
+    val hammer = player.offHandStack.takeIf { it.item == FRAMERS_HAMMER.value } ?: return callSuper()
+    val tag = hammer.tag ?: return callSuper()
+    val frameEntity = world.getBlockEntity(pos) as? FrameEntity<*> ?: return callSuper()
+    val hammerData = HammerData.fromTag(tag)
+
+    hammerData.applySettings(frameEntity, player, world) { callSuper() }
 }
