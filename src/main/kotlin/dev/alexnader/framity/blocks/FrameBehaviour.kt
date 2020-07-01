@@ -19,6 +19,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.ItemUsageContext
 import net.minecraft.screen.NamedScreenHandlerFactory
 import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.BooleanProperty
@@ -59,21 +60,24 @@ fun onHammerRemove(world: World, frameEntity: FrameEntity<*>?, state: BlockState
         return
     }
 
-    val slot = frameEntity.highestRemovePrioritySlot
+    fun removeStack(slot: Int) =
+        frameEntity.removeStack(slot, 1).let { stack ->
+            if (!stack.isEmpty && giveItem) {
+                player.inventory.offerOrDrop(world, stack)
 
-    if (slot == -1) {
-        return
-    }
+                world.playSound(null, frameEntity.pos, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS,
+                    0.2f,
+                    (Random.nextFloat() - Random.nextFloat()) * 1.4f + 2f
+                )
+            }
+        }
 
     world.setBlockState(frameEntity.pos, state)
-    val stackFromBlock = frameEntity.removeStack(slot, 1)
 
-    if (giveItem) {
-        player.inventory.offerOrDrop(world, stackFromBlock)
-
-        world.playSound(null, frameEntity.pos, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS,
-            0.2f,
-            (Random.nextFloat() - Random.nextFloat()) * 1.4F + 2.0F)
+    if (player.isSneaking) {
+        (0 until FrameEntity.SLOT_COUNT).forEach(::removeStack)
+    } else {
+        removeStack(frameEntity.highestRemovePrioritySlot)
     }
 
     frameEntity.sync()
@@ -183,7 +187,7 @@ fun frame_onStateReplaced(
             callSuper()
         }
         else -> {
-            if (player.isSneaking && player.getStackInHand(player.activeHand).item === FRAMERS_HAMMER.value) {
+            if (player.getStackInHand(player.activeHand).item === FRAMERS_HAMMER.value) {
                 onHammerRemove(world, world.getBlockEntity(pos) as FrameEntity<*>?, oldState, player, false)
             } else {
                 callSuper()
@@ -199,7 +203,7 @@ fun frame_onBlockBreakStart(state: BlockState, world: World, pos: BlockPos, play
         return
     }
 
-    if (player.isSneaking && player.getStackInHand(player.activeHand).item === FRAMERS_HAMMER.value) {
+    if (player.getStackInHand(player.activeHand).item === FRAMERS_HAMMER.value) {
         onHammerRemove(world, world.getBlockEntity(pos) as FrameEntity<*>?, state, player, true)
     }
 }
