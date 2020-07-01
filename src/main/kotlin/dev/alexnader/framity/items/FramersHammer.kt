@@ -64,7 +64,7 @@ data class HammerData(val storedData: FrameData?, val mode: HammerMode) {
     /**
      * Returns null on success, onFail() on fail
      */
-    fun <T> applySettings(frameEntity: FrameEntity<*>, player: PlayerEntity, world: World, onFail: () -> T): T? {
+    fun <T> applySettings(frameEntity: FrameEntity, player: PlayerEntity, world: World, onFail: () -> T): T? {
         val storedData = this.storedData ?: return onFail()
         val playerInventory = player.inventory ?: return onFail()
 
@@ -149,7 +149,7 @@ class FramersHammer : Item(Settings().maxCount(1)) {
         val player = context.player ?: return super.useOnBlock(context)
         val world = context.world ?: return super.useOnBlock(context)
         val pos = context.blockPos ?: return super.useOnBlock(context)
-        val frameEntity = world.getBlockEntity(pos) as? FrameEntity<*> ?: return super.useOnBlock(context)
+        val frameEntity = world.getBlockEntity(pos) as? FrameEntity ?: return super.useOnBlock(context)
 
         return if (player.isSneaking) {
             player.sendMessage(TranslatableText("gui.framity.framers_hammer.copy_settings"), true)

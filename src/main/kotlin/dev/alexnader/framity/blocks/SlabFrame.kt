@@ -1,7 +1,6 @@
 package dev.alexnader.framity.blocks
 
-import dev.alexnader.framity.SLAB_FRAME
-import dev.alexnader.framity.SLAB_FRAME_ENTITY
+import dev.alexnader.framity.FRAME_ENTITY
 import dev.alexnader.framity.block_entities.FrameEntity
 import net.minecraft.block.*
 import net.minecraft.entity.LivingEntity
@@ -15,8 +14,9 @@ import net.minecraft.util.math.Direction
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 
-class SlabFrame : SlabBlock(FRAME_SETTINGS), BlockEntityProvider {
-    override fun createBlockEntity(view: BlockView?) = FrameEntity(SLAB_FRAME, SLAB_FRAME_ENTITY)
+class SlabFrame : SlabBlock(FRAME_SETTINGS), BlockEntityProvider, Frame {
+    override fun createBlockEntity(view: BlockView) = FrameEntity(FRAME_ENTITY.value)
+
     init {
         this.defaultState = frameDefaultState(this.defaultState)
     }

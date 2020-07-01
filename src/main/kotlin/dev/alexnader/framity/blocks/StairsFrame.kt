@@ -17,8 +17,9 @@ import net.minecraft.util.math.Direction
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 
-class StairsFrame : StairsBlock(SHAPE_BLOCK_FRAME.value.defaultState, FRAME_SETTINGS), BlockEntityProvider {
-    override fun createBlockEntity(world: BlockView?) = FrameEntity(STAIRS_FRAME, STAIRS_FRAME_ENTITY)
+class StairsFrame : StairsBlock(SHAPE_BLOCK_FRAME.value.defaultState, FRAME_SETTINGS), BlockEntityProvider, Frame {
+    override fun createBlockEntity(view: BlockView) = FrameEntity(FRAME_ENTITY.value)
+
     init {
         this.defaultState = frameDefaultState(this.defaultState)
     }

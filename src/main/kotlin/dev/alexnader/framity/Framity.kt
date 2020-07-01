@@ -90,42 +90,40 @@ val BLOCK_FRAME = MOD.block("block_frame", BlockFrame())
     .renderLayer(RenderLayer.getCutout())
     .modelsFrom(SHAPE_BLOCK_FRAME, listOf(HOLLOW_FRAME_ID))
     .done()
-val BLOCK_FRAME_ENTITY = MOD.blockEntity("block_frame_entity", ::FrameEntity, BLOCK_FRAME)
-
 val SLAB_FRAME = MOD.block("slab_frame", SlabFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
     .modelsFrom(SHAPE_SLAB_FRAME, listOf(HOLLOW_FRAME_ID))
     .done()
-val SLAB_FRAME_ENTITY = MOD.blockEntity("slab_frame_entity", ::FrameEntity, SLAB_FRAME)
-
 val STAIRS_FRAME = MOD.block("stairs_frame", StairsFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
     .modelsFrom(SHAPE_STAIRS_FRAME, listOf(HOLLOW_FRAME_ID))
     .done()
-val STAIRS_FRAME_ENTITY = MOD.blockEntity("stairs_frame_entity", ::FrameEntity, STAIRS_FRAME)
-
 val FENCE_FRAME = MOD.block("fence_frame", FenceFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
     .modelsFrom(SHAPE_FENCE_FRAME, listOf(SOLID_FRAME_ID))
     .done()
-val FENCE_FRAME_ENTITY = MOD.blockEntity("fence_frame_entity", ::FrameEntity, FENCE_FRAME)
-
 val FENCE_GATE_FRAME = MOD.block("fence_gate_frame", FenceGateFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
     .modelsFrom(SHAPE_FENCE_GATE_FRAME, listOf(SOLID_FRAME_ID))
     .done()
-val FENCE_GATE_FRAME_ENTITY = MOD.blockEntity("fence_gate_frame_entity", ::FrameEntity, FENCE_GATE_FRAME)
-
 val TRAPDOOR_FRAME = MOD.block("trapdoor_frame", TrapdoorFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
     .modelsFrom(SHAPE_TRAPDOOR_FRAME, listOf(SOLID_FRAME_ID))
     .done()
-val TRAPDOOR_FRAME_ENTITY = MOD.blockEntity("trapdoor_frame_entity", ::FrameEntity, TRAPDOOR_FRAME)
+
+val FRAME_ENTITY = MOD.blockEntity("frame_entity", ::FrameEntity,
+    BLOCK_FRAME.value,
+    SLAB_FRAME.value,
+    STAIRS_FRAME.value,
+    FENCE_FRAME.value,
+    FENCE_GATE_FRAME.value,
+    TRAPDOOR_FRAME.value
+)
 
 lateinit var FRAME_SCREEN_HANDLER_TYPE: ScreenHandlerType<FrameGuiDescription>
 
@@ -152,7 +150,7 @@ fun clientInit() {
         register(MOD.id("block/path_side_overlay"))
     }})
 
-    ModelLoadingRegistry.INSTANCE.registerAppender { manager, out ->
+    ModelLoadingRegistry.INSTANCE.registerAppender { _, out ->
         out.accept(ModelIdentifier(MOD.id("framers_hammer_none"), "inventory"))
     }
 

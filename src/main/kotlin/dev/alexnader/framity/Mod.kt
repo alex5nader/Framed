@@ -79,12 +79,12 @@ class Mod(private val modId: String, private val modelVariantProvider: FramityMo
     fun item(id: String, item: Item) = ItemBuilder(id, item)
     fun block(id: String, block: Block) = BlockBuilder(id, block)
 
-    fun <E: BlockEntity> blockEntity(id: String, constructor: (WithId<Block>, WithId<BlockEntityType<E>>) -> E, block: WithId<Block>): WithId<BlockEntityType<E>> {
+    fun <E: BlockEntity> blockEntity(id: String, constructor: (BlockEntityType<E>) -> E, vararg blocks: Block): WithId<BlockEntityType<E>> {
 
         lateinit var blockEntityType: WithId<BlockEntityType<E>>
         blockEntityType = WithId(
             id,
-            BlockEntityType.Builder.create(Supplier { constructor(block, blockEntityType) }).build(null)
+            BlockEntityType.Builder.create(Supplier { constructor(blockEntityType.value) }, *blocks).build(null)
         )
         this.blockEntities[id] = BlockEntityInfo(blockEntityType.value)
         return blockEntityType

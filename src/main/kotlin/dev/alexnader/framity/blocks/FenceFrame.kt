@@ -1,7 +1,6 @@
 package dev.alexnader.framity.blocks
 
-import dev.alexnader.framity.FENCE_FRAME
-import dev.alexnader.framity.FENCE_FRAME_ENTITY
+import dev.alexnader.framity.FRAME_ENTITY
 import dev.alexnader.framity.block_entities.FrameEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockEntityProvider
@@ -18,9 +17,8 @@ import net.minecraft.util.math.Direction
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 
-class FenceFrame : FenceBlock(FRAME_SETTINGS), BlockEntityProvider {
-    override fun createBlockEntity(world: BlockView?) =
-        FrameEntity(FENCE_FRAME, FENCE_FRAME_ENTITY)
+class FenceFrame : FenceBlock(FRAME_SETTINGS), BlockEntityProvider, Frame {
+    override fun createBlockEntity(view: BlockView) = FrameEntity(FRAME_ENTITY.value)
 
     override fun canConnect(state: BlockState, neighborIsFullSquare: Boolean, dir: Direction) =
         state.block is FenceBlock || super.canConnect(state, neighborIsFullSquare, dir)

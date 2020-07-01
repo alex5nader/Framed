@@ -16,7 +16,9 @@ import net.minecraft.util.math.Direction
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 
-class BlockFrame : Block(FRAME_SETTINGS), BlockEntityProvider {
+class BlockFrame : Block(FRAME_SETTINGS), BlockEntityProvider, Frame {
+    override fun createBlockEntity(view: BlockView) = FrameEntity(FRAME_ENTITY.value)
+
     init {
         this.defaultState = frameDefaultState(this.defaultState)
     }
@@ -105,6 +107,4 @@ class BlockFrame : Block(FRAME_SETTINGS), BlockEntityProvider {
         itemStack: ItemStack
     ) =
         frame_onPlaced(world, pos, state, placer, itemStack) { super.onPlaced(world, pos, state, placer, itemStack) }
-
-    override fun createBlockEntity(view: BlockView) = FrameEntity(BLOCK_FRAME, BLOCK_FRAME_ENTITY)
 }

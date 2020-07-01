@@ -24,10 +24,7 @@ class BakedDelegateModel(private val delegateModel: BakedModel) : BakedModel by 
     }
 
     override fun emitItemQuads(stack: ItemStack?, randomSupplier: Supplier<Random>?, context: RenderContext?) {
-        transformed(context,
-            makeTransformer()
-                .prepare(stack, randomSupplier)
-        ) {
+        transformed(context, makeTransformer().apply { prepare(stack, randomSupplier) }) {
             (delegateModel as FabricBakedModel).emitItemQuads(stack, randomSupplier, context)
         }
     }
@@ -39,10 +36,7 @@ class BakedDelegateModel(private val delegateModel: BakedModel) : BakedModel by 
         randomSupplier: Supplier<Random>?,
         context: RenderContext?
     ) {
-        transformed(context,
-            makeTransformer()
-                .prepare(blockView, state, pos, randomSupplier)
-        ) {
+        transformed(context, makeTransformer().apply { prepare(blockView, state, pos, randomSupplier) }) {
             (delegateModel as FabricBakedModel).emitBlockQuads(blockView, state, pos, randomSupplier, context)
         }
     }

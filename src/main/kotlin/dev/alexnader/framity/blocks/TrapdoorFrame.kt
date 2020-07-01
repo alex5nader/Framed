@@ -1,7 +1,6 @@
 package dev.alexnader.framity.blocks
 
-import dev.alexnader.framity.TRAPDOOR_FRAME
-import dev.alexnader.framity.TRAPDOOR_FRAME_ENTITY
+import dev.alexnader.framity.FRAME_ENTITY
 import dev.alexnader.framity.block_entities.FrameEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockEntityProvider
@@ -18,9 +17,8 @@ import net.minecraft.util.math.Direction
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 
-class TrapdoorFrame : TrapdoorBlock(FRAME_SETTINGS), BlockEntityProvider {
-    override fun createBlockEntity(world: BlockView?) =
-        FrameEntity(TRAPDOOR_FRAME, TRAPDOOR_FRAME_ENTITY)
+class TrapdoorFrame : TrapdoorBlock(FRAME_SETTINGS), BlockEntityProvider, Frame {
+    override fun createBlockEntity(view: BlockView) = FrameEntity(FRAME_ENTITY.value)
 
     init {
         this.defaultState = frameDefaultState(this.defaultState)

@@ -44,18 +44,13 @@ val HAS_REDSTONE: BooleanProperty = BooleanProperty.of("has_redstone")
  */
 val posToPlayer: MutableMap<BlockPos, PlayerEntity> = mutableMapOf()
 
-/**
- * The `framity:frames` tag.
- */
-val FramesTag: Tag<Block> = TagRegistry.block(Identifier("framity", "frames"))
-
 fun frameStatesEqual(a: BlockState, b: BlockState) = equalsIgnoring<Block, BlockState>(setOf(Properties.LIT, HAS_REDSTONE))(a, b)
 
 /**
  * Called on server when left clicked by a player holding a framer's hammer.
  * Removes the "rightmost" item from [frameEntity].
  */
-fun onHammerRemove(world: World, frameEntity: FrameEntity<*>?, state: BlockState, player: PlayerEntity, giveItem: Boolean) {
+fun onHammerRemove(world: World, frameEntity: FrameEntity?, state: BlockState, player: PlayerEntity, giveItem: Boolean) {
     if (frameEntity == null) {
         return
     }
@@ -95,7 +90,7 @@ fun validForBase(stack: ItemStack, toState: (BlockItem) -> BlockState?, world: W
         return null
     }
 
-    if (FramesTag.contains(item.block)) {
+    if (item.block is Frame) {
         return null
     }
 
@@ -188,7 +183,7 @@ fun frame_onStateReplaced(
         }
         else -> {
             if (player.getStackInHand(player.activeHand).item === FRAMERS_HAMMER.value) {
-                onHammerRemove(world, world.getBlockEntity(pos) as FrameEntity<*>?, oldState, player, false)
+                onHammerRemove(world, world.getBlockEntity(pos) as FrameEntity?, oldState, player, false)
             } else {
                 callSuper()
             }
@@ -204,7 +199,7 @@ fun frame_onBlockBreakStart(state: BlockState, world: World, pos: BlockPos, play
     }
 
     if (player.getStackInHand(player.activeHand).item === FRAMERS_HAMMER.value) {
-        onHammerRemove(world, world.getBlockEntity(pos) as FrameEntity<*>?, state, player, true)
+        onHammerRemove(world, world.getBlockEntity(pos) as FrameEntity?, state, player, true)
     }
 }
 
@@ -227,7 +222,7 @@ fun frame_onUse(
     hit: BlockHitResult,
     callSuper: () -> ActionResult?
 ): ActionResult? {
-    val frameEntity = world.getBlockEntity(pos) as FrameEntity<*>? ?: return ActionResult.CONSUME
+    val frameEntity = world.getBlockEntity(pos) as FrameEntity? ?: return ActionResult.CONSUME
     
     val playerStack = player.mainHandStack
 
@@ -291,7 +286,7 @@ fun frame_onPlaced(
     val player = placer as? PlayerEntity ?: return callSuper()
     val hammer = player.offHandStack.takeIf { it.item == FRAMERS_HAMMER.value } ?: return callSuper()
     val tag = hammer.tag ?: return callSuper()
-    val frameEntity = world.getBlockEntity(pos) as? FrameEntity<*> ?: return callSuper()
+    val frameEntity = world.getBlockEntity(pos) as? FrameEntity ?: return callSuper()
     val hammerData = HammerData.fromTag(tag)
 
     hammerData.applySettings(frameEntity, player, world) { callSuper() }

@@ -37,8 +37,8 @@ private fun flip(f: Float) = 1 - f
  * to prepare the transformer for block and item contexts.
  */
 interface MeshTransformer : RenderContext.QuadTransform {
-    fun prepare(blockView: BlockRenderView?, state: BlockState?, pos: BlockPos?, randomSupplier: Supplier<Random>?): MeshTransformer
-    fun prepare(stack: ItemStack?, randomSupplier: Supplier<Random>?): MeshTransformer
+    fun prepare(blockView: BlockRenderView?, state: BlockState?, pos: BlockPos?, randomSupplier: Supplier<Random>?)
+    fun prepare(stack: ItemStack?, randomSupplier: Supplier<Random>?)
 }
 
 /**
@@ -75,8 +75,8 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
         state: BlockState?,
         pos: BlockPos?,
         randomSupplier: Supplier<Random>?
-    ): MeshTransformer {
-        val (baseState, overlayId) = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as Pair<BlockState?, Identifier?>
+    ) {
+        val (baseState, overlayId) = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as? Pair<BlockState?, Identifier?>? ?: return
         val overlay = getValidOverlay(overlayId)
 
         if (overlayId != null && overlay == null) {
@@ -104,15 +104,12 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
         this.cachedOverlayColor = overlay?.coloredLike?.let { colorHandler(it) }
 
         this.overlay = overlay
-
-        return this
     }
 
-    override fun prepare(stack: ItemStack?, randomSupplier: Supplier<Random>?): MeshTransformer {
+    override fun prepare(stack: ItemStack?, randomSupplier: Supplier<Random>?) {
         this.color = WHITE
         sprites.clear()
         this.mat = MAT_FINDER.clear().find()
-        return this
     }
 
     override fun transform(qe: MutableQuadView?): Boolean {

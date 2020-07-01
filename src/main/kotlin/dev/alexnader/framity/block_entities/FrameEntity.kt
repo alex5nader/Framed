@@ -36,14 +36,12 @@ import net.minecraft.world.World
 /**
  * Block entity for all frames.
  *
- * @param ktBlock The frame to use.
  * @param type The block entity type to use.
  */
-class FrameEntity<B: Block>(
-    private val ktBlock: WithId<B>,
-    type: WithId<BlockEntityType<FrameEntity<B>>>
+class FrameEntity(
+    type: BlockEntityType<FrameEntity>
 ): InventoryBlockEntity(
-    type.value
+    type
 ), RenderAttachmentBlockEntity, NamedScreenHandlerFactory {
     companion object {
         /**
@@ -62,34 +60,34 @@ class FrameEntity<B: Block>(
 
         sealed class OtherItem(val offset: Int) {
             class BindsProperty(offset: Int, private val property: BooleanProperty) : OtherItem(offset) {
-                override fun onAdd(world: World, frameEntity: FrameEntity<*>) {
+                override fun onAdd(world: World, frameEntity: FrameEntity) {
                     world.setBlockState(frameEntity.pos, frameEntity.cachedState.with(property, true))
                 }
 
-                override fun onRemove(world: World, frameEntity: FrameEntity<*>) {
+                override fun onRemove(world: World, frameEntity: FrameEntity) {
                     world.setBlockState(frameEntity.pos, frameEntity.cachedState.with(property, false))
                 }
             }
 
             class Many(offset: Int, private vararg val others: OtherItem) : OtherItem(offset) {
-                override fun onAdd(world: World, frameEntity: FrameEntity<*>) {
+                override fun onAdd(world: World, frameEntity: FrameEntity) {
                     this.others.forEach { it.onAdd(world, frameEntity) }
                 }
 
-                override fun onRemove(world: World, frameEntity: FrameEntity<*>) {
+                override fun onRemove(world: World, frameEntity: FrameEntity) {
                     this.others.forEach { it.onRemove(world, frameEntity) }
                 }
             }
 
             class Dummy(offset: Int) : OtherItem(offset) {
-                override fun onAdd(world: World, frameEntity: FrameEntity<*>) {}
-                override fun onRemove(world: World, frameEntity: FrameEntity<*>) {}
+                override fun onAdd(world: World, frameEntity: FrameEntity) {}
+                override fun onRemove(world: World, frameEntity: FrameEntity) {}
             }
 
             val slot get() = OTHER_SLOTS_START + this.offset
 
-            abstract fun onAdd(world: World, frameEntity: FrameEntity<*>)
-            abstract fun onRemove(world: World, frameEntity: FrameEntity<*>)
+            abstract fun onAdd(world: World, frameEntity: FrameEntity)
+            abstract fun onRemove(world: World, frameEntity: FrameEntity)
         }
 
         @JvmField
@@ -188,15 +186,18 @@ class FrameEntity<B: Block>(
     override fun markDirty() {
         super.markDirty()
 
+        val world = this.world ?: return
+        val block = world.getBlockState(this.pos).block
+
         if (this.world?.isClient == false) {
             for (obj in PlayerStream.watching(this)) {
                 (obj as ServerPlayerEntity).networkHandler.sendPacket(this.toUpdatePacket())
             }
-            this.world!!.updateNeighborsAlways(pos.offset(Direction.UP), this.ktBlock.value)
+            world.updateNeighborsAlways(pos.offset(Direction.UP), block)
             val state = this.world!!.getBlockState(pos)
-            this.world!!.updateListeners(pos, this.cachedState, state, 1)
+            world.updateListeners(pos, this.cachedState, state, 1)
         } else if (this.world?.isClient == true) {
-            MinecraftClient.getInstance().worldRenderer.updateBlock(this.world, this.pos, this.ktBlock.value.defaultState, this.ktBlock.value.defaultState, 1)
+            MinecraftClient.getInstance().worldRenderer.updateBlock(this.world, this.pos, block.defaultState, block.defaultState, 1)
         }
     }
 
