@@ -72,13 +72,14 @@ Thanks to:
 incredible help and support throughout the creation of Framity.
 - [Grondag](https://www.curseforge.com/members/grondagthebarbarian)
 for immensely helping me understand the fabric rendering API.
+- [LibGui](https://github.com/CottonMC/LibGui) for making GUI creation so easy.
 - [Lil Tater Reloaded](https://www.curseforge.com/minecraft/mc-mods/lil-tater-reloaded)
 for acting as an example of how to read assets/data.
 - [Mineshopper](https://www.curseforge.com/members/mineshopper) for letting
 me use assets from the original
 [Carpenter's Blocks](https://www.curseforge.com/minecraft/mc-mods/carpenters-blocks).
 
-Without them, this project would never have become more than a dream.
+Without them, this project would never have become more than a cool idea.
 
 ## License
 
