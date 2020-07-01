@@ -69,11 +69,20 @@ val SHAPE_FENCE_GATE_FRAME = MOD.block("shape_fence_gate_frame", FenceGateBlock(
     .hasItem(Item.Settings())
     .renderLayer(RenderLayer.getCutout())
     .done()
+val SHAPE_TRAPDOOR_FRAME = MOD.block("shape_trapdoor_frame", Trapdoor(SHAPE_FRAME_SETTINGS))
+    .hasItem(Item.Settings())
+    .renderLayer(RenderLayer.getCutout())
+    .done()
 
 @Suppress("deprecation")
 val HOLLOW_FRAME_ID = SpriteIdentifier(
     SpriteAtlasTexture.BLOCK_ATLAS_TEX,
-    Identifier("framity", "block/hollow_frame")
+    MOD.id("block/hollow_frame")
+)
+@Suppress("deprecation")
+val SOLID_FRAME_ID = SpriteIdentifier(
+    SpriteAtlasTexture.BLOCK_ATLAS_TEX,
+    MOD.id("block/solid_frame")
 )
 
 val BLOCK_FRAME = MOD.block("block_frame", BlockFrame())
@@ -100,16 +109,23 @@ val STAIRS_FRAME_ENTITY = MOD.blockEntity("stairs_frame_entity", ::FrameEntity, 
 val FENCE_FRAME = MOD.block("fence_frame", FenceFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
-    .modelsFrom(SHAPE_FENCE_FRAME, listOf(HOLLOW_FRAME_ID))
+    .modelsFrom(SHAPE_FENCE_FRAME, listOf(SOLID_FRAME_ID))
     .done()
 val FENCE_FRAME_ENTITY = MOD.blockEntity("fence_frame_entity", ::FrameEntity, FENCE_FRAME)
 
 val FENCE_GATE_FRAME = MOD.block("fence_gate_frame", FenceGateFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
-    .modelsFrom(SHAPE_FENCE_GATE_FRAME, listOf(HOLLOW_FRAME_ID))
+    .modelsFrom(SHAPE_FENCE_GATE_FRAME, listOf(SOLID_FRAME_ID))
     .done()
 val FENCE_GATE_FRAME_ENTITY = MOD.blockEntity("fence_gate_frame_entity", ::FrameEntity, FENCE_GATE_FRAME)
+
+val TRAPDOOR_FRAME = MOD.block("trapdoor_frame", TrapdoorFrame())
+    .hasItem(Item.Settings(), "framity")
+    .renderLayer(RenderLayer.getCutout())
+    .modelsFrom(SHAPE_TRAPDOOR_FRAME, listOf(SOLID_FRAME_ID))
+    .done()
+val TRAPDOOR_FRAME_ENTITY = MOD.blockEntity("trapdoor_frame_entity", ::FrameEntity, TRAPDOOR_FRAME)
 
 lateinit var FRAME_SCREEN_HANDLER_TYPE: ScreenHandlerType<FrameGuiDescription>
 

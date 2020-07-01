@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cat $1 | jq '
+OUT=$(cat $1 | jq '
 with_entries(
 	if (.key == "elements") then (
 		{key: "elements", value: .value | map (
@@ -9,5 +9,9 @@ with_entries(
 	) else (
 		.
 	) end
-)
-'
+)')
+if [ $2 ]; then
+	echo $OUT > $2
+else
+	echo $OUT > $1
+fi

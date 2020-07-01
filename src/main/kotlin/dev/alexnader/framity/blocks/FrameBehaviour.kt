@@ -227,10 +227,12 @@ fun frame_onUse(
     
     val playerStack = player.mainHandStack
 
-    if (!world.isClient && playerStack != null) {
+    if (playerStack != null) {
         if (frameEntity.overlayStack.isEmpty && validForOverlay(playerStack)) {
-            frameEntity.copyFrom(FrameEntity.OVERLAY_SLOT, playerStack, 1, !player.isCreative)
-            frameEntity.markDirty()
+            if (!world.isClient) {
+                frameEntity.copyFrom(FrameEntity.OVERLAY_SLOT, playerStack, 1, !player.isCreative)
+                frameEntity.markDirty()
+            }
             return ActionResult.SUCCESS
         }
 
@@ -242,19 +244,23 @@ fun frame_onUse(
         )
 
         if (playerStack.item !== frameEntity.baseStack.item && maybeBaseState != null) {
-            if (!frameEntity.baseStack.isEmpty && !player.isCreative) {
-                player.inventory.offerOrDrop(world, frameEntity.baseStack)
+            if (!world.isClient) {
+                if (!frameEntity.baseStack.isEmpty && !player.isCreative) {
+                    player.inventory.offerOrDrop(world, frameEntity.baseStack)
+                }
+                frameEntity.copyFrom(FrameEntity.BASE_SLOT, playerStack, 1, !player.isCreative)
+                frameEntity.baseState = maybeBaseState
             }
-            frameEntity.copyFrom(FrameEntity.BASE_SLOT, playerStack, 1, !player.isCreative)
-            frameEntity.baseState = maybeBaseState
             return ActionResult.SUCCESS
         }
 
         if (validForOther(playerStack)) {
             val otherItem: OtherItem? = FrameEntity.OTHER_ITEM_DATA[playerStack.item]
             return if (frameEntity.getStack(otherItem!!.slot).isEmpty) {
-                frameEntity.copyFrom(otherItem.slot, playerStack, 1, !player.isCreative)
-                otherItem.onAdd(world, frameEntity)
+                if (!world.isClient) {
+                    frameEntity.copyFrom(otherItem.slot, playerStack, 1, !player.isCreative)
+                    otherItem.onAdd(world, frameEntity)
+                }
                 ActionResult.SUCCESS
             } else {
                 ActionResult.CONSUME
@@ -267,11 +273,7 @@ fun frame_onUse(
         return ActionResult.SUCCESS
     }
 
-    return if (world.isClient) {
-        ActionResult.CONSUME
-    } else {
-        callSuper()
-    }
+    return callSuper()
 }
 
 fun frame_onPlaced(
