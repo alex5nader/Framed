@@ -1,4 +1,4 @@
-package dev.alexnader.framity.model
+package dev.alexnader.framity.client.model
 
 import dev.alexnader.framity.HOLLOW_FRAME_ID
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel

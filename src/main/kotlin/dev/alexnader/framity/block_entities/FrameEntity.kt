@@ -6,12 +6,11 @@ import dev.alexnader.framity.blocks.validForBase
 import dev.alexnader.framity.blocks.validForOther
 import dev.alexnader.framity.blocks.validForOverlay
 import dev.alexnader.framity.data.getOverlayId
-import dev.alexnader.framity.gui.FrameGuiDescription
+import dev.alexnader.framity.client.gui.FrameGuiDescription
 import dev.alexnader.framity.mixin.GetItemBeforeEmpty
 import dev.alexnader.framity.util.*
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity
 import net.fabricmc.fabric.api.server.PlayerStream
-import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.client.MinecraftClient
@@ -29,7 +28,6 @@ import net.minecraft.state.property.BooleanProperty
 import net.minecraft.state.property.Properties
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.collection.DefaultedList
-import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
 

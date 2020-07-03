@@ -1,4 +1,4 @@
-package dev.alexnader.framity.model
+package dev.alexnader.framity.client.model
 
 import dev.alexnader.framity.LOGGER
 import dev.alexnader.framity.data.getValidOverlay

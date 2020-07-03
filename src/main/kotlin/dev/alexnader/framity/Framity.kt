@@ -6,10 +6,10 @@ import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.blocks.*
 import dev.alexnader.framity.data.FramityAssetsListener
 import dev.alexnader.framity.data.FramityDataListener
-import dev.alexnader.framity.gui.FrameGuiDescription
-import dev.alexnader.framity.gui.FrameScreen
+import dev.alexnader.framity.client.gui.FrameGuiDescription
+import dev.alexnader.framity.client.gui.FrameScreen
 import dev.alexnader.framity.items.FramersHammer
-import dev.alexnader.framity.model.FramityModelVariantProvider
+import dev.alexnader.framity.client.model.FramityModelVariantProvider
 import net.fabricmc.fabric.api.`object`.builder.v1.block.FabricBlockSettings
 import net.fabricmc.fabric.api.`object`.builder.v1.client.model.FabricModelPredicateProviderRegistry
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry
@@ -26,7 +26,6 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.resource.ResourceType
 import net.minecraft.screen.ScreenHandlerType
-import net.minecraft.util.Identifier
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 

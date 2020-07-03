@@ -1,4 +1,4 @@
-package dev.alexnader.framity.gui
+package dev.alexnader.framity.client.gui
 
 import io.github.cottonmc.cotton.gui.client.CottonInventoryScreen
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry

@@ -1,4 +1,4 @@
-package dev.alexnader.framity.model
+package dev.alexnader.framity.client.model
 
 import net.fabricmc.fabric.api.client.model.ModelProviderContext
 import net.fabricmc.fabric.api.client.model.ModelVariantProvider

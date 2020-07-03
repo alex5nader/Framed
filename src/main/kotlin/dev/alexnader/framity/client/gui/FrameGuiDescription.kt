@@ -1,4 +1,4 @@
-package dev.alexnader.framity.gui
+package dev.alexnader.framity.client.gui
 
 import dev.alexnader.framity.FRAME_SCREEN_HANDLER_TYPE
 import dev.alexnader.framity.block_entities.FrameEntity

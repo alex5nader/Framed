@@ -1,4 +1,4 @@
-package dev.alexnader.framity.gui
+package dev.alexnader.framity.client.gui
 
 import io.github.cottonmc.cotton.gui.ValidatedSlot
 import io.github.cottonmc.cotton.gui.widget.WItemSlot

@@ -1,7 +1,7 @@
 package dev.alexnader.framity
 
 import dev.alexnader.framity.util.WithId
-import dev.alexnader.framity.model.FramityModelVariantProvider
+import dev.alexnader.framity.client.model.FramityModelVariantProvider
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry
