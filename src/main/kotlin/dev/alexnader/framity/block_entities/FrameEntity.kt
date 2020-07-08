@@ -1,251 +1,220 @@
 package dev.alexnader.framity.block_entities
 
-import com.mojang.serialization.Dynamic
-import dev.alexnader.framity.blocks.HAS_REDSTONE
+import dev.alexnader.framity.FRAME_ENTITY
+import dev.alexnader.framity.SPECIAL_ITEM_DATA
 import dev.alexnader.framity.blocks.validForBase
-import dev.alexnader.framity.blocks.validForOther
+import dev.alexnader.framity.blocks.validForSpecial
 import dev.alexnader.framity.blocks.validForOverlay
-import dev.alexnader.framity.data.getOverlayId
 import dev.alexnader.framity.client.gui.FrameGuiDescription
+import dev.alexnader.framity.data.getOverlayId
 import dev.alexnader.framity.mixin.GetItemBeforeEmpty
 import dev.alexnader.framity.util.*
+import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity
 import net.fabricmc.fabric.api.server.PlayerStream
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntityType
+import net.minecraft.block.entity.LockableContainerBlockEntity
 import net.minecraft.client.MinecraftClient
-import net.minecraft.datafixer.NbtOps
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.screen.NamedScreenHandlerFactory
 import net.minecraft.screen.ScreenHandlerContext
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.Properties
 import net.minecraft.text.TranslatableText
-import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.Direction
-import net.minecraft.world.World
+import kotlin.math.max
+import kotlin.math.min
 
-/**
- * Block entity for all frames.
- *
- * @param type The block entity type to use.
- */
-class FrameEntity(
+open class FrameEntity protected constructor(
+    format: FrameDataFormat,
     type: BlockEntityType<FrameEntity>
-): InventoryBlockEntity(
-    type
-), RenderAttachmentBlockEntity, NamedScreenHandlerFactory {
+) :
+    LockableContainerBlockEntity(type),
+    RenderAttachmentBlockEntity,
+    BlockEntityClientSerializable
+{
     companion object {
-        /**
-         * [Inventory][net.minecraft.inventory.Inventory] slot for the base block.
-         */
-        const val BASE_SLOT = 0
-        /**
-         * [Inventory][net.minecraft.inventory.Inventory] slot for overlay.
-         */
-        const val OVERLAY_SLOT = 1
-
-        /**
-         * [Inventory][net.minecraft.inventory.Inventory] slot for glowstone dust.
-         */
-        const val OTHER_SLOTS_START = 2
-
-        sealed class OtherItem(val offset: Int) {
-            class BindsProperty(offset: Int, private val property: BooleanProperty) : OtherItem(offset) {
-                override fun onAdd(world: World, frameEntity: FrameEntity) {
-                    world.setBlockState(frameEntity.pos, frameEntity.cachedState.with(property, true))
-                }
-
-                override fun onRemove(world: World, frameEntity: FrameEntity) {
-                    world.setBlockState(frameEntity.pos, frameEntity.cachedState.with(property, false))
-                }
-            }
-
-            class Many(offset: Int, private vararg val others: OtherItem) : OtherItem(offset) {
-                override fun onAdd(world: World, frameEntity: FrameEntity) {
-                    this.others.forEach { it.onAdd(world, frameEntity) }
-                }
-
-                override fun onRemove(world: World, frameEntity: FrameEntity) {
-                    this.others.forEach { it.onRemove(world, frameEntity) }
-                }
-            }
-
-            class Dummy(offset: Int) : OtherItem(offset) {
-                override fun onAdd(world: World, frameEntity: FrameEntity) {}
-                override fun onRemove(world: World, frameEntity: FrameEntity) {}
-            }
-
-            val slot get() = OTHER_SLOTS_START + this.offset
-
-            abstract fun onAdd(world: World, frameEntity: FrameEntity)
-            abstract fun onRemove(world: World, frameEntity: FrameEntity)
-        }
-
-        @JvmField
-        val OTHER_ITEM_DATA = mapOf(
-            Items.GLOWSTONE_DUST to OtherItem.BindsProperty(0, Properties.LIT),
-            Items.REDSTONE to OtherItem.BindsProperty(1, HAS_REDSTONE)
-        )
-
-        val SLOT_COUNT = 2 + OTHER_ITEM_DATA.size
+        val FORMAT = FrameDataFormat(1, 1, SPECIAL_ITEM_DATA.size)
     }
 
-    var data = FrameData(DefaultedList.ofSize(SLOT_COUNT, ItemStack.EMPTY), null)
+    constructor() : this(FORMAT, FRAME_ENTITY.value)
 
-    override val items get() = data.items
+    val data = FrameData(format, SectionedList(ItemStack.EMPTY, format, ItemStackEquality), FixedSizeList(null, format.base.size))
 
-    /**
-     * The base [BlockState].
-     */
-    var baseState: BlockState?
-        get() = data.baseState
-        set(v) {
-            data.baseState = v
+    val format get() = data.format
+
+    val items get() = data.items
+
+    val baseItems get() = items.getSection(FrameDataFormat.BASE_INDEX)
+    val overlayItems get() = items.getSection(FrameDataFormat.OVERLAY_INDEX)
+    val specialItems get() = items.getSection(FrameDataFormat.SPECIAL_INDEX)
+
+    val baseStates get() = data.baseStates
+
+    //region Inventory
+
+    fun copyFrom(slot: Int, stack: ItemStack, count: Int, take: Boolean) {
+        val newStack = stack.copy()
+        val realCount = min(count, stack.count)
+
+        newStack.count = realCount
+
+        if (take) {
+            stack.count -= realCount
+        }
+
+        this.setStack(slot, newStack)
+    }
+
+    // interface
+    override fun getMaxCountPerStack() = 1
+
+    override fun isValid(slot: Int, stack: ItemStack) =
+        when (format.getSectionIndex(slot)) {
+            FrameDataFormat.BASE_INDEX -> validForBase(stack, { s -> s.block.defaultState }, this.world!!, this.pos) != null
+            FrameDataFormat.OVERLAY_INDEX -> validForOverlay(stack)
+            FrameDataFormat.SPECIAL_INDEX -> validForSpecial(stack)
+            else -> false
+        }
+
+    override fun removeStack(slot: Int, amount: Int): ItemStack {
+        val sectionIndex = format.getSectionIndex(slot)
+
+        if (sectionIndex == FrameDataFormat.BASE_INDEX) {
+            this.baseStates.removeAt(format.base.findOffset(slot))
+        } else if (sectionIndex == FrameDataFormat.SPECIAL_INDEX) {
+            @Suppress("CAST_NEVER_SUCCEEDS")
+            val existing = this.getStack(slot) as GetItemBeforeEmpty
+            SPECIAL_ITEM_DATA[existing.itemBeforeEmpty]?.second?.onRemove(this.world!!, this)
+        }
+
+        val result =
+            if (slot >= 0 && slot < items.size && !items[slot].isEmpty && amount > 0) {
+                items[slot].split(amount).also {
+                    if (items.updateEmptyAt(slot)) {
+                        markDirty()
+                    }
+                }
+            } else {
+                ItemStack.EMPTY
+            }
+
+        if (!result.isEmpty) {
             this.markDirty()
         }
 
-    val baseStack
-        get() = this[BASE_SLOT]
-
-    val glowstoneStack
-        get() = this[OTHER_SLOTS_START]
-
-    val overlayStack
-        get() = this[OVERLAY_SLOT]
-
-    /**
-     * The index of the "rightmost" item in this frame which isn't empty.
-     */
-    val highestRemovePrioritySlot get() = this.items.indices.findLast { !this.items[it].isEmpty } ?: -1
-
-    /**
-     * [RenderAttachmentBlockEntity] implementation returning the base [BlockState] and the overlay ID.
-     */
-    override fun getRenderAttachmentData() =
-        Pair(this.baseState, getOverlayId(this.overlayStack))
-
-    override fun clear() {
-        OTHER_ITEM_DATA.forEach { (_, data) -> data.onRemove(this.world!!, this) }
-        super.clear()
-    }
-
-    override fun setStack(slot: Int, stack: ItemStack?) {
-        val isOtherItem = slot >= OTHER_SLOTS_START
-
-        if (isOtherItem) {
-            @Suppress("CAST_NEVER_SUCCEEDS")
-            val existing = this.getStack(slot) as GetItemBeforeEmpty
-            OTHER_ITEM_DATA[existing.itemBeforeEmpty]?.onRemove(this.world!!, this)
-        }
-
-        super.setStack(slot, stack)
-
-        if (slot == BASE_SLOT) {
-            this.baseState = (this.baseStack.item as? BlockItem)?.block?.defaultState
-        } else if (isOtherItem) {
-            OTHER_ITEM_DATA[stack?.item]?.onAdd(this.world!!, this)
-        }
+        return result
     }
 
     override fun removeStack(slot: Int): ItemStack {
-        if (slot == BASE_SLOT) {
-            this.baseState = null
-        } else if (slot >= OTHER_SLOTS_START) {
+        val sectionIndex = format.getSectionIndex(slot)
+
+        if (sectionIndex == FrameDataFormat.BASE_INDEX) {
+            this.baseStates.removeAt(format.base.findOffset(slot))
+        } else if (sectionIndex == FrameDataFormat.SPECIAL_INDEX) {
             @Suppress("CAST_NEVER_SUCCEEDS")
             val existing = this.getStack(slot) as GetItemBeforeEmpty
-            OTHER_ITEM_DATA[existing.itemBeforeEmpty]?.onRemove(this.world!!, this)
+            SPECIAL_ITEM_DATA[existing.itemBeforeEmpty]?.second?.onRemove(this.world!!, this)
         }
 
-        return super.removeStack(slot)
+        this.markDirty()
+
+        return if (slot >= 0 && slot < items.size)
+            items.set(slot, ItemStack.EMPTY)
+        else
+            ItemStack.EMPTY
     }
 
-    override fun removeStack(slot: Int, amount: Int): ItemStack {
-        if (slot == BASE_SLOT) {
-            this.baseState = null
-        } else if (slot >= OTHER_SLOTS_START) {
+    override fun getStack(slot: Int) = this.items[slot]
+
+    override fun size() = this.items.size
+
+    override fun isEmpty() = this.items.isEmpty()
+
+    override fun canPlayerUse(player: PlayerEntity) = true
+
+    override fun clear() {
+        SPECIAL_ITEM_DATA.forEach { (_, data) -> data.second.onRemove(this.world!!, this) }
+        this.items.clear()
+    }
+
+    override fun setStack(slot: Int, stack: ItemStack) {
+        val sectionIndex = format.getSectionIndex(slot)
+
+        if (sectionIndex == FrameDataFormat.SPECIAL_INDEX) {
             @Suppress("CAST_NEVER_SUCCEEDS")
             val existing = this.getStack(slot) as GetItemBeforeEmpty
-            OTHER_ITEM_DATA[existing.itemBeforeEmpty]?.onRemove(this.world!!, this)
+            SPECIAL_ITEM_DATA[existing.itemBeforeEmpty]?.second?.onRemove(this.world!!, this)
         }
 
-        return super.removeStack(slot, amount)
+        this.items[slot] = stack
+        stack.count = max(stack.count, this.maxCountPerStack)
+        this.markDirty()
+
+        if (sectionIndex == FrameDataFormat.BASE_INDEX) {
+            val baseSlot = format.base.findOffset(slot)
+            this.baseStates[baseSlot] =
+                (this.baseItems[baseSlot].item as? BlockItem)?.block?.defaultState
+        } else if (sectionIndex == FrameDataFormat.SPECIAL_INDEX) {
+            SPECIAL_ITEM_DATA[stack.item]?.second?.onAdd(this.world!!, this)
+        }
     }
 
-    /**
-     * Marks this frame as dirty. Causes client to re-render the block when called.
-     */
     override fun markDirty() {
         super.markDirty()
 
         val world = this.world ?: return
-        val block = world.getBlockState(this.pos).block
+        val state = world.getBlockState(this.pos)
+        val block = state.block
 
-        if (this.world?.isClient == false) {
+        if (world.isClient) {
+            MinecraftClient.getInstance().worldRenderer.updateBlock(world, pos, cachedState, state, 1)
+        } else {
+            sync()
+
             for (obj in PlayerStream.watching(this)) {
                 (obj as ServerPlayerEntity).networkHandler.sendPacket(this.toUpdatePacket())
             }
+
             world.updateNeighborsAlways(pos.offset(Direction.UP), block)
-            val state = this.world!!.getBlockState(pos)
-            world.updateListeners(pos, this.cachedState, state, 1)
-        } else if (this.world?.isClient == true) {
-            MinecraftClient.getInstance().worldRenderer.updateBlock(this.world, this.pos, block.defaultState, block.defaultState, 1)
         }
     }
+    //endregion Inventory
 
-    /**
-     * Reads this frame's data from [tag].
-     */
-    override fun fromTag(state: BlockState?, tag: CompoundTag?) {
+    //region RenderAttachmentBlockEntity
+    override fun getRenderAttachmentData() =
+        Pair(this.baseStates, getOverlayId(this.overlayItems.firstOrNull() ?: ItemStack.EMPTY))
+    //endregion RenderAttachmentBlockEntity
+
+    //region Tag
+    override fun toTag(tag: CompoundTag): CompoundTag {
+        toClientTag(tag)
+        return super.toTag(tag)
+    }
+
+    override fun fromTag(state: BlockState, tag: CompoundTag) {
+        fromClientTag(tag)
         super.fromTag(state, tag)
-        this.fromClientTag(tag)
     }
 
-    /**
-     * Writes this frame's data to [tag].
-     */
-    override fun toTag(tag: CompoundTag?): CompoundTag {
-        val tag2 = this.toClientTag(tag)
-        return super.toTag(tag2)
+    //region BlockEntityClientSerializable
+    override fun toClientTag(tag: CompoundTag) = tag.also {
+        tag.put("frameData", this.data.toTag())
     }
 
-    override fun fromClientTag(tag: CompoundTag?) {
-        super.fromClientTag(tag)
-        if (tag?.contains("state") == true) {
-            this.baseState = BlockState.CODEC.decode(Dynamic(NbtOps.INSTANCE, tag.get("state"))).result().get().first
-        } else {
-            this.baseState = null
-        }
+    override fun fromClientTag(tag: CompoundTag) {
+        this.data.fromTag(tag.getCompound("frameData"))
+        this.markDirty()
     }
+    //endregion BlockEntityClientSerializable
 
-    override fun toClientTag(tag: CompoundTag?): CompoundTag {
-        if (this.baseState == null) {
-            tag?.remove("state")
-        } else {
-            tag?.put("state", BlockState.CODEC.encode(this.baseState, NbtOps.INSTANCE, CompoundTag()).get().left().get())
-        }
-        return super.toClientTag(tag)
-    }
+    //endregion Tag
 
-    override fun getMaxCountPerStack() =
-        1
+    override fun createScreenHandler(syncId: Int, playerInventory: PlayerInventory?) =
+        FrameGuiDescription(syncId, playerInventory, ScreenHandlerContext.create(this.world, this.pos), this.format)
 
-    override fun isValid(slot: Int, stack: ItemStack) =
-        when (slot) {
-            BASE_SLOT -> validForBase(stack, { s -> s.block.defaultState }, this.world!!, this.pos) != null
-            OVERLAY_SLOT -> validForOverlay(stack)
-            else -> validForOther(stack)
-        }
-
-    override fun getDisplayName() =
-        TranslatableText(cachedState.block.translationKey)
-
-    override fun createMenu(syncId: Int, inv: PlayerInventory, player: PlayerEntity) =
-        FrameGuiDescription(syncId, inv, ScreenHandlerContext.create(this.world, this.pos))
+    override fun getContainerName() = TranslatableText(cachedState.block.translationKey)
 }

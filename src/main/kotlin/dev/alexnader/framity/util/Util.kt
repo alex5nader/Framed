@@ -1,5 +1,6 @@
 package dev.alexnader.framity.util
 
+import net.minecraft.item.ItemStack
 import net.minecraft.state.State
 import net.minecraft.state.property.Property
 import net.minecraft.util.shape.VoxelShape
@@ -40,3 +41,14 @@ fun <O, S> equalsIgnoring(toIgnore: Set<Property<*>>) =
         .filter { it !in toIgnore }
         .all { propEq(it as Property<Comparable<Comparable<*>>>, a, b) }
     }
+
+object ItemStackEquality : Equality<ItemStack> {
+    override fun checkEquality(a: ItemStack, b: ItemStack) = ItemStack.areEqual(a, b)
+
+    override val name: String = "ItemStack::areEqual"
+}
+
+inline fun <T> T.log(message: T.() -> String): T {
+    println(this.message())
+    return this
+}

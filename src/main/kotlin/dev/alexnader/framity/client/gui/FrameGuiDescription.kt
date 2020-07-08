@@ -1,9 +1,11 @@
 package dev.alexnader.framity.client.gui
 
 import dev.alexnader.framity.FRAME_SCREEN_HANDLER_TYPE
+import dev.alexnader.framity.SPECIAL_ITEM_DATA
 import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.blocks.validForBase
 import dev.alexnader.framity.blocks.validForOverlay
+import dev.alexnader.framity.util.FrameDataFormat
 import dev.alexnader.framity.util.orNull
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription
 import io.github.cottonmc.cotton.gui.widget.WGridPanel
@@ -22,11 +24,12 @@ import java.util.function.Predicate
 class FrameGuiDescription(
     syncId: Int,
     playerInventory: PlayerInventory?,
-    context: ScreenHandlerContext
-) : SyncedGuiDescription(FRAME_SCREEN_HANDLER_TYPE, syncId, playerInventory, getBlockInventory(context, FrameEntity.SLOT_COUNT), getBlockPropertyDelegate(context)) {
-    companion object : ScreenHandlerRegistry.SimpleClientHandlerFactory<FrameGuiDescription> {
-        override fun create(syncId: Int, inventory: PlayerInventory) =
-            FrameGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY)
+    context: ScreenHandlerContext,
+    private val format: FrameDataFormat
+) : SyncedGuiDescription(FRAME_SCREEN_HANDLER_TYPE, syncId, playerInventory, getBlockInventory(context, format.totalSize), getBlockPropertyDelegate(context)) {
+    companion object {
+        fun factory(format: FrameDataFormat) =
+            ScreenHandlerRegistry.SimpleClientHandlerFactory<FrameGuiDescription> { syncId, inventory -> FrameGuiDescription(syncId, inventory, ScreenHandlerContext.EMPTY, format) }
     }
 
     init {
@@ -39,7 +42,7 @@ class FrameGuiDescription(
         baseText.horizontalAlignment = HorizontalAlignment.CENTER
         baseText.verticalAlignment = VerticalAlignment.CENTER
         root.add(baseText, 1, 2, 8, 2)
-        val baseSlot = SingleItemSlot(blockInventory, FrameEntity.BASE_SLOT)
+        val baseSlot = SingleItemSlot(blockInventory, format.base.start)
         baseSlot.filter = Predicate { stack -> validForBase(stack, { item -> item.block.defaultState }, this.world, pos) != null }
         root.add(baseSlot, 4, 4)
 
@@ -47,23 +50,22 @@ class FrameGuiDescription(
         overlayText.horizontalAlignment = HorizontalAlignment.CENTER
         overlayText.verticalAlignment = VerticalAlignment.CENTER
         root.add(overlayText, 9, 2, 8, 2)
-        val overlaySlot = SingleItemSlot(blockInventory, FrameEntity.OVERLAY_SLOT)
+        val overlaySlot = SingleItemSlot(blockInventory, format.overlay.start)
         overlaySlot.filter = Predicate{ stack -> validForOverlay(stack) }
         root.add(overlaySlot, 12, 4)
 
-        val otherText = WLabel(TranslatableText("gui.framity.frame.other_label"))
-        otherText.horizontalAlignment = HorizontalAlignment.CENTER
-        otherText.verticalAlignment = VerticalAlignment.CENTER
-        root.add(otherText, 0, 6, 18, 2)
+        val specialText = WLabel(TranslatableText("gui.framity.frame.special_label"))
+        specialText.horizontalAlignment = HorizontalAlignment.CENTER
+        specialText.verticalAlignment = VerticalAlignment.CENTER
+        root.add(specialText, 0, 6, 18, 2)
 
-        val otherSlotsCount = FrameEntity.OTHER_ITEM_DATA.size
-        val otherSlotsStart = 9 - otherSlotsCount
+        val specialSlotsX = 9 - format.special.size
 
-        FrameEntity.OTHER_ITEM_DATA.forEach { (item, data) ->
-            val otherSlot = SingleItemSlot(blockInventory, FrameEntity.OTHER_SLOTS_START + data.offset)
-            otherSlot.filter = Predicate { stack -> stack.item == item }
-            root.add(otherSlot, otherSlotsStart + data.offset * 2, 8)
-        }
+        SPECIAL_ITEM_DATA.forEach { (item, data) -> data.let { (offset, _) ->
+            val specialSlot = SingleItemSlot(blockInventory, format.special.applyOffset(offset))
+            specialSlot.filter = Predicate { stack -> stack.item == item }
+            root.add(specialSlot, specialSlotsX + offset * 2, 8)
+        }}
 
         root.add(createPlayerInventoryPanel(), 0, 11)
 

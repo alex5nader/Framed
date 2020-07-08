@@ -60,6 +60,7 @@ The features below are in no particular order, and are not guaranteed to be adde
     - Lever
     - Button
     - Path
+    - Chest
 - Other
     - Independent sides → Each side of the frame can have a different texture  
     - ✔ Glowstone dust → Frame gains light level of 15

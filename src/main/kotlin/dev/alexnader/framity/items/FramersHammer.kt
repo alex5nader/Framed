@@ -50,16 +50,14 @@ data class HammerData(val storedData: FrameData?, val mode: HammerMode) {
     companion object {
         fun fromTag(tag: CompoundTag) =
             HammerData(
-                FrameData.fromTag(tag.getCompound("storedData")),
+                if ("storedData" in tag) {
+                    FrameData.fromTag(tag.getCompound("storedData"))
+                } else {
+                    null
+                },
                 HammerMode.fromString(tag.getString("mode")) ?: HammerMode.default()
             )
     }
-
-    fun toTag() =
-        CompoundTag().apply {
-            this@HammerData.storedData?.let { this.put("storedData", it.toTag()) }
-            this.putString("mode", this@HammerData.mode.toString())
-        }
 
     /**
      * Returns null on success, onFail() on fail
@@ -67,6 +65,10 @@ data class HammerData(val storedData: FrameData?, val mode: HammerMode) {
     fun <T> applySettings(frameEntity: FrameEntity, player: PlayerEntity, world: World, onFail: () -> T): T? {
         val storedData = this.storedData ?: return onFail()
         val playerInventory = player.inventory ?: return onFail()
+
+        if (storedData.format != frameEntity.format) {
+            return onFail()
+        }
 
         if (!player.isCreative) {
             val requireAllItems = when (mode) {
@@ -95,8 +97,8 @@ data class HammerData(val storedData: FrameData?, val mode: HammerMode) {
 
             if (!world.isClient) {
                 playerSlotToFrameSlot.forEach { (playerSlot, frameSlot) ->
-                    if (frameEntity[frameSlot].item != playerInventory.getStack(playerSlot).item) {
-                        if (!frameEntity[frameSlot].isEmpty) {
+                    if (frameEntity.getStack(frameSlot).item != playerInventory.getStack(playerSlot).item) {
+                        if (!frameEntity.getStack(frameSlot).isEmpty) {
                             player.inventory.offerOrDrop(world, frameEntity.removeStack(frameSlot))
                         }
                         frameEntity.setStack(frameSlot, playerInventory.removeStack(playerSlot, 1))
@@ -104,6 +106,10 @@ data class HammerData(val storedData: FrameData?, val mode: HammerMode) {
                 }
             }
         } else {
+            if (mode == HammerMode.NONE) {
+                return onFail()
+            }
+
             if (!world.isClient) {
                 storedData.items.forEachIndexed { slot, storedStack ->
                     frameEntity.setStack(slot, storedStack.copy())

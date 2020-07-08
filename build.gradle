@@ -80,12 +80,17 @@ jar {
 // configure the maven publication
 publishing {
     publications {
+        //noinspection GroovyAssignabilityCheck
         mavenJava(MavenPublication) {
             // add all the jars that should be included when publishing to maven
+            //noinspection GroovyAssignabilityCheck
             artifact(remapJar) {
+                //noinspection GroovyAssignabilityCheck
                 builtBy remapJar
             }
+            //noinspection GroovyAssignabilityCheck
             artifact(sourcesJar) {
+                //noinspection GroovyAssignabilityCheck
                 builtBy remapSourcesJar
             }
         }
@@ -101,6 +106,5 @@ publishing {
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
-        freeCompilerArgs = ["-XXLanguage:+InlineClasses"]
     }
 }

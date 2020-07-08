@@ -1,8 +1,8 @@
 package dev.alexnader.framity
 
 import com.google.gson.Gson
-import dev.alexnader.framity.util.WithId
 import dev.alexnader.framity.block_entities.FrameEntity
+import dev.alexnader.framity.util.WithId
 import dev.alexnader.framity.blocks.*
 import dev.alexnader.framity.data.FramityAssetsListener
 import dev.alexnader.framity.data.FramityDataListener
@@ -130,7 +130,7 @@ lateinit var FRAME_SCREEN_HANDLER_TYPE: ScreenHandlerType<FrameGuiDescription>
 fun init() {
     MOD.register()
 
-    FRAME_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(MOD.id("frame_screen_handler"), FrameGuiDescription)
+    FRAME_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(MOD.id("frame_screen_handler"), FrameGuiDescription.factory(FrameEntity.FORMAT))
 
     ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FramityDataListener())
 }

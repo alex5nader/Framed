@@ -76,7 +76,8 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
         pos: BlockPos?,
         randomSupplier: Supplier<Random>?
     ) {
-        val (baseState, overlayId) = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as? Pair<BlockState?, Identifier?>? ?: return
+        val (baseStates, overlayId) = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as? Pair<FixedSizeList<BlockState?>, Identifier?>? ?: return
+        val baseState = baseStates[0] //TODO actually use more than the first base state
         val overlay = getValidOverlay(overlayId)
 
         if (overlayId != null && overlay == null) {
