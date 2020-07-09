@@ -88,6 +88,9 @@ Without them, this project would never have become more than a cool idea.
   - `src/main/resources/assets/framity/textures/block/solid_frame.png`
   - `src/main/resources/assets/framity/textures/block/hollow_frame.ase`
   - `src/main/resources/assets/framity/textures/block/hollow_frame.png`
+  - `src/main/resources/assets/framity/textures/item/hammer.ase`
   - `src/main/resources/assets/framity/textures/item/hammer.png`
+  - `src/main/resources/assets/framity/textures/item/hammer_partial.png`
+  - `src/main/resources/assets/framity/textures/item/hammer_whole.png`
   - `src/main/resources/assets/framity/icon.png`
 - All other files are licensed under the [MIT License](LICENSE_MIT.md).
