@@ -1,5 +1,5 @@
 {
-  "parent": "item/generated",
+  "parent": "framity:item/framers_hammer",
   "textures": {
     "layer0": "framity:item/hammer"
   }
