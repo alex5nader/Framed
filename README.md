@@ -36,7 +36,7 @@ its [CurseForge page](https://www.curseforge.com/minecraft/mc-mods/framity).
 
 ## Roadmap
 
-A roadmap is available on Framity's [Trello board](https://trello.com/b/eq4oultm/framity-roadmap)
+A roadmap is available on Framity's [Trello board](https://trello.com/b/eq4oultm/framity-roadmap).
     
 ## Thanks
 
