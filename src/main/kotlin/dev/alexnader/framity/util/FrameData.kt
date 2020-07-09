@@ -1,6 +1,7 @@
 package dev.alexnader.framity.util
 
 import com.mojang.serialization.Dynamic
+import dev.alexnader.framity.SPECIAL_ITEMS
 import net.minecraft.block.BlockState
 import net.minecraft.datafixer.NbtOps
 import net.minecraft.item.ItemStack
@@ -29,12 +30,15 @@ class FrameDataFormat private constructor(private val sections: MutableList<Sect
             FrameDataFormat(sizesToSections(tag.getList("format", 3).asSequence().map { (it as IntTag).int }))
     }
 
-    constructor(baseSize: Int, overlaySize: Int, specialSize: Int, vararg otherSizes: Int) : this(sizesToSections(sequence {
-        yield(baseSize)
-        yield(overlaySize)
-        yield(specialSize)
+    constructor(partCount: Int, vararg otherSizes: Int) : this(sizesToSections(sequence {
+        yield(partCount) // base
+        yield(partCount) // overlay
+        yield(SPECIAL_ITEMS.size)
         yieldAll(otherSizes.asSequence())
     }))
+
+    private val partCountOrNull get() = if (base.size == overlay.size) base.size else null
+    val partCount = partCountOrNull ?: error("Base size must equal overlay size.")
 
     val base get() = sections[BASE_INDEX]
     val overlay get() = sections[OVERLAY_INDEX]
@@ -42,10 +46,8 @@ class FrameDataFormat private constructor(private val sections: MutableList<Sect
 
     val totalSize get() = sections.sumBy { it.size }
 
-    fun fromTag(tag: CompoundTag) {
-        sections.clear()
-        sections.addAll(sizesToSections(tag.getList("format", 3).asSequence().map { (it as IntTag).int }))
-    }
+    fun getSectionIndex(absoluteIndex: Int) =
+        indexOfFirst { it.contains(absoluteIndex) }
 
     fun toTag() = ListTag().apply {
         sections.forEach { section -> add(IntTag.of(section.size)) }
@@ -79,7 +81,7 @@ class FrameDataFormat private constructor(private val sections: MutableList<Sect
     }
 }
 
-data class FrameData(val format: FrameDataFormat, val items: SectionedList<ItemStack>, val baseStates: FixedSizeList<BlockState?>) {
+data class FrameData(var format: FrameDataFormat, val items: SectionedList<ItemStack>, val baseStates: FixedSizeList<BlockState?>) {
     companion object {
         private fun itemsFromTag(target: SectionedList<ItemStack>, tag: CompoundTag) = target.also {
             tag.getList("Items", 10).let { listTag ->
@@ -95,10 +97,10 @@ data class FrameData(val format: FrameDataFormat, val items: SectionedList<ItemS
 
         private fun statesFromTag(target: FixedSizeList<BlockState?>, tag: CompoundTag) = target.also {
             tag.getList("states", 10).let { listTag ->
-                listTag.indices.map {
+                listTag.indices.forEach {
                     val stateTag = listTag.getCompound(it)
-                    target[it] =
-                        BlockState.CODEC.decode(Dynamic(NbtOps.INSTANCE, stateTag)).result().get().first
+                    val i = stateTag.getInt("i")
+                    target[i] = BlockState.CODEC.decode(Dynamic(NbtOps.INSTANCE, stateTag)).result().get().first
                 }
             }
         }
@@ -107,8 +109,8 @@ data class FrameData(val format: FrameDataFormat, val items: SectionedList<ItemS
             FrameDataFormat.fromTag(tag).let { format ->
                 FrameData(
                     format,
-                    itemsFromTag(SectionedList(ItemStack.EMPTY, format, ItemStackEquality), tag),
-                    statesFromTag(FixedSizeList(null, format.base.size), tag)
+                    itemsFromTag(SectionedList(format, ItemStackEquality) { ItemStack.EMPTY }, tag),
+                    statesFromTag(FixedSizeList(format.base.size) { null }, tag)
                 )
             }
     }
@@ -116,7 +118,7 @@ data class FrameData(val format: FrameDataFormat, val items: SectionedList<ItemS
     fun fromTag(tag: CompoundTag) {
         this.items.clear()
 
-        this.format.fromTag(tag)
+        this.format = FrameDataFormat.fromTag(tag)
         itemsFromTag(this.items, tag)
         statesFromTag(this.baseStates, tag)
     }
@@ -138,11 +140,11 @@ data class FrameData(val format: FrameDataFormat, val items: SectionedList<ItemS
                 .takeUnless { it.isEmpty() }
                 ?.let { put("Items", it) }
 
-            baseStates.nonEmpty
-                .fold(ListTag()) { list, baseState ->
-                    list.add(BlockState.CODEC.encode(baseState, NbtOps.INSTANCE, CompoundTag()).get().left().get())
-                    list
+            baseStates.nonEmptyIndices.fold(ListTag()) { list, i ->
+                list.apply {
+                    add(BlockState.CODEC.encode(baseStates[i], NbtOps.INSTANCE, CompoundTag().apply { putInt("i", i) }).get().left().get())
                 }
+            }
                 .takeUnless { it.isEmpty() }
                 ?.let { put("states", it) }
         }

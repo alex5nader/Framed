@@ -9,18 +9,19 @@ data class Section(val start: Int, val end: Int) {
     fun applyOffset(relative: Int) = start + relative
 }
 
-fun List<Section>.getSectionIndex(absoluteIndex: Int) =
-    indexOfFirst { it.contains(absoluteIndex) }
-
 interface Equality<T> {
     fun checkEquality(a: T, b: T): Boolean
     val name: String
 }
 
-class SectionedList<T>(default: T, private val sections: List<Section>, equality: Equality<T> = equalsEquality()) : FixedSizeList<T>(default, sections.sumBy { it.size }, equality) {
+class SectionedList<T>(private val sections: List<Section>, equality: Equality<T> = equalsEquality(), default: () -> T) : FixedSizeList<T>(sections.sumBy { it.size }, equality, default) {
     fun getSection(sectionIndex: Int): FixedSizeList<T> =
         this.sections[sectionIndex]
             .let { section -> this.subList(section.start, section.end) }
+
+    fun getSectionOrNull(sectionIndex: Int): FixedSizeList<T>? =
+        this.sections.getOrNull(sectionIndex)
+            ?.let { section -> this.subList(section.start, section.end) }
 
     override fun toString() =
         "SectionedList(${sections.joinToString(" | ") { section ->
@@ -28,12 +29,12 @@ class SectionedList<T>(default: T, private val sections: List<Section>, equality
         }})"
 }
 
-open class FixedSizeList<T> private constructor(private val elements: MutableList<T?>, private val default: T, final override val size: Int, private val equality: Equality<T>) : MutableList<T> {
+open class FixedSizeList<T> private constructor(private val elements: MutableList<T?>, private val equality: Equality<T>, private val default: () -> T) : MutableList<T> {
     private class Iterator<T>(private val fixedSizeList: FixedSizeList<T>) : MutableIterator<T> {
         private var nextIndex = 0
 
         override fun hasNext() = nextIndex < fixedSizeList.size
-        override fun next() = fixedSizeList.elements[nextIndex++] ?: fixedSizeList.default
+        override fun next() = fixedSizeList[nextIndex++]
         override fun remove() {
             fixedSizeList.elements[nextIndex - 1] = null
         }
@@ -46,7 +47,7 @@ open class FixedSizeList<T> private constructor(private val elements: MutableLis
         override fun nextIndex() = nextIndex
         override fun previous(): T {
             justReturnedIndex = previousIndex()
-            return fixedSizeList.elements[previousIndex()] ?: fixedSizeList.default
+            return fixedSizeList[previousIndex()]
         }
         override fun previousIndex() = nextIndex - 1
 
@@ -54,21 +55,21 @@ open class FixedSizeList<T> private constructor(private val elements: MutableLis
             if (fixedSizeList.isPresent(previousIndex())) {
                 throw UnsupportedOperationException("Cannot add to occupied slot (${previousIndex()}) of FixedSizeList")
             }
-            fixedSizeList.elements[previousIndex()] = element
+            fixedSizeList[previousIndex()] = element
         }
 
         override fun hasNext() = nextIndex < fixedSizeList.size
         override fun next(): T {
             justReturnedIndex = nextIndex
-            return fixedSizeList.elements[nextIndex] ?: fixedSizeList.default
+            return fixedSizeList[nextIndex]
         }
 
         override fun remove() {
-            fixedSizeList.elements[justReturnedIndex] = null
+            fixedSizeList.removeAt(justReturnedIndex)
         }
 
         override fun set(element: T) {
-            fixedSizeList.elements[justReturnedIndex] = element
+            fixedSizeList[justReturnedIndex] = element
         }
     }
 
@@ -80,7 +81,8 @@ open class FixedSizeList<T> private constructor(private val elements: MutableLis
         }
     }
 
-    constructor(default: T, size: Int, equality: Equality<T> = equalsEquality()) : this(MutableList(size) { null }, default, size, equality)
+    constructor(sequence: Sequence<T>, equality: Equality<T> = equalsEquality(), default: () -> T) : this(sequence.toMutableList<T?>(), equality, default)
+    constructor(size: Int, equality: Equality<T> = equalsEquality(), default: () -> T) : this(MutableList<T?>(size) { null }, equality, default)
 
     val firstEmptyIndex get() =
         elements.indexOfFirst { it == null }
@@ -91,12 +93,18 @@ open class FixedSizeList<T> private constructor(private val elements: MutableLis
     val lastNonEmptyIndex get() =
         elements.indexOfLast { it != null }
 
+    val nonEmptyIndices get() = elements.indices.asSequence().filter { elements[it] != null }
     val nonEmpty get() = elements.asSequence().filter { it != null }
 
     fun isPresent(index: Int) = elements[index] != null
     fun isFull() = elements.none { it == null }
 
-    private fun T.isDefault() = equality.checkEquality(default, this)
+    private fun T?.orDefault() = this ?: default()
+    private fun T.isDefault() = equality.checkEquality(default(), this)
+
+    fun setToDefault(index: Int) {
+        elements[index] = default()
+    }
 
     fun updateEmptyAt(index: Int) =
         (elements[index]
@@ -106,16 +114,17 @@ open class FixedSizeList<T> private constructor(private val elements: MutableLis
             ?: false)
 
     //region List
+    override val size get() = elements.size
     override fun contains(element: T) = elements.contains(element)
     override fun containsAll(elements: Collection<T>) = elements.containsAll(elements)
-    override fun get(index: Int) = elements[index] ?: default
+    override fun get(index: Int) = elements[index].orDefault()
     override fun indexOf(element: T) = elements.indexOf(element)
     override fun isEmpty() = elements.all { it == null }
     override fun iterator(): MutableIterator<T> = Iterator(this)
     override fun lastIndexOf(element: T) = elements.lastIndexOf(element)
     override fun listIterator(): MutableListIterator<T> = ListIterator(this)
     override fun listIterator(index: Int): MutableListIterator<T> = ListIterator(this.subList(index, size))
-    override fun subList(fromIndex: Int, toIndex: Int): FixedSizeList<T> = FixedSizeList(elements.subList(fromIndex, toIndex), default, toIndex - fromIndex, equality)
+    override fun subList(fromIndex: Int, toIndex: Int): FixedSizeList<T> = FixedSizeList(elements.subList(fromIndex, toIndex), equality, default)
     //endregion List
 
     //region MutableList
@@ -166,7 +175,7 @@ open class FixedSizeList<T> private constructor(private val elements: MutableLis
     override fun removeAt(index: Int): T {
         val element = elements[index]
         elements[index] = null
-        return element ?: default
+        return element.orDefault()
     }
 
     override fun retainAll(elements: Collection<T>) =
@@ -183,7 +192,7 @@ open class FixedSizeList<T> private constructor(private val elements: MutableLis
         val oldElement = elements[index]
         elements[index] = element
         updateEmptyAt(index)
-        return oldElement ?: default
+        return oldElement.orDefault()
     }
     //endregion MutableList
 

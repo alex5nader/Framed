@@ -22,11 +22,13 @@ sealed class SpecialItemData {
     abstract fun onRemove(world: World, frameEntity: FrameEntity)
 }
 
+data class SpecialItem(val offset: Int, val data: SpecialItemData)
+
 @JvmField
-val SPECIAL_ITEM_DATA = mapOf(
+val SPECIAL_ITEMS = mapOf(
     Items.GLOWSTONE_DUST to SpecialItemData.BindsProperty(Properties.LIT),
     Items.REDSTONE to SpecialItemData.BindsProperty(HAS_REDSTONE)
 )
     .entries
-    .mapIndexed { i, (item, data) -> Pair(item, Pair(i, data)) }
+    .mapIndexed { i, (item, data) -> Pair(item, SpecialItem(i, data)) }
     .toMap()

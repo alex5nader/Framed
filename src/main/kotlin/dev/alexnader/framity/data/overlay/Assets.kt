@@ -7,6 +7,8 @@ import net.minecraft.block.BlockState
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction
 import net.minecraft.util.registry.Registry
+import kotlin.math.max
+import kotlin.math.min
 
 private fun directionFromJson(ctx: JsonParseContext) =
     when (ctx.string) {
@@ -174,4 +176,12 @@ data class Float4(val a: Float, val b: Float, val c: Float, val d: Float) {
                 }
             }
     }
+
+    val min get() = min(a, min(b, min(c, d)))
+    val max get() = max(a, max(b, max(c, d)))
+    val center get() = (min + max) / 2
+
+    fun map(f: (Float) -> Float) = Float4(f(a), f(b), f(c), f(d))
+
+    override fun toString() = "[$a, $b, $c, $d]"
 }

@@ -1,10 +1,10 @@
 package dev.alexnader.framity.util
 
+import dev.alexnader.framity.LOGGER
 import net.minecraft.item.ItemStack
 import net.minecraft.state.State
 import net.minecraft.state.property.Property
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
+import net.minecraft.util.math.Vec3d
 import java.util.*
 
 infix fun <A, B, C> ((A) -> B).andThen(f: (B) -> C): (A) -> C =
@@ -13,11 +13,8 @@ infix fun <A, B, C> ((A) -> B).andThen(f: (B) -> C): (A) -> C =
 fun <T> Optional<T>.orNull(): T? =
     this.orElse(null)
 
-/**
- * Returns the union of this and [rhs].
- */
-operator fun VoxelShape.plus(rhs: VoxelShape): VoxelShape =
-    VoxelShapes.union(this, rhs)
+operator fun Vec3d.minus(rhs: Vec3d): Vec3d =
+    this.subtract(rhs)
 
 fun <N> minMax(a: N, b: N) where N: Number, N: Comparable<N> =
     if (a < b) {
@@ -48,7 +45,7 @@ object ItemStackEquality : Equality<ItemStack> {
     override val name: String = "ItemStack::areEqual"
 }
 
-inline fun <T> T.log(message: T.() -> String): T {
-    println(this.message())
+inline fun <T> T.log(message: T.() -> Any): T {
+    LOGGER.info(this.message())
     return this
 }

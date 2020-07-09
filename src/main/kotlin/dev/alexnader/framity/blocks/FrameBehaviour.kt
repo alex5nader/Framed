@@ -1,13 +1,16 @@
-@file:Suppress("FunctionName", "UNUSED_PARAMETER")
+@file:Suppress("FunctionName", "UNUSED_PARAMETER", "unused")
 
 package dev.alexnader.framity.blocks
 
 import dev.alexnader.framity.FRAMERS_HAMMER
-import dev.alexnader.framity.SPECIAL_ITEM_DATA
+import dev.alexnader.framity.SPECIAL_ITEMS
 import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.data.hasOverlay
 import dev.alexnader.framity.items.HammerData
+import dev.alexnader.framity.util.FixedSizeList
 import dev.alexnader.framity.util.equalsIgnoring
+import dev.alexnader.framity.util.log
+import dev.alexnader.framity.util.minus
 import net.minecraft.block.*
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
@@ -28,6 +31,7 @@ import net.minecraft.util.ItemScatterer
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import net.minecraft.util.math.Vec3d
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
@@ -75,7 +79,7 @@ fun onHammerRemove(world: World, frameEntity: FrameEntity?, state: BlockState, p
 }
 
 fun validForSpecial(stack: ItemStack) =
-    stack.item in SPECIAL_ITEM_DATA
+    stack.item in SPECIAL_ITEMS
 
 fun validForOverlay(stack: ItemStack) =
     hasOverlay(stack)
@@ -115,11 +119,19 @@ fun validStateForBase(state: BlockState, world: World, pos: BlockPos): Boolean {
     return true
 }
 
-fun frameDefaultState(base: BlockState): BlockState =
+fun <F> F.frameDefaultState(base: BlockState): BlockState
+where
+    F: Block,
+    F: Frame
+=
     base.with(Properties.LIT, false)
         .with(HAS_REDSTONE, false)
 
-fun frame_appendProperties(builder: StateManager.Builder<Block, BlockState>, callSuper: () -> Unit) {
+fun <F> F.frame_appendProperties(builder: StateManager.Builder<Block, BlockState>, callSuper: () -> Unit)
+where
+    F: Block,
+    F: Frame
+{
     callSuper()
     builder.add(Properties.LIT)
     builder.add(HAS_REDSTONE)
@@ -129,40 +141,62 @@ const val IS_TRANSLUCENT = true
 const val HAS_DYNAMIC_BOUNDS = true
 const val AMBIENT_OCCLUSION_LIGHT_LEVEL = 1f
 
-fun frame_emitsRedstonePower(state: BlockState): Boolean =
+fun <F> F.frame_emitsRedstonePower(state: BlockState): Boolean
+where
+    F: Block,
+    F: Frame
+=
     state[HAS_REDSTONE]
 
-fun frame_getWeakRedstonePower(state: BlockState, world: BlockView, pos: BlockPos, direction: Direction) =
+fun <F> F.frame_getWeakRedstonePower(state: BlockState, world: BlockView, pos: BlockPos, direction: Direction)
+where
+    F: Block,
+    F: Frame
+=
     if (state[HAS_REDSTONE]) 15 else 0
 
-fun frame_isSideInvisible(
+fun <F> F.frame_isSideInvisible(
     state: BlockState,
     stateFrom: BlockState,
     direction: Direction,
-    `this`: Block,
     callSuper: () -> Boolean
-): Boolean {
-    return stateFrom.isOf(`this`) && frameStatesEqual(state, stateFrom) || callSuper()
+): Boolean
+where
+    F: Block,
+    F: Frame
+{
+    return stateFrom.isOf(this) && frameStatesEqual(state, stateFrom) || callSuper()
 }
 
-fun frame_onSyncedBlockEvent(state: BlockState, world: World, pos: BlockPos, type: Int, data: Int, callSuper: () -> Boolean): Boolean {
+fun <F> F.frame_onSyncedBlockEvent(state: BlockState, world: World, pos: BlockPos, type: Int, data: Int, callSuper: () -> Boolean): Boolean
+where
+    F: Block,
+    F: Frame
+{
     callSuper()
     return world.getBlockEntity(pos)?.onSyncedBlockEvent(type, data) ?: false
 }
 
-fun frame_createScreenHandlerFactory(state: BlockState, world: World, pos: BlockPos): NamedScreenHandlerFactory? {
+fun <F> F.frame_createScreenHandlerFactory(state: BlockState, world: World, pos: BlockPos): NamedScreenHandlerFactory?
+where
+    F: Block,
+    F: Frame
+{
     return world.getBlockEntity(pos) as? NamedScreenHandlerFactory
 }
 
-fun frame_onStateReplaced(
+fun <F> F.frame_onStateReplaced(
     oldState: BlockState,
     world: World,
     pos: BlockPos,
     newState: BlockState,
     moved: Boolean,
-    `this`: Block,
     callSuper: () -> Unit
-) {
+)
+where
+    F: Block,
+    F: Frame
+{
     if (world.isClient() || oldState.block === newState.block) {
         return
     }
@@ -171,7 +205,7 @@ fun frame_onStateReplaced(
             val blockEntity = world.getBlockEntity(pos)
             if (blockEntity is Inventory) {
                 ItemScatterer.spawn(world, pos, blockEntity as Inventory?)
-                world.updateComparators(pos, `this`)
+                world.updateComparators(pos, this)
             }
             callSuper()
         }
@@ -185,7 +219,11 @@ fun frame_onStateReplaced(
     }
 }
 
-fun frame_onBlockBreakStart(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity, callSuper: () -> Unit) {
+fun <F> F.frame_onBlockBreakStart(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity, callSuper: () -> Unit)
+where
+    F: Block,
+    F: Frame
+{
     callSuper()
 
     if (world.isClient()) {
@@ -197,7 +235,11 @@ fun frame_onBlockBreakStart(state: BlockState, world: World, pos: BlockPos, play
     }
 }
 
-fun frame_onBreak(world: World, pos: BlockPos, state: BlockState, player: PlayerEntity, callSuper: () -> Unit) {
+fun <F> F.frame_onBreak(world: World, pos: BlockPos, state: BlockState, player: PlayerEntity, callSuper: () -> Unit)
+where
+    F: Block,
+    F: Frame
+{
     callSuper()
 
     if (world.isClient() || !player.isCreative) {
@@ -207,7 +249,31 @@ fun frame_onBreak(world: World, pos: BlockPos, state: BlockState, player: Player
     posToPlayer[pos] = player
 }
 
-fun frame_onUse(
+private fun swapItems(
+    frameEntity: FrameEntity,
+    slots: FixedSizeList<ItemStack>,
+    absoluteSlot: Int,
+    relativeSlot: Int,
+    player: PlayerEntity,
+    playerStack: ItemStack,
+    world: World,
+    onSuccess: (() -> Unit)? = null
+): ActionResult {
+    return if (playerStack.item != slots[relativeSlot].item) {
+        if (!world.isClient) {
+            if (!player.isCreative && !slots[relativeSlot].isEmpty) {
+                player.inventory.offerOrDrop(world, slots[relativeSlot])
+            }
+            frameEntity.copyFrom(absoluteSlot, playerStack, 1, !player.isCreative)
+            onSuccess?.invoke()
+        }
+        ActionResult.SUCCESS
+    } else {
+        ActionResult.CONSUME
+    }
+}
+
+fun <F> F.frame_onUse(
     state: BlockState,
     world: World,
     pos: BlockPos,
@@ -215,19 +281,24 @@ fun frame_onUse(
     hand: Hand,
     hit: BlockHitResult,
     callSuper: () -> ActionResult?
-): ActionResult? {
-    val frameEntity = world.getBlockEntity(pos) as FrameEntity? ?: return ActionResult.CONSUME
-    
+): ActionResult?
+where
+    F: Block,
+    F: Frame
+{
+    val frameEntity = world.getBlockEntity(pos) as? FrameEntity ?: return ActionResult.CONSUME
+
     val playerStack = player.mainHandStack
 
     if (playerStack != null) {
-        if (!frameEntity.overlayItems.isFull() && validForOverlay(playerStack)) {
-            if (!world.isClient) {
-                val slotOffset = frameEntity.overlayItems.firstEmptyIndex
-                val slot = frameEntity.format.overlay.applyOffset(slotOffset)
-                frameEntity.copyFrom(slot, playerStack, 1, !player.isCreative)
-            }
-            return ActionResult.SUCCESS
+        val posInBlock = hit.pos - Vec3d.of(hit.blockPos)
+        val slotOffset = this.getSlotFor(state, posInBlock, hit.side)
+
+        if (validForOverlay(playerStack)) {
+            @Suppress("UnnecessaryVariable")
+            val overlaySlot = slotOffset
+            val absoluteSlot = frameEntity.format.overlay.applyOffset(overlaySlot)
+            return swapItems(frameEntity, frameEntity.overlayItems, absoluteSlot, overlaySlot, player, playerStack, world)
         }
 
         val maybeBaseState = validForBase(
@@ -237,29 +308,22 @@ fun frame_onUse(
             pos
         )
 
-        //TODO: extract behaviour with base item as param instead of baseItems[0]
         if (maybeBaseState != null) {
-            return if (playerStack.item !== frameEntity.baseItems[0].item) {
-                if (!world.isClient) {
-                    if (!frameEntity.baseItems[0].isEmpty && !player.isCreative) {
-                        player.inventory.offerOrDrop(world, frameEntity.baseItems[0])
-                    }
-                    frameEntity.copyFrom(frameEntity.format.base.applyOffset(0), playerStack, 1, !player.isCreative)
-                    frameEntity.baseStates[0] = maybeBaseState
-                }
-                ActionResult.SUCCESS
-            } else {
-                ActionResult.CONSUME
+            @Suppress("UnnecessaryVariable")
+            val baseSlot = slotOffset
+            val absoluteSlot = frameEntity.format.base.applyOffset(baseSlot)
+            return swapItems(frameEntity, frameEntity.baseItems, absoluteSlot, baseSlot, player, playerStack, world) {
+                frameEntity.baseStates[baseSlot] = maybeBaseState
             }
         }
 
         if (validForSpecial(playerStack)) {
-            val specialItem = SPECIAL_ITEM_DATA[playerStack.item] ?: error("Invalid special item: ${playerStack.item}")
-            val slot = frameEntity.format.special.applyOffset(specialItem.first)
+            val specialItem = SPECIAL_ITEMS[playerStack.item] ?: error("Invalid special item: ${playerStack.item}")
+            val slot = frameEntity.format.special.applyOffset(specialItem.offset)
             return if (frameEntity.getStack(slot).isEmpty) {
                 if (!world.isClient) {
                     frameEntity.copyFrom(slot, playerStack, 1, !player.isCreative)
-                    specialItem.second.onAdd(world, frameEntity)
+                    specialItem.data.onAdd(world, frameEntity)
                 }
                 ActionResult.SUCCESS
             } else {
@@ -267,7 +331,7 @@ fun frame_onUse(
             }
         }
     }
-    
+
     if (playerStack.isEmpty && player.isSneaking) {
         player.openHandledScreen(state.createScreenHandlerFactory(world, pos))
         return ActionResult.SUCCESS
@@ -276,19 +340,23 @@ fun frame_onUse(
     return callSuper()
 }
 
-fun frame_onPlaced(
+fun <F> F.frame_onPlaced(
     world: World,
     pos: BlockPos,
     state: BlockState,
     placer: LivingEntity?,
     itemStack: ItemStack,
     callSuper: () -> Unit
-) {
+)
+where
+    F: Block,
+    F: Frame
+{
     val player = placer as? PlayerEntity ?: return callSuper()
     val hammer = player.offHandStack.takeIf { it.item == FRAMERS_HAMMER.value } ?: return callSuper()
     val tag = hammer.tag ?: return callSuper()
     val frameEntity = world.getBlockEntity(pos) as? FrameEntity ?: return callSuper()
     val hammerData = HammerData.fromTag(tag)
 
-    hammerData.applySettings(frameEntity, player, world) { callSuper() }
+    hammerData.applySettings(this, state, frameEntity, player, world) { callSuper() }
 }

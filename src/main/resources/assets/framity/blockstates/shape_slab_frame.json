@@ -2,6 +2,6 @@
   "variants": {
     "type=bottom": { "model": "framity:block/frame/slab" },
     "type=top": { "model": "framity:block/frame/slab_top" },
-    "type=double": { "model": "framity:block/frame/block" }
+    "type=double": { "model": "framity:block/frame/slab_full" }
   }
 }

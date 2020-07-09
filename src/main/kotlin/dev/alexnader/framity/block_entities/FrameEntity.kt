@@ -1,7 +1,8 @@
 package dev.alexnader.framity.block_entities
 
 import dev.alexnader.framity.FRAME_ENTITY
-import dev.alexnader.framity.SPECIAL_ITEM_DATA
+import dev.alexnader.framity.FRAME_SCREEN_HANDLER_TYPE
+import dev.alexnader.framity.SPECIAL_ITEMS
 import dev.alexnader.framity.blocks.validForBase
 import dev.alexnader.framity.blocks.validForSpecial
 import dev.alexnader.framity.blocks.validForOverlay
@@ -22,14 +23,16 @@ import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.screen.ScreenHandlerContext
+import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.math.Direction
 import kotlin.math.max
 import kotlin.math.min
 
-open class FrameEntity protected constructor(
+open class FrameEntity constructor(
     format: FrameDataFormat,
+    private val screenHandlerType: ScreenHandlerType<FrameGuiDescription>,
     type: BlockEntityType<FrameEntity>
 ) :
     LockableContainerBlockEntity(type),
@@ -37,12 +40,12 @@ open class FrameEntity protected constructor(
     BlockEntityClientSerializable
 {
     companion object {
-        val FORMAT = FrameDataFormat(1, 1, SPECIAL_ITEM_DATA.size)
+        val FORMAT = FrameDataFormat(1)
     }
 
-    constructor() : this(FORMAT, FRAME_ENTITY.value)
+    constructor() : this(FORMAT, FRAME_SCREEN_HANDLER_TYPE, FRAME_ENTITY.value)
 
-    val data = FrameData(format, SectionedList(ItemStack.EMPTY, format, ItemStackEquality), FixedSizeList(null, format.base.size))
+    val data = FrameData(format, SectionedList(format, ItemStackEquality) { ItemStack.EMPTY }, FixedSizeList(format.base.size) { null })
 
     val format get() = data.format
 
@@ -80,7 +83,7 @@ open class FrameEntity protected constructor(
             else -> false
         }
 
-    override fun removeStack(slot: Int, amount: Int): ItemStack {
+    private fun beforeRemove(slot: Int) {
         val sectionIndex = format.getSectionIndex(slot)
 
         if (sectionIndex == FrameDataFormat.BASE_INDEX) {
@@ -88,9 +91,12 @@ open class FrameEntity protected constructor(
         } else if (sectionIndex == FrameDataFormat.SPECIAL_INDEX) {
             @Suppress("CAST_NEVER_SUCCEEDS")
             val existing = this.getStack(slot) as GetItemBeforeEmpty
-            SPECIAL_ITEM_DATA[existing.itemBeforeEmpty]?.second?.onRemove(this.world!!, this)
+            SPECIAL_ITEMS[existing.itemBeforeEmpty]?.data?.onRemove(this.world!!, this)
         }
+    }
 
+    override fun removeStack(slot: Int, amount: Int): ItemStack {
+        beforeRemove(slot)
         val result =
             if (slot >= 0 && slot < items.size && !items[slot].isEmpty && amount > 0) {
                 items[slot].split(amount).also {
@@ -110,15 +116,7 @@ open class FrameEntity protected constructor(
     }
 
     override fun removeStack(slot: Int): ItemStack {
-        val sectionIndex = format.getSectionIndex(slot)
-
-        if (sectionIndex == FrameDataFormat.BASE_INDEX) {
-            this.baseStates.removeAt(format.base.findOffset(slot))
-        } else if (sectionIndex == FrameDataFormat.SPECIAL_INDEX) {
-            @Suppress("CAST_NEVER_SUCCEEDS")
-            val existing = this.getStack(slot) as GetItemBeforeEmpty
-            SPECIAL_ITEM_DATA[existing.itemBeforeEmpty]?.second?.onRemove(this.world!!, this)
-        }
+        beforeRemove(slot)
 
         this.markDirty()
 
@@ -137,7 +135,7 @@ open class FrameEntity protected constructor(
     override fun canPlayerUse(player: PlayerEntity) = true
 
     override fun clear() {
-        SPECIAL_ITEM_DATA.forEach { (_, data) -> data.second.onRemove(this.world!!, this) }
+        SPECIAL_ITEMS.forEach { (_, specialItem) -> specialItem.data.onRemove(this.world!!, this) }
         this.items.clear()
     }
 
@@ -147,7 +145,7 @@ open class FrameEntity protected constructor(
         if (sectionIndex == FrameDataFormat.SPECIAL_INDEX) {
             @Suppress("CAST_NEVER_SUCCEEDS")
             val existing = this.getStack(slot) as GetItemBeforeEmpty
-            SPECIAL_ITEM_DATA[existing.itemBeforeEmpty]?.second?.onRemove(this.world!!, this)
+            SPECIAL_ITEMS[existing.itemBeforeEmpty]?.data?.onRemove(this.world!!, this)
         }
 
         this.items[slot] = stack
@@ -159,7 +157,7 @@ open class FrameEntity protected constructor(
             this.baseStates[baseSlot] =
                 (this.baseItems[baseSlot].item as? BlockItem)?.block?.defaultState
         } else if (sectionIndex == FrameDataFormat.SPECIAL_INDEX) {
-            SPECIAL_ITEM_DATA[stack.item]?.second?.onAdd(this.world!!, this)
+            SPECIAL_ITEMS[stack.item]?.data?.onAdd(this.world!!, this)
         }
     }
 
@@ -186,7 +184,9 @@ open class FrameEntity protected constructor(
 
     //region RenderAttachmentBlockEntity
     override fun getRenderAttachmentData() =
-        Pair(this.baseStates, getOverlayId(this.overlayItems.firstOrNull() ?: ItemStack.EMPTY))
+        this.items.getSectionOrNull(FrameDataFormat.OVERLAY_INDEX)?.let {
+            Pair(this.baseStates, this.overlayItems.map(::getOverlayId))
+        }
     //endregion RenderAttachmentBlockEntity
 
     //region Tag
@@ -214,7 +214,7 @@ open class FrameEntity protected constructor(
     //endregion Tag
 
     override fun createScreenHandler(syncId: Int, playerInventory: PlayerInventory?) =
-        FrameGuiDescription(syncId, playerInventory, ScreenHandlerContext.create(this.world, this.pos), this.format)
+        FrameGuiDescription(screenHandlerType, syncId, playerInventory, ScreenHandlerContext.create(this.world, this.pos), this.format)
 
     override fun getContainerName() = TranslatableText(cachedState.block.translationKey)
 }

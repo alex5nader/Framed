@@ -1,13 +1,11 @@
 package dev.alexnader.framity.client.model
 
-import dev.alexnader.framity.LOGGER
+import dev.alexnader.framity.blocks.Frame
 import dev.alexnader.framity.data.getValidOverlay
 import dev.alexnader.framity.data.overlay.*
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
-import net.fabricmc.fabric.api.renderer.v1.Renderer
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode
-import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder
 import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
@@ -16,7 +14,6 @@ import net.minecraft.block.BlockState
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.texture.Sprite
-import net.minecraft.item.ItemStack
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
@@ -26,6 +23,7 @@ import java.util.function.Supplier
 import dev.alexnader.framity.util.*
 import net.minecraft.client.texture.SpriteAtlasTexture
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.Vec3d
 
 /**
  * Flips a number in the range [0, 1] as if it were in the range [1, 0].
@@ -33,112 +31,115 @@ import net.minecraft.util.Identifier
 private fun flip(f: Float) = 1 - f
 
 /**
- * [RenderContext.QuadTransform] sub-interface which gives the ability
- * to prepare the transformer for block and item contexts.
+ * Clamps a number to the range [0, 1].
  */
-interface MeshTransformer : RenderContext.QuadTransform {
-    fun prepare(blockView: BlockRenderView?, state: BlockState?, pos: BlockPos?, randomSupplier: Supplier<Random>?)
-    fun prepare(stack: ItemStack?, randomSupplier: Supplier<Random>?)
-}
+private fun clamp01(f: Float) = MathHelper.clamp(f, 0f, 1f)
 
-/**
- * [MeshTransformer] implementor which copies the sprite data from a
- * [RenderAttachedBlockView] and applies them to the emitter being transformed.
- */
-class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
+const val WHITE      = 0x00FFFFFF
+const val FULL_ALPHA = 0xFF000000.toInt()
+
+class FrameTransform(
+    partCount: Int,
+    defaultSprite: Sprite,
+    blockView: BlockRenderView,
+    private val state: BlockState,
+    pos: BlockPos,
+    randomSupplier: Supplier<Random>
+) : RenderContext.QuadTransform {
+    private data class Data(
+        val sprites: SpriteSource,
+        val overlay: OverlayInfo.Valid?,
+        val cachedOverlayColor: Int?,
+        val color: Int,
+        val material: RenderMaterial?
+    )
+
     companion object {
-        private val CLIENT: MinecraftClient = MinecraftClient.getInstance()
-        private val RENDERER: Renderer = RendererAccess.INSTANCE.renderer
-        private val MAT_FINDER: MaterialFinder = RENDERER.materialFinder()
-
-        const val WHITE      = 0x00FFFFFF
-        const val FULL_ALPHA = 0xFF000000.toInt()
-
-        /**
-         * Clamps a number to the range [0, 1].
-         */
-        private fun clamp01(f: Float) = MathHelper.clamp(f, 0f, 1f)
+        private val CLIENT = MinecraftClient.getInstance()
+        private val MAT_FINDER = RendererAccess.INSTANCE.renderer.materialFinder()
     }
 
-    private val sprites = SpriteSet(defaultSprite)
+    private val data: FixedSizeList<Data>
     private val transformedIndex: EnumMap<Direction, Int> = EnumMap(Direction::class.java)
 
-    private var overlay: OverlayInfo.Valid? = null
-    private var cachedOverlayColor: Int? = null
+    init {
+        @Suppress("UNCHECKED_CAST")
+        val attachment = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as? Pair<FixedSizeList<BlockState?>, List<Identifier?>>? ?: error("Block (${state.block})at $pos has invalid render attachment")
+        val (baseStates, overlayIds) = attachment
 
-    private var color = 0
-    private var mat: RenderMaterial? = null
-
-    @Suppress("UNCHECKED_CAST")
-    override fun prepare(
-        blockView: BlockRenderView?,
-        state: BlockState?,
-        pos: BlockPos?,
-        randomSupplier: Supplier<Random>?
-    ) {
-        val (baseStates, overlayId) = (blockView as RenderAttachedBlockView).getBlockEntityRenderAttachment(pos) as? Pair<FixedSizeList<BlockState?>, Identifier?>? ?: return
-        val baseState = baseStates[0] //TODO actually use more than the first base state
-        val overlay = getValidOverlay(overlayId)
-
-        if (overlayId != null && overlay == null) {
-            LOGGER.warn("Trying to access invalid overlay: $overlayId")
+        if (state.block !is Frame) {
+            error("Cannot  transform non-frame block ${state.block}")
         }
 
-        if (baseState == null) {
-            sprites.clear()
-            this.mat = MAT_FINDER.clear().blendMode(0, BlendMode.CUTOUT).find()
-        } else {
-            this.mat = MAT_FINDER.clear().disableDiffuse(0, false).disableAo(0, false).blendMode(0, BlendMode.fromRenderLayer(RenderLayers.getBlockLayer(baseState))).find()
+        if (baseStates.size != overlayIds.size) {
+            error("Invalid render attachment: number of base states ${baseStates.size} must equal number of overlays ${overlayIds.size}")
+        }
+
+        if (baseStates.size != partCount) {
+            error("Transformer failed: expected $partCount parts, found ${baseStates.size}.")
+        }
+
+        data = FixedSizeList((0 until partCount).asSequence().map { i ->
+            val baseState = baseStates[i]
             val model = CLIENT.blockRenderManager.getModel(baseState)
-            sprites.prepare(model, randomSupplier?.get())
 
-            ColorProviderRegistry.BLOCK.get(baseState.block)?.let { colorProvider ->
-                this.color = FULL_ALPHA or colorProvider.getColor(baseState, blockView, pos, 1)
+            val (material, color, sprites) = if (baseState == null) {
+                val material = MAT_FINDER.clear().blendMode(0, BlendMode.CUTOUT).find()
+                Triple(material, WHITE, SpriteSource.Default(defaultSprite, null, model, randomSupplier.get()))
+            } else {
+                val material = MAT_FINDER.clear().disableDiffuse(0, false).disableAo(0, false).blendMode(0, BlendMode.fromRenderLayer(RenderLayers.getBlockLayer(state))).find()
+
+                val color = ColorProviderRegistry.BLOCK.get(baseState.block)?.let { colorProvider ->
+                    FULL_ALPHA or colorProvider.getColor(baseState, blockView, pos, 1)
+                } ?: WHITE
+                Triple(material, color, SpriteSource.Set(baseState, model, randomSupplier.get()))
             }
-        }
-
-        fun colorHandler(coloredLike: ColoredLike): Int? =
-            ColorProviderRegistry.BLOCK.get(coloredLike.colorSource.block)
-                ?.getColor(coloredLike.colorSource, blockView, pos, 1)
-                ?.let { FULL_ALPHA or it }
-
-        this.cachedOverlayColor = overlay?.coloredLike?.let { colorHandler(it) }
-
-        this.overlay = overlay
+            val overlay = getValidOverlay(overlayIds[i])
+            val cachedOverlayColor = overlay?.coloredLike?.let { coloredLike ->
+                ColorProviderRegistry.BLOCK.get(coloredLike.colorSource.block)
+                    ?.getColor(coloredLike.colorSource, blockView, pos, 1)
+                    ?.let { FULL_ALPHA or it }
+            }
+            Data(sprites, overlay, cachedOverlayColor, color, material)
+        }) { error("Cannot remove from Frame Transform Data") }
     }
 
-    override fun prepare(stack: ItemStack?, randomSupplier: Supplier<Random>?) {
-        this.color = WHITE
-        sprites.clear()
-        this.mat = MAT_FINDER.clear().find()
-    }
-
-    override fun transform(qe: MutableQuadView?): Boolean {
-        qe!!.material(this.mat)
-
+    override fun transform(qe: MutableQuadView): Boolean {
         val direction = qe.lightFace()!!
 
-        val shapeIndex = this.transformedIndex[direction] ?: 0
-        this.transformedIndex[direction] = shapeIndex + 1
+        val quadIndex = this.transformedIndex[direction] ?: 0
+        this.transformedIndex[direction] = quadIndex + 1
 
-        // first half of quads are base, second half are overlay
-        val (sprite, color) = if (shapeIndex % 2 == 0) {
-            if (sprites.isDefault) {
+        val state = this.state
+
+        val partIndex = run {
+            val xs = Float4(qe.x(0), qe.x(1), qe.x(2), qe.x(3))
+            val ys = Float4(qe.y(0), qe.y(1), qe.y(2), qe.y(3))
+            val zs = Float4(qe.z(0), qe.z(1), qe.z(2), qe.z(3))
+            (state.block as Frame).getSlotFor(state, Vec3d(xs.center.toDouble(), ys.center.toDouble(), zs.center.toDouble()), direction)
+        }
+
+        val (sprites, overlay, cachedOverlayColor, storedColor, material) = data[partIndex]
+
+        qe.material(material)
+
+        val (sprite, color) = if (quadIndex % 2 == 0) {
+            if (sprites is SpriteSource.Default) {
                 return true
             }
 
-            val spriteIndex = shapeIndex % this.sprites.getQuadCount(direction)
+            val spriteIndex = quadIndex % sprites.getCount(direction)
 
-            val sprite = this.sprites[direction, spriteIndex]
-            val color = if (this.sprites.hasColor(direction, spriteIndex)) {
-                this.color
+            val sprite = sprites[direction, spriteIndex]
+            val color = if (sprites.hasColor(direction, spriteIndex)) {
+                storedColor
             } else {
                 null
             }
 
             Pair(sprite, color)
         } else {
-            val spriteIndex = shapeIndex % this.sprites.getQuadCount(direction)
+            val spriteIndex = quadIndex % sprites.getCount(direction)
 
             fun handleTexture(source: TextureSource): Pair<Sprite, Int?>? {
                 return when (source) {
@@ -147,22 +148,22 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
                         @Suppress("deprecation")
                         val sprite = CLIENT.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX).apply(spriteId)
 
-                        Pair(sprite, this.cachedOverlayColor)
+                        Pair(sprite, cachedOverlayColor)
                     }
                     is TextureSource.Single -> {
                         @Suppress("deprecation")
                         val sprite = CLIENT.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX).apply(source.spriteId)
 
-                        Pair(sprite, this.cachedOverlayColor)
+                        Pair(sprite, cachedOverlayColor)
                     }
                 }
             }
 
-            val (sprite, color) = when (val overlay = this.overlay) {
+            val (sprite, color) = when (overlay) {
                 null -> {
-                    val sprite = this.sprites[direction, spriteIndex]
-                    val color = if (this.sprites.hasColor(direction, spriteIndex)) {
-                        this.color
+                    val sprite = sprites[direction, spriteIndex]
+                    val color = if (sprites.hasColor(direction, spriteIndex)) {
+                        storedColor
                     } else {
                         null
                     }
@@ -177,6 +178,10 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
             Pair(sprite, color)
         }
 
+        if (color != null) {
+            qe.spriteColor(0, color, color, color, color)
+        }
+
         val (uSource, vSource) = when (direction) {
             Direction.DOWN  -> Pair(qe::x,                qe::z andThen ::flip)
             Direction.UP    -> Pair(qe::x,                qe::z)
@@ -186,60 +191,44 @@ class FrameMeshTransformer(defaultSprite: Sprite) : MeshTransformer {
             Direction.WEST  -> Pair(qe::z,                qe::y andThen ::flip)
         }
 
-        if (color != null) {
-            qe.spriteColor(0, color, color, color, color)
-        }
+        val (us, vs) = Float4(uSource(0), uSource(1), uSource(2), uSource(3)).let { origUs ->
+            Float4(vSource(0), vSource(1), vSource(2), vSource(3)).let { origVs ->
+                fun handleOffsetter(offsetter: Offsetter, orig: Float4): Float4? =
+                    when (offsetter) {
+                        is Offsetter.Remap ->
+                            offsetter[orig] ?: orig
+                        Offsetter.Zero -> {
+                            val (min, max) = minMax(orig.a, orig.b)
+                            val delta = max - min
 
-        val (us, vs) = Pair(
-            Float4(
-                uSource(0),
-                uSource(1),
-                uSource(2),
-                uSource(3)
-            ),
-            Float4(
-                vSource(0),
-                vSource(1),
-                vSource(2),
-                vSource(3)
-            )
-        ).let { (origUs, origVs) ->
-            fun handleOffsetter(offsetter: Offsetter, orig: Float4): Float4? =
-                when (offsetter) {
-                    is Offsetter.Remap ->
-                        offsetter[orig] ?: orig
-                    Offsetter.Zero -> {
-                        val (min, max) = minMax(orig.a, orig.b)
-                        val delta = max - min
-
-                        if (orig.a == min) {
-                            Float4(0f, delta, delta, 0f)
-                        } else {
-                            Float4(delta, 0f, 0f, delta)
+                            if (orig.a == min) {
+                                Float4(0f, delta, delta, 0f)
+                            } else {
+                                Float4(delta, 0f, 0f, delta)
+                            }
                         }
                     }
-                }
 
-            val overlay = this.overlay
-            val offsets = if (overlay?.offsets != null) {
-                overlay.offsets[direction]?.let { offsetters ->
-                    when (offsetters) {
-                        is Offsetters.U ->
-                            Pair(handleOffsetter(offsetters.uOffsetter, origUs) ?: origUs, origVs)
-                        is Offsetters.V ->
-                            Pair(origUs, handleOffsetter(offsetters.vOffsetter, origVs) ?: origVs)
-                        is Offsetters.UV ->
-                            Pair(
-                                handleOffsetter(offsetters.uOffsetter, origUs) ?: origUs,
-                                handleOffsetter(offsetters.vOffsetter, origVs) ?: origVs
-                            )
+                val offsets = if (overlay?.offsets != null) {
+                    overlay.offsets[direction]?.let { offsetters ->
+                        when (offsetters) {
+                            is Offsetters.U ->
+                                Pair(handleOffsetter(offsetters.uOffsetter, origUs) ?: origUs, origVs)
+                            is Offsetters.V ->
+                                Pair(origUs, handleOffsetter(offsetters.vOffsetter, origVs) ?: origVs)
+                            is Offsetters.UV ->
+                                Pair(
+                                    handleOffsetter(offsetters.uOffsetter, origUs) ?: origUs,
+                                    handleOffsetter(offsetters.vOffsetter, origVs) ?: origVs
+                                )
+                        }
                     }
+                } else {
+                    null
                 }
-            } else {
-                null
-            }
 
-            offsets ?: Pair(origUs, origVs)
+                offsets ?: Pair(origUs, origVs)
+            }
         }
 
         qe

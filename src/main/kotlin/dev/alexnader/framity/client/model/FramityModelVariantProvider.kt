@@ -27,7 +27,7 @@ class FramityModelVariantProvider : ModelVariantProvider {
 
     private val variants: MutableMap<ModelIdentifier, UnbakedModel> = mutableMapOf()
 
-    fun registerModelsFor(targetBlock: Block, delegateBlock: Block, sprites: List<SpriteIdentifier>) {
+    fun registerModelsFor(targetBlock: Block, delegateBlock: Block, partCount: Int, sprites: List<SpriteIdentifier>) {
         val unimportantProps = targetBlock.stateManager.defaultState.properties subtract delegateBlock.stateManager.defaultState.properties
 
         val unimportantProduct =
@@ -53,7 +53,7 @@ class FramityModelVariantProvider : ModelVariantProvider {
                 val targetId = BlockModels.getModelId(targetState)
                 val delegateId = BlockModels.getModelId(delegateState)
                 this.variants[targetId] =
-                    UnbakedDelegatedModel(delegateId, sprites)
+                    UnbakedFrameModel(partCount, delegateId, sprites)
             }
         }
         val targetItemId = Registry.ITEM.getId(targetBlock.asItem())
@@ -64,9 +64,9 @@ class FramityModelVariantProvider : ModelVariantProvider {
         val targetId = ModelIdentifier(targetItemId, "inventory")
         val delegateId = ModelIdentifier(delegateItemId, "inventory")
         this.variants[targetId] =
-            UnbakedDelegatedModel(delegateId, sprites)
+            UnbakedFrameModel(partCount, delegateId, sprites)
     }
 
-    override fun loadModelVariant(modelId: ModelIdentifier?, context: ModelProviderContext?) =
+    override fun loadModelVariant(modelId: ModelIdentifier, context: ModelProviderContext?) =
         this.variants[modelId]
 }
