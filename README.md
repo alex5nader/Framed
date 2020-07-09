@@ -1,6 +1,7 @@
 # Framity
 
 Framity is a [Minecraft](https://www.minecraft.net/) mod for the [Fabric](https://fabricmc.net/use/) mod loader.
+There are no plans for a version for the Forge mod loader.
 
 Framity adds several types of block frame with various shapes. Each
 frame can have its texture changed to that of any full-size block in
@@ -33,41 +34,12 @@ placed into the world, they are not able to be placed into a frame.
 Framity is not currently available, but when it is, it will be available through
 its [CurseForge page](https://www.curseforge.com/minecraft/mc-mods/framity).
 
-## Planned Features
+## Roadmap
 
-The features below are in no particular order, and are not guaranteed to be added.
-
-- Overlay textures
-    - ✔ Grass (via wheat seeds)
-    - ✔ Snow (via snowball)
-    - ✔ Mycelium (via red/brown mushroom)
-    - ✔ Path (via dead bush)
-    - ✔ Hay (via wheat)
-    - ✔ Vines (via vine)
-- Frame blocks
-    - ✔ Full block
-    - ✔ Slab
-    - ✔ Stairs
-    - ✔ Fence
-    - ✔ Fence gate
-    - Slope
-    - Bed
-    - Flower pot
-    - Door
-    - ✔ Trapdoor
-    - Torch
-    - Pressure plate
-    - Lever
-    - Button
-    - Path
-    - Chest
-- Other
-    - Independent sides → Each side of the frame can have a different texture  
-    - ✔ Glowstone dust → Frame gains light level of 15
-    - ✔ Redstone dust → Frame outputs redstone signal of 15
-    - Ice shard (via cotton) → Frame is slippery
+A roadmap is available on Framity's [Trello board](https://trello.com/b/eq4oultm/framity-roadmap)
     
 ## Thanks
+
 Thanks to:
 - The members of the [Fabric Discord](https://discord.gg/v6v4pMv) for their
 incredible help and support throughout the creation of Framity.
