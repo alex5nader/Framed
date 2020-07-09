@@ -22,7 +22,8 @@ private fun String.withNamespace(namespace: String) = Identifier(namespace, this
 class Mod(private val modId: String, private val modelVariantProvider: FramityModelVariantProvider) {
     private data class ItemGroupInfo(val items: MutableList<String>, val icon: () -> ItemStack)
     private data class ItemInfo(val item: Item)
-    private data class BlockInfo(val block: Block, var renderLayer: RenderLayer? = null, var delegatedModel: Pair<WithId<Block>, List<SpriteIdentifier>>? = null)
+    private data class DelegatedModelInfo(val delegate: WithId<Block>, val partCount: Int, val sprites: List<SpriteIdentifier>)
+    private data class BlockInfo(val block: Block, var renderLayer: RenderLayer? = null, var delegatedModel: DelegatedModelInfo? = null)
     private data class BlockItemInfo(val blockItem: BlockItem)
     private data class BlockEntityInfo<E: BlockEntity>(val blockEntityType: BlockEntityType<E>)
 
@@ -68,8 +69,8 @@ class Mod(private val modId: String, private val modelVariantProvider: FramityMo
             this@Mod.blocks[this.id]?.let { it.renderLayer = layer }
         }
 
-        fun modelsFrom(source: WithId<Block>, sprites: List<SpriteIdentifier>) = this.apply {
-            this@Mod.blocks[this.id]?.let { it.delegatedModel = Pair(source, sprites) }
+        fun hasDelegateModel(source: WithId<Block>, sprites: List<SpriteIdentifier>, partCount: Int) = this.apply {
+            this@Mod.blocks[this.id]?.let { it.delegatedModel = DelegatedModelInfo(source, partCount, sprites) }
         }
 
         fun done() = WithId(this.id, this.block)
@@ -80,7 +81,6 @@ class Mod(private val modId: String, private val modelVariantProvider: FramityMo
     fun block(id: String, block: Block) = BlockBuilder(id, block)
 
     fun <E: BlockEntity> blockEntity(id: String, constructor: (BlockEntityType<E>) -> E, vararg blocks: Block): WithId<BlockEntityType<E>> {
-
         lateinit var blockEntityType: WithId<BlockEntityType<E>>
         blockEntityType = WithId(
             id,
@@ -130,7 +130,7 @@ class Mod(private val modId: String, private val modelVariantProvider: FramityMo
         ModelLoadingRegistry.INSTANCE.registerVariantProvider { this.modelVariantProvider }
 
         for ((_, block) in this.blocks) {
-            block.delegatedModel?.let { (source, sprites) -> this@Mod.modelVariantProvider.registerModelsFor(block.block, source.value, sprites) }
+            block.delegatedModel?.let { (source, partCount, sprites) -> this@Mod.modelVariantProvider.registerModelsFor(block.block, source.value, partCount, sprites) }
             block.renderLayer?.let { BlockRenderLayerMap.INSTANCE.putBlock(block.block,  it) }
         }
     }

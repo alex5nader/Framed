@@ -11,7 +11,8 @@ import net.minecraft.client.util.SpriteIdentifier
 import net.minecraft.util.Identifier
 import java.util.function.Function
 
-class UnbakedDelegatedModel constructor(
+class UnbakedFrameModel constructor(
+    private val partCount: Int,
     private val delegateId: ModelIdentifier,
     private val sprites: List<SpriteIdentifier>
 ) : UnbakedModel {
@@ -32,7 +33,7 @@ class UnbakedDelegatedModel constructor(
     ): BakedModel? {
         if (!this::model.isInitialized) {
             val delegateModel = loader.bakedModelMap[this.delegateId] ?: loader.getOrLoadModel(this.delegateId).bake(loader, textureGetter, rotationContainer, this.delegateId)!!
-            this.model = BakedDelegateModel(delegateModel)
+            this.model = BakedFrameModel(partCount, delegateModel)
         }
         return this.model
     }

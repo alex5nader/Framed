@@ -1,6 +1,6 @@
 package dev.alexnader.framity.blocks
 
-import dev.alexnader.framity.*
+import dev.alexnader.framity.SHAPE_BLOCK_FRAME
 import dev.alexnader.framity.block_entities.FrameEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockEntityProvider
@@ -14,11 +14,21 @@ import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import net.minecraft.util.math.Vec3d
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 
 class StairsFrame : StairsBlock(SHAPE_BLOCK_FRAME.value.defaultState, FRAME_SETTINGS), BlockEntityProvider, Frame {
-    override fun createBlockEntity(view: BlockView) = FrameEntity(FRAME_ENTITY.value)
+    override fun createBlockEntity(view: BlockView) = FrameEntity()
+
+    override val format = FrameEntity.FORMAT
+    override fun getSlotFor(
+        state: BlockState,
+        posInBlock: Vec3d,
+        side: Direction
+    ) = 0
+    override fun slotIsValid(state: BlockState, slot: Int) =
+        format.getOrNull(format.getSectionIndex(slot)) != null
 
     init {
         this.defaultState = frameDefaultState(this.defaultState)
@@ -48,7 +58,7 @@ class StairsFrame : StairsBlock(SHAPE_BLOCK_FRAME.value.defaultState, FRAME_SETT
         frame_getWeakRedstonePower(state, world, pos, direction)
 
     override fun isSideInvisible(state: BlockState, stateFrom: BlockState, direction: Direction) =
-        frame_isSideInvisible(state, stateFrom, direction, this) {
+        frame_isSideInvisible(state, stateFrom, direction) {
             @Suppress("DEPRECATION")
             super.isSideInvisible(state, stateFrom, direction)
         }
@@ -73,7 +83,7 @@ class StairsFrame : StairsBlock(SHAPE_BLOCK_FRAME.value.defaultState, FRAME_SETT
         newState: BlockState,
         moved: Boolean
     ) =
-        frame_onStateReplaced(state, world, pos, newState, moved, this) { super.onStateReplaced(state, world, pos, newState, moved) }
+        frame_onStateReplaced(state, world, pos, newState, moved) { super.onStateReplaced(state, world, pos, newState, moved) }
 
     override fun onBlockBreakStart(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity) =
         frame_onBlockBreakStart(state, world, pos, player) { super.onBlockBreakStart(state, world, pos, player) }

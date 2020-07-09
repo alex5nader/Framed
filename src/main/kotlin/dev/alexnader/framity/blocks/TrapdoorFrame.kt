@@ -1,6 +1,5 @@
 package dev.alexnader.framity.blocks
 
-import dev.alexnader.framity.FRAME_ENTITY
 import dev.alexnader.framity.block_entities.FrameEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockEntityProvider
@@ -14,11 +13,21 @@ import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import net.minecraft.util.math.Vec3d
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 
 class TrapdoorFrame : TrapdoorBlock(FRAME_SETTINGS), BlockEntityProvider, Frame {
-    override fun createBlockEntity(view: BlockView) = FrameEntity(FRAME_ENTITY.value)
+    override fun createBlockEntity(view: BlockView) = FrameEntity()
+
+    override val format = FrameEntity.FORMAT
+    override fun getSlotFor(
+        state: BlockState,
+        posInBlock: Vec3d,
+        side: Direction
+    ) = 0
+    override fun slotIsValid(state: BlockState, slot: Int) =
+        format.getOrNull(format.getSectionIndex(slot)) != null
 
     init {
         this.defaultState = frameDefaultState(this.defaultState)
@@ -40,7 +49,7 @@ class TrapdoorFrame : TrapdoorBlock(FRAME_SETTINGS), BlockEntityProvider, Frame 
         frame_emitsRedstonePower(state)
 
     override fun isSideInvisible(state: BlockState, stateFrom: BlockState, direction: Direction) =
-        frame_isSideInvisible(state, stateFrom, direction, this) {
+        frame_isSideInvisible(state, stateFrom, direction) {
             @Suppress("DEPRECATION")
             super.isSideInvisible(state, stateFrom, direction)
         }
@@ -73,7 +82,7 @@ class TrapdoorFrame : TrapdoorBlock(FRAME_SETTINGS), BlockEntityProvider, Frame 
         newState: BlockState,
         moved: Boolean
     ) =
-        frame_onStateReplaced(state, world, pos, newState, moved, this) {
+        frame_onStateReplaced(state, world, pos, newState, moved) {
             @Suppress("DEPRECATION")
             super.onStateReplaced(state, world, pos, newState, moved)
         }

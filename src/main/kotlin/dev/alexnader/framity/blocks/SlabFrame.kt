@@ -1,21 +1,59 @@
 package dev.alexnader.framity.blocks
 
-import dev.alexnader.framity.FRAME_ENTITY
+import dev.alexnader.framity.SLAB_FRAME_ENTITY
+import dev.alexnader.framity.SLAB_FRAME_SCREEN_HANDLER_TYPE
 import dev.alexnader.framity.block_entities.FrameEntity
+import dev.alexnader.framity.util.FrameDataFormat
 import net.minecraft.block.*
+import net.minecraft.block.enums.SlabType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.state.StateManager
+import net.minecraft.state.property.Properties
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import net.minecraft.util.math.Vec3d
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 
 class SlabFrame : SlabBlock(FRAME_SETTINGS), BlockEntityProvider, Frame {
-    override fun createBlockEntity(view: BlockView) = FrameEntity(FRAME_ENTITY.value)
+    companion object {
+        val FORMAT = FrameDataFormat(2)
+
+        private const val LOWER_SLOT = 0
+        private const val UPPER_SLOT = 1
+    }
+
+    override fun createBlockEntity(view: BlockView) = FrameEntity(FORMAT, SLAB_FRAME_SCREEN_HANDLER_TYPE, SLAB_FRAME_ENTITY.value)
+
+    override val format = FORMAT
+    override fun getSlotFor(
+        state: BlockState,
+        posInBlock: Vec3d,
+        side: Direction
+    ) =
+        when (side) {
+            Direction.UP -> if (posInBlock.y == 0.5) LOWER_SLOT else UPPER_SLOT
+            Direction.DOWN -> if (posInBlock.y == 0.5) UPPER_SLOT else LOWER_SLOT
+            else -> if (posInBlock.y < 0.5) LOWER_SLOT else UPPER_SLOT
+        }
+    override fun slotIsValid(state: BlockState, slot: Int): Boolean {
+        val wantedSlot = when (state.get(Properties.SLAB_TYPE)) {
+            SlabType.DOUBLE -> return true
+            SlabType.TOP -> UPPER_SLOT
+            SlabType.BOTTOM -> LOWER_SLOT
+            null -> error("Slab type is null.")
+        }
+        return when (format.getSectionIndex(slot)) {
+            FrameDataFormat.BASE_INDEX -> format.base.findOffset(slot) == wantedSlot
+            FrameDataFormat.OVERLAY_INDEX -> format.overlay.findOffset(slot) == wantedSlot
+            FrameDataFormat.SPECIAL_INDEX -> true // special items are not dependent on slab half
+            else -> error("Frame slab should not have other data.")
+        }
+    }
 
     init {
         this.defaultState = frameDefaultState(this.defaultState)
@@ -45,7 +83,7 @@ class SlabFrame : SlabBlock(FRAME_SETTINGS), BlockEntityProvider, Frame {
         frame_getWeakRedstonePower(state, world, pos, direction)
 
     override fun isSideInvisible(state: BlockState, stateFrom: BlockState, direction: Direction) =
-        frame_isSideInvisible(state, stateFrom, direction, this) {
+        frame_isSideInvisible(state, stateFrom, direction) {
             @Suppress("DEPRECATION")
             super.isSideInvisible(state, stateFrom, direction)
         }
@@ -70,7 +108,7 @@ class SlabFrame : SlabBlock(FRAME_SETTINGS), BlockEntityProvider, Frame {
         newState: BlockState,
         moved: Boolean
     ) =
-        frame_onStateReplaced(state, world, pos, newState, moved, this) {
+        frame_onStateReplaced(state, world, pos, newState, moved) {
             @Suppress("DEPRECATION")
             super.onStateReplaced(state, world, pos, newState, moved)
         }

@@ -1,8 +1,8 @@
 package dev.alexnader.framity
 
 import com.google.gson.Gson
-import dev.alexnader.framity.util.WithId
 import dev.alexnader.framity.block_entities.FrameEntity
+import dev.alexnader.framity.util.WithId
 import dev.alexnader.framity.blocks.*
 import dev.alexnader.framity.data.FramityAssetsListener
 import dev.alexnader.framity.data.FramityDataListener
@@ -87,50 +87,62 @@ val SOLID_FRAME_ID = SpriteIdentifier(
 val BLOCK_FRAME = MOD.block("block_frame", BlockFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
-    .modelsFrom(SHAPE_BLOCK_FRAME, listOf(HOLLOW_FRAME_ID))
+    .hasDelegateModel(SHAPE_BLOCK_FRAME, listOf(HOLLOW_FRAME_ID), FrameEntity.FORMAT.partCount)
     .done()
 val SLAB_FRAME = MOD.block("slab_frame", SlabFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
-    .modelsFrom(SHAPE_SLAB_FRAME, listOf(HOLLOW_FRAME_ID))
+    .hasDelegateModel(SHAPE_SLAB_FRAME, listOf(HOLLOW_FRAME_ID), SlabFrame.FORMAT.partCount)
     .done()
 val STAIRS_FRAME = MOD.block("stairs_frame", StairsFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
-    .modelsFrom(SHAPE_STAIRS_FRAME, listOf(HOLLOW_FRAME_ID))
+    .hasDelegateModel(SHAPE_STAIRS_FRAME, listOf(HOLLOW_FRAME_ID), FrameEntity.FORMAT.partCount)
     .done()
 val FENCE_FRAME = MOD.block("fence_frame", FenceFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
-    .modelsFrom(SHAPE_FENCE_FRAME, listOf(SOLID_FRAME_ID))
+    .hasDelegateModel(SHAPE_FENCE_FRAME, listOf(SOLID_FRAME_ID), FrameEntity.FORMAT.partCount)
     .done()
 val FENCE_GATE_FRAME = MOD.block("fence_gate_frame", FenceGateFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
-    .modelsFrom(SHAPE_FENCE_GATE_FRAME, listOf(SOLID_FRAME_ID))
+    .hasDelegateModel(SHAPE_FENCE_GATE_FRAME, listOf(SOLID_FRAME_ID), FrameEntity.FORMAT.partCount)
     .done()
 val TRAPDOOR_FRAME = MOD.block("trapdoor_frame", TrapdoorFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
-    .modelsFrom(SHAPE_TRAPDOOR_FRAME, listOf(SOLID_FRAME_ID))
+    .hasDelegateModel(SHAPE_TRAPDOOR_FRAME, listOf(SOLID_FRAME_ID), FrameEntity.FORMAT.partCount)
     .done()
 
-val FRAME_ENTITY = MOD.blockEntity("frame_entity", ::FrameEntity,
+val FRAME_ENTITY = MOD.blockEntity<FrameEntity>("frame_entity", { FrameEntity() },
     BLOCK_FRAME.value,
-    SLAB_FRAME.value,
     STAIRS_FRAME.value,
     FENCE_FRAME.value,
     FENCE_GATE_FRAME.value,
     TRAPDOOR_FRAME.value
 )
+val SLAB_FRAME_ENTITY = MOD.blockEntity<FrameEntity>("slab_frame_entity", { type -> FrameEntity(SlabFrame.FORMAT, SLAB_FRAME_SCREEN_HANDLER_TYPE, type) }, SLAB_FRAME.value)
 
 lateinit var FRAME_SCREEN_HANDLER_TYPE: ScreenHandlerType<FrameGuiDescription>
+lateinit var SLAB_FRAME_SCREEN_HANDLER_TYPE: ScreenHandlerType<FrameGuiDescription>
 
 @Suppress("unused")
 fun init() {
     MOD.register()
 
-    FRAME_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(MOD.id("frame_screen_handler"), FrameGuiDescription)
+    FRAME_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(
+        MOD.id("frame_screen_handler"),
+        FrameGuiDescription.factory(FrameEntity.FORMAT) {
+            FRAME_SCREEN_HANDLER_TYPE
+        }
+    )
+    SLAB_FRAME_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(
+        MOD.id("slab_frame_screen_handler"),
+        FrameGuiDescription.factory(SlabFrame.FORMAT) {
+            SLAB_FRAME_SCREEN_HANDLER_TYPE
+        }
+    )
 
     ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FramityDataListener())
 }
@@ -140,6 +152,7 @@ fun clientInit() {
     MOD.registerClient()
 
     ScreenRegistry.register(FRAME_SCREEN_HANDLER_TYPE, FrameScreen)
+    ScreenRegistry.register(SLAB_FRAME_SCREEN_HANDLER_TYPE, FrameScreen)
 
     @Suppress("deprecation")
     ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEX).register(ClientSpriteRegistryCallback { _, registry -> with(registry) {
@@ -149,11 +162,11 @@ fun clientInit() {
         register(MOD.id("block/path_side_overlay"))
     }})
 
+    ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(FramityAssetsListener())
+
     ModelLoadingRegistry.INSTANCE.registerAppender { _, out ->
         out.accept(ModelIdentifier(MOD.id("framers_hammer_none"), "inventory"))
     }
-
-    ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(FramityAssetsListener())
 
     FabricModelPredicateProviderRegistry.register(FRAMERS_HAMMER.value, MOD.id("hammer_mode"), FramersHammer.Companion.ModelPredicate)
 }

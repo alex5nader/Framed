@@ -1,7 +1,9 @@
 package dev.alexnader.framity.items
 
 import dev.alexnader.framity.block_entities.FrameEntity
+import dev.alexnader.framity.blocks.Frame
 import dev.alexnader.framity.util.FrameData
+import net.minecraft.block.BlockState
 import net.minecraft.client.item.ModelPredicateProvider
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.entity.LivingEntity
@@ -50,23 +52,26 @@ data class HammerData(val storedData: FrameData?, val mode: HammerMode) {
     companion object {
         fun fromTag(tag: CompoundTag) =
             HammerData(
-                FrameData.fromTag(tag.getCompound("storedData")),
+                if ("storedData" in tag) {
+                    FrameData.fromTag(tag.getCompound("storedData"))
+                } else {
+                    null
+                },
                 HammerMode.fromString(tag.getString("mode")) ?: HammerMode.default()
             )
     }
 
-    fun toTag() =
-        CompoundTag().apply {
-            this@HammerData.storedData?.let { this.put("storedData", it.toTag()) }
-            this.putString("mode", this@HammerData.mode.toString())
-        }
-
     /**
      * Returns null on success, onFail() on fail
      */
-    fun <T> applySettings(frameEntity: FrameEntity, player: PlayerEntity, world: World, onFail: () -> T): T? {
+    fun <T> applySettings(frame: Frame, state: BlockState, frameEntity: FrameEntity, player: PlayerEntity, world: World, onFail: () -> T): T? {
         val storedData = this.storedData ?: return onFail()
         val playerInventory = player.inventory ?: return onFail()
+
+        if (storedData.format != frameEntity.format) {
+            player.sendMessage(TranslatableText("gui.framity.framers_hammer.different_format"), true)
+            return onFail()
+        }
 
         if (!player.isCreative) {
             val requireAllItems = when (mode) {
@@ -95,8 +100,9 @@ data class HammerData(val storedData: FrameData?, val mode: HammerMode) {
 
             if (!world.isClient) {
                 playerSlotToFrameSlot.forEach { (playerSlot, frameSlot) ->
-                    if (frameEntity[frameSlot].item != playerInventory.getStack(playerSlot).item) {
-                        if (!frameEntity[frameSlot].isEmpty) {
+                    if (frameEntity.getStack(frameSlot).item != playerInventory.getStack(playerSlot).item
+                        && frame.slotIsValid(state, frameSlot)) {
+                        if (!frameEntity.getStack(frameSlot).isEmpty) {
                             player.inventory.offerOrDrop(world, frameEntity.removeStack(frameSlot))
                         }
                         frameEntity.setStack(frameSlot, playerInventory.removeStack(playerSlot, 1))
@@ -104,6 +110,10 @@ data class HammerData(val storedData: FrameData?, val mode: HammerMode) {
                 }
             }
         } else {
+            if (mode == HammerMode.NONE) {
+                return onFail()
+            }
+
             if (!world.isClient) {
                 storedData.items.forEachIndexed { slot, storedStack ->
                     frameEntity.setStack(slot, storedStack.copy())
@@ -149,6 +159,8 @@ class FramersHammer : Item(Settings().maxCount(1)) {
         val player = context.player ?: return super.useOnBlock(context)
         val world = context.world ?: return super.useOnBlock(context)
         val pos = context.blockPos ?: return super.useOnBlock(context)
+        val state = world.getBlockState(pos)
+        val frame = state.block as? Frame ?: return super.useOnBlock(context)
         val frameEntity = world.getBlockEntity(pos) as? FrameEntity ?: return super.useOnBlock(context)
 
         return if (player.isSneaking) {
@@ -157,7 +169,7 @@ class FramersHammer : Item(Settings().maxCount(1)) {
 
             ActionResult.SUCCESS
         } else {
-            hammerData.applySettings(frameEntity, player, world) { super.useOnBlock(context) }
+            hammerData.applySettings(frame, state, frameEntity, player, world) { super.useOnBlock(context) }
                 ?: ActionResult.SUCCESS
         }
     }

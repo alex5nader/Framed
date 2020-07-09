@@ -10,10 +10,11 @@
   "itemGroup.framity.framity": "Framity",
   "gui.framity.frame.base_label": "Base",
   "gui.framity.frame.overlay_label": "Overlay",
-  "gui.framity.frame.other_label": "Other",
+  "gui.framity.frame.special_label": "Special",
   "gui.framity.framers_hammer.no_copy_mode": "Don't Copy",
   "gui.framity.framers_hammer.partial_copy_mode": "Copy Some Items",
   "gui.framity.framers_hammer.whole_copy_mode": "Only Copy All Items",
   "gui.framity.framers_hammer.copy_settings": "Settings Copied!",
-  "gui.framity.framers_hammer.apply_settings": "Settings Applied!"
+  "gui.framity.framers_hammer.apply_settings": "Settings Applied!",
+  "gui.framity.framers_hammer.different_format": "Did not apply because the source and target have different formats"
 }
