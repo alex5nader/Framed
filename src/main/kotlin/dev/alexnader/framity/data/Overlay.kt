@@ -1,4 +1,4 @@
-package dev.alexnader.framity.data.overlay
+package dev.alexnader.framity.data
 
 import dev.alexnader.framity.util.JsonParseContext
 import dev.alexnader.framity.util.JsonParser
@@ -12,6 +12,11 @@ object IngredientParser : JsonParser<Ingredient> {
 data class OverlayTrigger(val trigger: Ingredient) {
     object Parser : JsonParser<OverlayTrigger> {
         override fun invoke(ctx: JsonParseContext) =
-            OverlayTrigger(ctx.runParserOnMember("trigger", IngredientParser))
+            OverlayTrigger(
+                ctx.runParserOnMember(
+                    "trigger",
+                    IngredientParser
+                )
+            )
     }
 }

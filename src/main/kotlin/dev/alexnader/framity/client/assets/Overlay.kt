@@ -1,6 +1,5 @@
-package dev.alexnader.framity.data.overlay
+package dev.alexnader.framity.client.assets
 
-import dev.alexnader.framity.data.*
 import dev.alexnader.framity.util.*
 import net.minecraft.block.BlockState
 import net.minecraft.util.Identifier
@@ -40,7 +39,9 @@ private fun <T> makeSidedMapParserUsing(parser: JsonParser<T>) =
 sealed class OverlayInfo {
     object DependenciesParser : JsonParser<List<Identifier>> {
         override fun invoke(ctx: JsonParseContext): List<Identifier> {
-            val parent = ctx.runParserOnNullableMember("parent", IdentifierParser)
+            val parent = ctx.runParserOnNullableMember("parent",
+                IdentifierParser
+            )
 
             return parent?.let { listOf(it) } ?: listOf()
         }
@@ -48,20 +49,36 @@ sealed class OverlayInfo {
 
     object Parser : JsonParser<OverlayInfo> {
         override fun invoke(ctx: JsonParseContext): OverlayInfo {
-            val parent = ctx.runParserOnNullableMember("parent", IdentifierParser)
+            val parent = ctx.runParserOnNullableMember("parent",
+                IdentifierParser
+            )
             val parentInfo = parent?.let { getOverlay(it) }
 
-            val textureSource = ctx.runParserOnNullableMember("textureSource", TextureSource.Parser)
+            val textureSource = ctx.runParserOnNullableMember("textureSource",
+                TextureSource.Parser
+            )
                 ?: parentInfo?.textureSource
-            val coloredLike = ctx.runParserOnNullableMember("coloredLike", ColoredLike.Parser)
+            val coloredLike = ctx.runParserOnNullableMember("coloredLike",
+                ColoredLike.Parser
+            )
                 ?: parentInfo?.coloredLike
-            val offsets = ctx.runParserOnNullableMember("offsets", TextureOffsets.Parser)
+            val offsets = ctx.runParserOnNullableMember("offsets",
+                TextureOffsets.Parser
+            )
                 ?: parentInfo?.offsets
 
             return if (textureSource == null) {
-                Partial(textureSource, coloredLike, offsets)
+                Partial(
+                    textureSource,
+                    coloredLike,
+                    offsets
+                )
             } else {
-                Complete(textureSource, coloredLike, offsets)
+                Complete(
+                    textureSource,
+                    coloredLike,
+                    offsets
+                )
             }
         }
     }
@@ -86,14 +103,22 @@ sealed class TextureSource {
     data class Single(val spriteId: Identifier) : TextureSource() {
         object Parser : JsonParser<Single> {
             override fun invoke(ctx: JsonParseContext) =
-                Single(ctx.runParser(IdentifierParser))
+                Single(
+                    ctx.runParser(
+                        IdentifierParser
+                    )
+                )
         }
     }
 
     data class Sided(val map: Map<Direction, Identifier>) : TextureSource(), Map<Direction, Identifier> by map {
         object Parser : JsonParser<Sided> {
             override fun invoke(ctx: JsonParseContext) =
-                Sided(makeSidedMapParserUsing(IdentifierParser)(ctx))
+                Sided(
+                    makeSidedMapParserUsing(IdentifierParser)(
+                        ctx
+                    )
+                )
         }
     }
 }
@@ -102,7 +127,9 @@ data class ColoredLike(val colorSource: BlockState) {
     object Parser : JsonParser<ColoredLike> {
         override fun invoke(ctx: JsonParseContext) =
             ctx.runParser(IdentifierParser).let { id ->
-                ColoredLike(Registry.BLOCK.getOrEmpty(id).orNull()?.defaultState ?: ctx.error("Invalid ID: $id"))
+                ColoredLike(
+                    Registry.BLOCK.getOrEmpty(id).orNull()?.defaultState ?: ctx.error("Invalid ID: $id")
+                )
             }
     }
 }
@@ -110,7 +137,11 @@ data class ColoredLike(val colorSource: BlockState) {
 data class TextureOffsets(val map: Map<Direction, Offsetters>) : Map<Direction, Offsetters> by map {
     object Parser : JsonParser<TextureOffsets> {
         override fun invoke(ctx: JsonParseContext) =
-            TextureOffsets(makeSidedMapParserUsing(Offsetters.Parser)(ctx))
+            TextureOffsets(
+                makeSidedMapParserUsing(Offsetters.Parser)(
+                    ctx
+                )
+            )
     }
 }
 
@@ -118,8 +149,8 @@ sealed class Offsetters {
     object Parser : JsonParser<Offsetters> {
         override fun invoke(ctx: JsonParseContext) =
             ctx.sumType(
-                "uOffsetter" to (Offsetter.Parser andThen ::U),
-                "vOffsetter" to (Offsetter.Parser andThen ::V),
+                "uOffsetter" to (Offsetter.Parser andThen Offsetters::U),
+                "vOffsetter" to (Offsetter.Parser andThen Offsetters::V),
                 "uv" to UV.Parser
             )
     }
@@ -130,8 +161,14 @@ sealed class Offsetters {
         object Parser : JsonParser<UV> {
             override fun invoke(ctx: JsonParseContext) =
                 UV(
-                    ctx.runParserOnMember("uOffsetter", Offsetter.Parser),
-                    ctx.runParserOnMember("vOffsetter", Offsetter.Parser)
+                    ctx.runParserOnMember(
+                        "uOffsetter",
+                        Offsetter.Parser
+                    ),
+                    ctx.runParserOnMember(
+                        "vOffsetter",
+                        Offsetter.Parser
+                    )
                 )
         }
     }
@@ -158,8 +195,14 @@ sealed class Offsetter {
             override fun invoke(ctx: JsonParseContext) =
                 Remap(ctx.map { objCtx ->
                     Pair(
-                        objCtx.runParserOnMember("from", Float4.Parser),
-                        objCtx.runParserOnMember("to", Float4.Parser)
+                        objCtx.runParserOnMember(
+                            "from",
+                            Float4.Parser
+                        ),
+                        objCtx.runParserOnMember(
+                            "to",
+                            Float4.Parser
+                        )
                     )
                 }.toMap())
         }

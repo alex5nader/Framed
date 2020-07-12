@@ -9,7 +9,6 @@ import dev.alexnader.framity.data.hasOverlay
 import dev.alexnader.framity.items.HammerData
 import dev.alexnader.framity.util.FixedSizeList
 import dev.alexnader.framity.util.equalsIgnoring
-import dev.alexnader.framity.util.log
 import dev.alexnader.framity.util.minus
 import net.minecraft.block.*
 import net.minecraft.entity.LivingEntity

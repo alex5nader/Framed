@@ -1,9 +1,8 @@
-package dev.alexnader.framity.data
+package dev.alexnader.framity.client.assets
 
 import com.google.gson.JsonElement
 import dev.alexnader.framity.GSON
 import dev.alexnader.framity.LOGGER
-import dev.alexnader.framity.data.overlay.OverlayInfo
 import dev.alexnader.framity.util.JsonParseException
 import dev.alexnader.framity.util.toContext
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener
@@ -22,7 +21,9 @@ fun getOverlay(id: Identifier?) =
 fun getValidOverlay(id: Identifier?) =
     id?.let { OverlayInfoMap[it] as? OverlayInfo.Complete? }
 
+
 data class FramityAssets(val overlayIds: Collection<Identifier>)
+
 
 class FramityAssetsListener : SimpleResourceReloadListener<FramityAssets> {
     companion object {

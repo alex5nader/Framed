@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.util.WithId
 import dev.alexnader.framity.blocks.*
-import dev.alexnader.framity.data.FramityAssetsListener
+import dev.alexnader.framity.client.assets.FramityAssetsListener
 import dev.alexnader.framity.data.FramityDataListener
 import dev.alexnader.framity.client.gui.FrameGuiDescription
 import dev.alexnader.framity.client.gui.FrameScreen
