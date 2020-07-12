@@ -48,7 +48,7 @@ class FrameTransform(
 ) : RenderContext.QuadTransform {
     private data class Data(
         val sprites: SpriteSource,
-        val overlay: OverlayInfo.Valid?,
+        val overlay: OverlayInfo.Complete?,
         val cachedOverlayColor: Int?,
         val color: Int,
         val material: RenderMaterial?

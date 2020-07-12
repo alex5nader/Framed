@@ -4,6 +4,8 @@ import com.google.gson.JsonElement
 import dev.alexnader.framity.GSON
 import dev.alexnader.framity.LOGGER
 import dev.alexnader.framity.data.overlay.OverlayTrigger
+import dev.alexnader.framity.util.JsonParseException
+import dev.alexnader.framity.util.toContext
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener
 import net.minecraft.item.ItemStack
 import net.minecraft.resource.ResourceManager
@@ -57,11 +59,9 @@ class FramityDataListener : SimpleResourceReloadListener<FramityData> {
                 val input = manager.getResource(overlayId).inputStream
                 val reader = BufferedReader(InputStreamReader(input))
 
-                val element = GSON.fromJson(reader, JsonElement::class.java)
+                val ctx = GSON.fromJson(reader, JsonElement::class.java).toContext(overlayId.toString())
 
-                val ctx = JsonParseContext(overlayId.toString(), element)
-
-                OverlayTriggers.add(Pair(OverlayTrigger.fromJson(ctx), overlayId))
+                OverlayTriggers.add(Pair(ctx.runParser(OverlayTrigger.Parser), overlayId))
             } catch (e: IOException) {
                 LOGGER.error("Error while loading a Framity overlay: $e")
             } catch (e: JsonParseException) {

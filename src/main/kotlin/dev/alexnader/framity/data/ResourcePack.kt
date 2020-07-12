@@ -4,13 +4,13 @@ import com.google.gson.JsonElement
 import dev.alexnader.framity.GSON
 import dev.alexnader.framity.LOGGER
 import dev.alexnader.framity.data.overlay.OverlayInfo
+import dev.alexnader.framity.util.JsonParseException
+import dev.alexnader.framity.util.toContext
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener
 import net.minecraft.resource.ResourceManager
 import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
-import java.io.BufferedReader
 import java.io.IOException
-import java.io.InputStreamReader
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 import java.util.function.Supplier
@@ -20,7 +20,7 @@ private val OverlayInfoMap: MutableMap<Identifier, OverlayInfo> = mutableMapOf()
 fun getOverlay(id: Identifier?) =
     id?.let { OverlayInfoMap[it] }
 fun getValidOverlay(id: Identifier?) =
-    id?.let { OverlayInfoMap[it] as? OverlayInfo.Valid? }
+    id?.let { OverlayInfoMap[it] as? OverlayInfo.Complete? }
 
 data class FramityAssets(val overlayIds: Collection<Identifier>)
 
@@ -44,25 +44,25 @@ class FramityAssetsListener : SimpleResourceReloadListener<FramityAssets> {
             FramityAssets(overlayIds)
         }, executor)
 
-    private fun loadOverlay(manager: ResourceManager, overlayId: Identifier) {
+    private fun loadOverlay(manager: ResourceManager, rootOverlayId: Identifier) {
         val dependencies = mutableSetOf<Identifier>()
 
         fun loadOverlayRec(overlayId: Identifier) {
-            val element = GSON.fromJson(manager.getResource(overlayId).inputStream.buffered().reader(), JsonElement::class.java)
+            val ctx = GSON.fromJson(manager.getResource(overlayId).inputStream.buffered().reader(), JsonElement::class.java).toContext(overlayId.toString())
 
-            val ctx = JsonParseContext(overlayId.toString(), element)
-
-            OverlayInfo.dependencies(ctx).forEach {
+            ctx.runParser(OverlayInfo.DependenciesParser).forEach {
                 if (!dependencies.add(it)) {
                     ctx.error("Circular dependency: $it and $overlayId")
                 }
                 loadOverlayRec(it)
             }
 
-            OverlayInfoMap[overlayId] = OverlayInfo.fromJson(ctx)
+            OverlayInfoMap[overlayId] = ctx.runParser(OverlayInfo.Parser)
         }
 
-        loadOverlayRec(overlayId)
+        if (rootOverlayId !in OverlayInfoMap) {
+            loadOverlayRec(rootOverlayId)
+        }
     }
 
     override fun apply(
