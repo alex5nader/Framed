@@ -1,15 +1,10 @@
-package dev.alexnader.framity.data
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
-import com.google.gson.JsonPrimitive
-import kotlin.error as ktError
+package dev.alexnader.framity.util
+
+import com.google.gson.*
 
 class JsonParseException(message: String) : Exception(message)
-
-fun floatFromJson(ctx: JsonParseContext) =
-    ctx.float
 
 class JsonParseContext private constructor(private val label: String, val json: JsonElement, private val path: String) {
     constructor(label: String, json: JsonElement) : this(label, json, "")
@@ -23,7 +18,7 @@ class JsonParseContext private constructor(private val label: String, val json: 
         return JsonParseContext(this.label, json, "${this.path}[$index]")
     }
 
-    fun getChild(key: String): JsonParseContext {
+    fun getMember(key: String): JsonParseContext {
         val json = this.obj[key] ?: this.error("Expected key $key.")
         return JsonParseContext(this.label, json, "${this.path}.$key")
     }
@@ -46,10 +41,10 @@ class JsonParseContext private constructor(private val label: String, val json: 
     val obj: JsonObject get() = getAsOrNull(JsonElement::getAsJsonObject, this.json, "Expected an object.")
     val arr: JsonArray get() = getAsOrNull(JsonElement::getAsJsonArray, this.json, "Expected an array.")
     val primitive: JsonPrimitive get() = getAsOrNull(JsonElement::getAsJsonPrimitive, this.json, "Expected a primitive.")
-    val jsonNull get() = getAsOrNull(JsonElement::getAsJsonNull, this.json, "Expected null")
+    val jsonNull: JsonNull get() = getAsOrNull(JsonElement::getAsJsonNull, this.json, "Expected null")
     val bool get() = getAsOrNull(JsonPrimitive::getAsBoolean, this.primitive, "Expected a boolean.")
-    val number get() = getAsOrNull(JsonPrimitive::getAsNumber, this.primitive, "Expected a number.")
-    val string get() = getAsOrNull(JsonPrimitive::getAsString, this.primitive, "Expected a string.")
+    val number: Number get() = getAsOrNull(JsonPrimitive::getAsNumber, this.primitive, "Expected a number.")
+    val string: String get() = getAsOrNull(JsonPrimitive::getAsString, this.primitive, "Expected a string.")
     val double get() = getAsOrNull(JsonPrimitive::getAsDouble, this.primitive, "Expected a double.")
     val float get() = getAsOrNull(JsonPrimitive::getAsFloat, this.primitive, "Expected a float.")
     val long get() = getAsOrNull(JsonPrimitive::getAsLong, this.primitive, "Expected a long.")
@@ -61,28 +56,39 @@ class JsonParseContext private constructor(private val label: String, val json: 
     fun error(msg: String): Nothing =
         throw JsonParseException("Error from ${this.label} at ${if (this.path.isEmpty()) "<root>" else this.path}: $msg")
 
-    fun <T> getChildWith(key: String, fromJson: FromJson<T>): T =
-        fromJson(this.getChild(key))
+    fun <T> runParserOnMember(key: String, parser: JsonParser<T>): T =
+        parser(this.getMember(key))
 
-    fun <T> getChildOrNullWith(key: String, fromJson: FromJson<T>): T? =
-        this.getChildOrNull(key)?.let { ctx -> fromJson(ctx) }
+    fun <T> runParserOnNullableMember(key: String, parser: JsonParser<T>): T? =
+        this.getChildOrNull(key)?.let { ctx -> parser(ctx) }
 
-    fun <T> sumType(vararg cases: Pair<String, FromJson<T>>): T {
+    fun <T> sumType(vararg cases: Pair<String, JsonParser<T>>): T {
         val obj = this.obj
         val (key, parser) = cases.find { (key, _) ->
             obj.has(key)
         } ?: this.error("Expected one of: ${cases.map(Pair<*, *>::first)}")
-        return parser(this.getChild(key))
+        return parser(this.getMember(key))
     }
 
-    fun <T> map(fromJson: FromJson<T>) =
-        (0 until this.arr.size()).map { fromJson(accessArray(it)) }
+    fun <T> map(parser: JsonParser<T>) =
+        (0 until this.arr.size()).map { parser(accessArray(it)) }
 
-    fun <T> flatMap(fromJson: FromJson<Iterable<T>>) =
-        (0 until this.arr.size()).flatMap { fromJson(accessArray(it)) }
+    fun <T> flatMap(parser: JsonParser<Iterable<T>>) =
+        (0 until this.arr.size()).flatMap { parser(accessArray(it)) }
 
-    fun heteroArray(vararg fromJson: FromJson<Any>) =
-        (0 until this.arr.size()).map { fromJson[it](accessArray(it)) }
+    fun heteroArray(vararg parser: JsonParser<Any>) =
+        (0 until this.arr.size()).map { parser[it](accessArray(it)) }
+
+    fun <T> runParser(parser: JsonParser<T>) = parser(this)
+
+    fun <T> wrapErrors(block: JsonParseContext.() -> T) =
+        try {
+            this.block()
+        } catch (e: Exception) {
+            this.error("Error while parsing: $e")
+        }
 }
 
-typealias FromJson<T> = (JsonParseContext) -> T
+fun JsonElement.toContext(label: String) = JsonParseContext(label, this)
+
+typealias JsonParser<T> = (JsonParseContext) -> T

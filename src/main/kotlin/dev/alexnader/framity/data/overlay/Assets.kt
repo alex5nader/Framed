@@ -1,8 +1,7 @@
 package dev.alexnader.framity.data.overlay
 
 import dev.alexnader.framity.data.*
-import dev.alexnader.framity.util.andThen
-import dev.alexnader.framity.util.orNull
+import dev.alexnader.framity.util.*
 import net.minecraft.block.BlockState
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction
@@ -10,59 +9,65 @@ import net.minecraft.util.registry.Registry
 import kotlin.math.max
 import kotlin.math.min
 
-private fun directionFromJson(ctx: JsonParseContext) =
-    when (ctx.string) {
-        "down" -> Direction.DOWN
-        "up" -> Direction.UP
-        "north" -> Direction.NORTH
-        "south" -> Direction.SOUTH
-        "east" -> Direction.EAST
-        "west" -> Direction.WEST
-        else -> ctx.error("Invalid direction.")
-    }
+private object DirectionParser : JsonParser<Direction> {
+    override fun invoke(ctx: JsonParseContext) =
+        when (ctx.string) {
+            "down" -> Direction.DOWN
+            "up" -> Direction.UP
+            "north" -> Direction.NORTH
+            "south" -> Direction.SOUTH
+            "east" -> Direction.EAST
+            "west" -> Direction.WEST
+            else -> ctx.error("Invalid direction.")
+        }
+}
 
-private fun identifierFromJson(ctx: JsonParseContext) =
-    Identifier(ctx.string)
+private object IdentifierParser : JsonParser<Identifier> {
+    override fun invoke(ctx: JsonParseContext) =
+        Identifier(ctx.string)
+}
 
-private fun <T> makeSidedMapFromJson(fromJson: FromJson<T>) =
+private fun <T> makeSidedMapParserUsing(parser: JsonParser<T>) =
     { arrCtx: JsonParseContext ->
         arrCtx.flatMap { objCtx ->
-            val value = objCtx.getChildWith("value", fromJson)
-            objCtx.getChild("sides").map { sideCtx ->
-                Pair(directionFromJson(sideCtx), value)
+            val value = objCtx.runParserOnMember("value", parser)
+            objCtx.getMember("sides").map { sideCtx ->
+                Pair(sideCtx.runParser(DirectionParser), value)
             }
         }.toMap()
     }
 
 sealed class OverlayInfo {
-    companion object {
-        fun dependencies(ctx: JsonParseContext): List<Identifier> {
-            val parent = ctx.getChildOrNullWith("parent", ::identifierFromJson)
+    object DependenciesParser : JsonParser<List<Identifier>> {
+        override fun invoke(ctx: JsonParseContext): List<Identifier> {
+            val parent = ctx.runParserOnNullableMember("parent", IdentifierParser)
 
             return parent?.let { listOf(it) } ?: listOf()
         }
+    }
 
-        fun fromJson(ctx: JsonParseContext): OverlayInfo {
-            val parent = ctx.getChildOrNullWith("parent", ::identifierFromJson)
+    object Parser : JsonParser<OverlayInfo> {
+        override fun invoke(ctx: JsonParseContext): OverlayInfo {
+            val parent = ctx.runParserOnNullableMember("parent", IdentifierParser)
             val parentInfo = parent?.let { getOverlay(it) }
 
-            val textureSource = ctx.getChildOrNullWith("textureSource", TextureSource.Companion::fromJson)
+            val textureSource = ctx.runParserOnNullableMember("textureSource", TextureSource.Parser)
                 ?: parentInfo?.textureSource
-            val coloredLike = ctx.getChildOrNullWith("coloredLike", ColoredLike.Companion::fromJson)
+            val coloredLike = ctx.runParserOnNullableMember("coloredLike", ColoredLike.Parser)
                 ?: parentInfo?.coloredLike
-            val offsets = ctx.getChildOrNullWith("offsets", TextureOffsets.Companion::fromJson)
+            val offsets = ctx.runParserOnNullableMember("offsets", TextureOffsets.Parser)
                 ?: parentInfo?.offsets
 
             return if (textureSource == null) {
-                Parent(textureSource, coloredLike, offsets)
+                Partial(textureSource, coloredLike, offsets)
             } else {
-                Valid(textureSource, coloredLike, offsets)
+                Complete(textureSource, coloredLike, offsets)
             }
         }
     }
 
-    data class Valid(public override val textureSource: TextureSource, public override val coloredLike: ColoredLike?, public override val offsets: TextureOffsets?) : OverlayInfo()
-    data class Parent(override val textureSource: TextureSource?, override val coloredLike: ColoredLike?, override val offsets: TextureOffsets?) : OverlayInfo()
+    data class Complete(public override val textureSource: TextureSource, public override val coloredLike: ColoredLike?, public override val offsets: TextureOffsets?) : OverlayInfo()
+    data class Partial(override val textureSource: TextureSource?, override val coloredLike: ColoredLike?, override val offsets: TextureOffsets?) : OverlayInfo()
 
     protected abstract val textureSource: TextureSource?
     protected abstract val coloredLike: ColoredLike?
@@ -70,63 +75,63 @@ sealed class OverlayInfo {
 }
 
 sealed class TextureSource {
-    companion object {
-        fun fromJson(ctx: JsonParseContext) =
+    object Parser : JsonParser<TextureSource> {
+        override fun invoke(ctx: JsonParseContext) =
             ctx.sumType(
-                "single" to Single.Companion::fromJson,
-                "sided" to Sided.Companion::fromJson
+                "single" to Single.Parser,
+                "sided" to Sided.Parser
             )
     }
 
     data class Single(val spriteId: Identifier) : TextureSource() {
-        companion object {
-            fun fromJson(ctx: JsonParseContext) =
-                Single(identifierFromJson(ctx))
+        object Parser : JsonParser<Single> {
+            override fun invoke(ctx: JsonParseContext) =
+                Single(ctx.runParser(IdentifierParser))
         }
     }
 
     data class Sided(val map: Map<Direction, Identifier>) : TextureSource(), Map<Direction, Identifier> by map {
-        companion object {
-            fun fromJson(ctx: JsonParseContext) =
-                Sided(makeSidedMapFromJson(::identifierFromJson)(ctx))
+        object Parser : JsonParser<Sided> {
+            override fun invoke(ctx: JsonParseContext) =
+                Sided(makeSidedMapParserUsing(IdentifierParser)(ctx))
         }
     }
 }
 
 data class ColoredLike(val colorSource: BlockState) {
-    companion object {
-        fun fromJson(ctx: JsonParseContext) =
-            identifierFromJson(ctx).let { id ->
+    object Parser : JsonParser<ColoredLike> {
+        override fun invoke(ctx: JsonParseContext) =
+            ctx.runParser(IdentifierParser).let { id ->
                 ColoredLike(Registry.BLOCK.getOrEmpty(id).orNull()?.defaultState ?: ctx.error("Invalid ID: $id"))
             }
     }
 }
 
 data class TextureOffsets(val map: Map<Direction, Offsetters>) : Map<Direction, Offsetters> by map {
-    companion object {
-        fun fromJson(ctx: JsonParseContext) =
-            TextureOffsets(makeSidedMapFromJson(Offsetters.Companion::fromJson)(ctx))
+    object Parser : JsonParser<TextureOffsets> {
+        override fun invoke(ctx: JsonParseContext) =
+            TextureOffsets(makeSidedMapParserUsing(Offsetters.Parser)(ctx))
     }
 }
 
 sealed class Offsetters {
-    companion object {
-        fun fromJson(ctx: JsonParseContext) =
+    object Parser : JsonParser<Offsetters> {
+        override fun invoke(ctx: JsonParseContext) =
             ctx.sumType(
-                "uOffsetter" to (Offsetter.Companion::fromJson andThen ::U),
-                "vOffsetter" to (Offsetter.Companion::fromJson andThen ::V),
-                "uv" to UV.Companion::fromJson
+                "uOffsetter" to (Offsetter.Parser andThen ::U),
+                "vOffsetter" to (Offsetter.Parser andThen ::V),
+                "uv" to UV.Parser
             )
     }
 
     data class U(val uOffsetter: Offsetter) : Offsetters()
     data class V(val vOffsetter: Offsetter) : Offsetters()
     data class UV(val uOffsetter: Offsetter, val vOffsetter: Offsetter) : Offsetters() {
-        companion object {
-            fun fromJson(ctx: JsonParseContext) =
+        object Parser : JsonParser<UV> {
+            override fun invoke(ctx: JsonParseContext) =
                 UV(
-                    ctx.getChildWith("uOffsetter", Offsetter.Companion::fromJson),
-                    ctx.getChildWith("vOffsetter", Offsetter.Companion::fromJson)
+                    ctx.runParserOnMember("uOffsetter", Offsetter.Parser),
+                    ctx.runParserOnMember("vOffsetter", Offsetter.Parser)
                 )
         }
     }
@@ -136,10 +141,11 @@ sealed class Offsetters {
  * An [Offsetter] can offset the uv coordinates of the overlay.
  */
 sealed class Offsetter {
-    companion object {
-        fun fromJson(ctx: JsonParseContext) =
+    object Parser : JsonParser<Offsetter> {
+        @Suppress("RedundantLambdaArrow")
+        override fun invoke(ctx: JsonParseContext) =
             ctx.sumType<Offsetter>(
-                "remap" to Remap.Companion::fromJson,
+                "remap" to Remap.Parser,
                 "zero" to { _ -> Zero }
             )
     }
@@ -148,12 +154,12 @@ sealed class Offsetter {
      * "Offets" by performing hard-coded value replacements.
      */
     data class Remap(val map: Map<Float4, Float4>) : Offsetter(), Map<Float4, Float4> by map {
-        companion object {
-            fun fromJson(ctx: JsonParseContext) =
+        object Parser : JsonParser<Remap> {
+            override fun invoke(ctx: JsonParseContext) =
                 Remap(ctx.map { objCtx ->
                     Pair(
-                        objCtx.getChildWith("from", Float4.Companion::fromJson),
-                        objCtx.getChildWith("to", Float4.Companion::fromJson)
+                        objCtx.runParserOnMember("from", Float4.Parser),
+                        objCtx.runParserOnMember("to", Float4.Parser)
                     )
                 }.toMap())
         }
@@ -166,9 +172,9 @@ sealed class Offsetter {
 }
 
 data class Float4(val a: Float, val b: Float, val c: Float, val d: Float) {
-    companion object {
-        fun fromJson(ctx: JsonParseContext) =
-            ctx.map(::floatFromJson).let { list ->
+    object Parser : JsonParser<Float4> {
+        override fun invoke(ctx: JsonParseContext) =
+            ctx.map(JsonParseContext::float).let { list ->
                 if (list.size != 4) {
                     ctx.error("Expected 4 elements.")
                 } else {
@@ -177,7 +183,9 @@ data class Float4(val a: Float, val b: Float, val c: Float, val d: Float) {
             }
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     val min get() = min(a, min(b, min(c, d)))
+    @Suppress("MemberVisibilityCanBePrivate")
     val max get() = max(a, max(b, max(c, d)))
     val center get() = (min + max) / 2
 

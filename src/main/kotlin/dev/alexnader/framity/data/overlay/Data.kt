@@ -1,18 +1,17 @@
 package dev.alexnader.framity.data.overlay
 
-import dev.alexnader.framity.data.JsonParseContext
+import dev.alexnader.framity.util.JsonParseContext
+import dev.alexnader.framity.util.JsonParser
 import net.minecraft.recipe.Ingredient
 
-fun ingredientFromJson(ctx: JsonParseContext) =
-    try {
-        Ingredient.fromJson(ctx.json)
-    } catch (e: Exception) {
-        ctx.error("Error while parsing ingredient: $e")
-    }
+object IngredientParser : JsonParser<Ingredient> {
+    override fun invoke(ctx: JsonParseContext): Ingredient =
+        ctx.wrapErrors { Ingredient.fromJson(ctx.json) }
+}
 
 data class OverlayTrigger(val trigger: Ingredient) {
-    companion object {
-        fun fromJson(ctx: JsonParseContext) =
-            OverlayTrigger(ctx.getChildWith("trigger", ::ingredientFromJson))
+    object Parser : JsonParser<OverlayTrigger> {
+        override fun invoke(ctx: JsonParseContext) =
+            OverlayTrigger(ctx.runParserOnMember("trigger", IngredientParser))
     }
 }
