@@ -3,7 +3,6 @@ package dev.alexnader.framity.data
 import com.google.gson.JsonElement
 import dev.alexnader.framity.GSON
 import dev.alexnader.framity.LOGGER
-import dev.alexnader.framity.data.overlay.OverlayTrigger
 import dev.alexnader.framity.util.JsonParseException
 import dev.alexnader.framity.util.toContext
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener
@@ -25,7 +24,9 @@ fun hasOverlay(stack: ItemStack) = getOverlayId(stack) != null
 fun getOverlayId(stack: ItemStack) =
     OverlayTriggers.find { (trigger, _) -> trigger.trigger.test(stack) }?.second
 
+
 data class FramityData(val overlayIds: Collection<Identifier>)
+
 
 class FramityDataListener : SimpleResourceReloadListener<FramityData> {
     companion object {

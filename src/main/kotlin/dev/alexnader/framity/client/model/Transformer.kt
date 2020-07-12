@@ -1,8 +1,8 @@
 package dev.alexnader.framity.client.model
 
 import dev.alexnader.framity.blocks.Frame
-import dev.alexnader.framity.data.getValidOverlay
-import dev.alexnader.framity.data.overlay.*
+import dev.alexnader.framity.client.assets.*
+import dev.alexnader.framity.client.assets.getValidOverlay
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode
@@ -191,8 +191,14 @@ class FrameTransform(
             Direction.WEST  -> Pair(qe::z,                qe::y andThen ::flip)
         }
 
-        val (us, vs) = Float4(uSource(0), uSource(1), uSource(2), uSource(3)).let { origUs ->
-            Float4(vSource(0), vSource(1), vSource(2), vSource(3)).let { origVs ->
+        val (us, vs) = Float4(
+            uSource(0),
+            uSource(1),
+            uSource(2),
+            uSource(3)
+        ).let { origUs ->
+            Float4(vSource(0), vSource(1), vSource(2), vSource(3))
+                .let { origVs ->
                 fun handleOffsetter(offsetter: Offsetter, orig: Float4): Float4? =
                     when (offsetter) {
                         is Offsetter.Remap ->
