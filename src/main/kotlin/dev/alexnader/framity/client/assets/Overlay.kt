@@ -224,12 +224,27 @@ sealed class Offsetter {
                     )
                 }.toMap())
         }
+
+        override fun apply(orig: Float4): Float4 = this[orig] ?: orig
     }
 
     /**
      * Offsets by converting from the range a..b to 0..(b-a)
      */
-    object Zero : Offsetter()
+    object Zero : Offsetter() {
+        override fun apply(orig: Float4): Float4 {
+            val (min, max) = minMax(orig.a, orig.b)
+            val delta = max - min
+
+            return if (orig.a == min) {
+                Float4(0f, delta, delta, 0f)
+            } else {
+                Float4(delta, 0f, 0f, delta)
+            }
+        }
+    }
+
+    abstract fun apply(orig: Float4): Float4
 }
 
 data class Float4(val a: Float, val b: Float, val c: Float, val d: Float) {
