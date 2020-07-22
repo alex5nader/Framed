@@ -4,12 +4,12 @@ import com.google.gson.Gson
 import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.util.WithId
 import dev.alexnader.framity.blocks.*
-import dev.alexnader.framity.client.assets.FramityAssetsListener
-import dev.alexnader.framity.data.FramityDataListener
+import dev.alexnader.framity.client.assets.OverlayAssetsListener
 import dev.alexnader.framity.client.gui.FrameGuiDescription
 import dev.alexnader.framity.client.gui.FrameScreen
 import dev.alexnader.framity.items.FramersHammer
 import dev.alexnader.framity.client.model.FramityModelVariantProvider
+import dev.alexnader.framity.data.OverlayDataListener
 import net.fabricmc.fabric.api.`object`.builder.v1.block.FabricBlockSettings
 import net.fabricmc.fabric.api.`object`.builder.v1.client.model.FabricModelPredicateProviderRegistry
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry
@@ -135,7 +135,7 @@ fun init() {
         FrameGuiDescription(syncId, inventory, ScreenHandlerContext.create(inventory.player.world, buf.readBlockPos()))
     }
 
-    ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FramityDataListener())
+    ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(OverlayDataListener)
 }
 
 @Suppress("unused")
@@ -152,7 +152,7 @@ fun clientInit() {
         register(MOD.id("block/path_side_overlay"))
     }})
 
-    ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(FramityAssetsListener())
+    ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(OverlayAssetsListener)
 
     ModelLoadingRegistry.INSTANCE.registerAppender { _, out ->
         out.accept(ModelIdentifier(MOD.id("framers_hammer_none"), "inventory"))
