@@ -33,7 +33,7 @@ fun <T> makeSidedMapParserUsing(parser: JsonParser<T>) =
     object : JsonParser<Map<Direction, T>> {
         override fun invoke(ctx: JsonParseContext) =
             ctx.flatMap { objCtx ->
-                val value = objCtx["value"].runParser(parser)
+                val value = objCtx.runParser(parser)
                 objCtx["sides"].map { sideCtx ->
                     Pair(sideCtx.runParser(DirectionParser), value)
                 }

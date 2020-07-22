@@ -4,11 +4,11 @@
     "sided": [
       {
         "sides": [ "up" ],
-        "value": "minecraft:block/mycelium_top"
+        "texture": "minecraft:block/mycelium_top"
       },
       {
         "sides": [ "north", "south", "east", "west" ],
-        "value": "framity:block/mycelium_side_overlay"
+        "texture": "framity:block/mycelium_side_overlay"
       }
     ]
   }

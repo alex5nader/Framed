@@ -4,11 +4,11 @@
     "sided": [
       {
         "sides": [ "up" ],
-        "value": "minecraft:block/snow"
+        "texture": "minecraft:block/snow"
       },
       {
         "sides": [ "north", "south", "east", "west" ],
-        "value": "framity:block/snow_side_overlay"
+        "texture": "framity:block/snow_side_overlay"
       }
     ]
   }
