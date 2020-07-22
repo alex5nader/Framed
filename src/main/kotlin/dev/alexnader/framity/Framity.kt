@@ -25,6 +25,7 @@ import net.minecraft.client.util.SpriteIdentifier
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.resource.ResourceType
+import net.minecraft.screen.ScreenHandlerContext
 import net.minecraft.screen.ScreenHandlerType
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -115,34 +116,24 @@ val TRAPDOOR_FRAME = MOD.block("trapdoor_frame", TrapdoorFrame())
     .hasDelegateModel(SHAPE_TRAPDOOR_FRAME, listOf(SOLID_FRAME_ID), FrameEntity.FORMAT.partCount)
     .done()
 
-val FRAME_ENTITY = MOD.blockEntity<FrameEntity>("frame_entity", { FrameEntity() },
+val FRAME_ENTITY = MOD.blockEntity("frame_entity", ::FrameEntity,
     BLOCK_FRAME.value,
+    SLAB_FRAME.value,
     STAIRS_FRAME.value,
     FENCE_FRAME.value,
     FENCE_GATE_FRAME.value,
     TRAPDOOR_FRAME.value
 )
-val SLAB_FRAME_ENTITY = MOD.blockEntity<FrameEntity>("slab_frame_entity", { type -> FrameEntity(SlabFrame.FORMAT, SLAB_FRAME_SCREEN_HANDLER_TYPE, type) }, SLAB_FRAME.value)
 
 lateinit var FRAME_SCREEN_HANDLER_TYPE: ScreenHandlerType<FrameGuiDescription>
-lateinit var SLAB_FRAME_SCREEN_HANDLER_TYPE: ScreenHandlerType<FrameGuiDescription>
 
 @Suppress("unused")
 fun init() {
     MOD.register()
 
-    FRAME_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(
-        MOD.id("frame_screen_handler"),
-        FrameGuiDescription.factory(FrameEntity.FORMAT) {
-            FRAME_SCREEN_HANDLER_TYPE
-        }
-    )
-    SLAB_FRAME_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(
-        MOD.id("slab_frame_screen_handler"),
-        FrameGuiDescription.factory(SlabFrame.FORMAT) {
-            SLAB_FRAME_SCREEN_HANDLER_TYPE
-        }
-    )
+    FRAME_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerExtended(MOD.id("frame_screen_handler")) { syncId, inventory, buf ->
+        FrameGuiDescription(syncId, inventory, ScreenHandlerContext.create(inventory.player.world, buf.readBlockPos()))
+    }
 
     ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FramityDataListener())
 }
@@ -152,7 +143,6 @@ fun clientInit() {
     MOD.registerClient()
 
     ScreenRegistry.register(FRAME_SCREEN_HANDLER_TYPE, FrameScreen)
-    ScreenRegistry.register(SLAB_FRAME_SCREEN_HANDLER_TYPE, FrameScreen)
 
     @Suppress("deprecation")
     ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEX).register(ClientSpriteRegistryCallback { _, registry -> with(registry) {

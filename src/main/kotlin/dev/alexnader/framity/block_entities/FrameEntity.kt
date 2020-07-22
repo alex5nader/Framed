@@ -1,7 +1,6 @@
 package dev.alexnader.framity.block_entities
 
 import dev.alexnader.framity.FRAME_ENTITY
-import dev.alexnader.framity.FRAME_SCREEN_HANDLER_TYPE
 import dev.alexnader.framity.SPECIAL_ITEMS
 import dev.alexnader.framity.blocks.validForBase
 import dev.alexnader.framity.blocks.validForSpecial
@@ -12,9 +11,9 @@ import dev.alexnader.framity.mixin.GetItemBeforeEmpty
 import dev.alexnader.framity.util.*
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory
 import net.fabricmc.fabric.api.server.PlayerStream
 import net.minecraft.block.BlockState
-import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.block.entity.LockableContainerBlockEntity
 import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.player.PlayerEntity
@@ -22,20 +21,17 @@ import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.PacketByteBuf
 import net.minecraft.screen.ScreenHandlerContext
-import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.math.Direction
 import kotlin.math.max
 import kotlin.math.min
 
-open class FrameEntity constructor(
-    format: FrameDataFormat,
-    private val screenHandlerType: ScreenHandlerType<FrameGuiDescription>,
-    type: BlockEntityType<FrameEntity>
-) :
-    LockableContainerBlockEntity(type),
+open class FrameEntity constructor(format: FrameDataFormat) :
+    LockableContainerBlockEntity(FRAME_ENTITY.value),
+    ExtendedScreenHandlerFactory,
     RenderAttachmentBlockEntity,
     BlockEntityClientSerializable
 {
@@ -43,7 +39,7 @@ open class FrameEntity constructor(
         val FORMAT = FrameDataFormat(1)
     }
 
-    constructor() : this(FORMAT, FRAME_SCREEN_HANDLER_TYPE, FRAME_ENTITY.value)
+    constructor() : this(FORMAT)
 
     val data = FrameData(format, SectionedList(format, ItemStackEquality) { ItemStack.EMPTY }, FixedSizeList(format.base.size) { null })
 
@@ -213,8 +209,14 @@ open class FrameEntity constructor(
 
     //endregion Tag
 
+    //region ExtendedScreenHandlerFactory
     override fun createScreenHandler(syncId: Int, playerInventory: PlayerInventory?) =
-        FrameGuiDescription(screenHandlerType, syncId, playerInventory, ScreenHandlerContext.create(this.world, this.pos), this.format)
+        FrameGuiDescription(syncId, playerInventory, ScreenHandlerContext.create(this.world, this.pos))
+
+    override fun writeScreenOpeningData(player: ServerPlayerEntity, buf: PacketByteBuf) {
+        buf.writeBlockPos(this.pos)
+    }
+    //endregion ExtendedScreenHandlerFactory
 
     override fun getContainerName() = TranslatableText(cachedState.block.translationKey)
 }
