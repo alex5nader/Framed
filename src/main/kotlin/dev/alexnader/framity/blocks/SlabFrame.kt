@@ -1,7 +1,5 @@
 package dev.alexnader.framity.blocks
 
-import dev.alexnader.framity.SLAB_FRAME_ENTITY
-import dev.alexnader.framity.SLAB_FRAME_SCREEN_HANDLER_TYPE
 import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.util.FrameDataFormat
 import net.minecraft.block.*
@@ -27,7 +25,7 @@ class SlabFrame : SlabBlock(FRAME_SETTINGS), BlockEntityProvider, Frame {
         private const val UPPER_SLOT = 1
     }
 
-    override fun createBlockEntity(view: BlockView) = FrameEntity(FORMAT, SLAB_FRAME_SCREEN_HANDLER_TYPE, SLAB_FRAME_ENTITY.value)
+    override fun createBlockEntity(view: BlockView) = FrameEntity(FORMAT)
 
     override val format = FORMAT
     override fun getSlotFor(
