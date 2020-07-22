@@ -121,121 +121,100 @@ class FrameTransform(
 
         val (sprites, overlay, cachedOverlayColor, storedColor, material) = data[partIndex]
 
-        qe.material(material)
-
-        val (sprite, color) = if (quadIndex % 2 == 0) {
-            if (sprites is SpriteSource.Default) {
-                return true
+        val (sprite, color, us, vs) = run {
+            val (uSource, vSource) = when (direction) {
+                Direction.DOWN  -> Pair(qe::x,                qe::z andThen ::flip)
+                Direction.UP    -> Pair(qe::x,                qe::z)
+                Direction.NORTH -> Pair(qe::x andThen ::flip, qe::y andThen ::flip)
+                Direction.SOUTH -> Pair(qe::x,                qe::y andThen ::flip)
+                Direction.EAST  -> Pair(qe::z andThen ::flip, qe::y andThen ::flip)
+                Direction.WEST  -> Pair(qe::z,                qe::y andThen ::flip)
             }
 
-            val spriteIndex = quadIndex % sprites.getCount(direction)
+            val origUs = Float4(uSource(0), uSource(1), uSource(2), uSource(3))
+            val origVs = Float4(vSource(0), vSource(1), vSource(2), vSource(3))
 
-            val sprite = sprites[direction, spriteIndex]
-            val color = if (sprites.hasColor(direction, spriteIndex)) {
-                storedColor
+            if (quadIndex % 2 == 0) {
+                if (sprites is SpriteSource.Default) {
+                    return true
+                }
+
+                val spriteIndex = quadIndex % sprites.getCount(direction)
+
+                val sprite = sprites[direction, spriteIndex]
+                val color = if (sprites.hasColor(direction, spriteIndex)) {
+                    storedColor
+                } else {
+                    null
+                }
+
+                Tuple4(sprite, color, origUs, origVs)
             } else {
-                null
-            }
+                val spriteIndex = quadIndex % sprites.getCount(direction)
 
-            Pair(sprite, color)
-        } else {
-            val spriteIndex = quadIndex % sprites.getCount(direction)
+                fun handleTexture(source: TextureSource): Pair<Sprite, Int?>? {
+                    return when (source) {
+                        is TextureSource.Sided -> {
+                            val spriteId = source[direction] ?: return null
 
-            fun handleTexture(source: TextureSource): Pair<Sprite, Int?>? {
-                return when (source) {
-                    is TextureSource.Sided -> {
-                        val spriteId = source[direction] ?: return null
-                        @Suppress("deprecation")
-                        val sprite = CLIENT.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX).apply(spriteId)
+                            @Suppress("deprecation")
+                            val sprite = CLIENT.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX).apply(spriteId)
 
-                        Pair(sprite, cachedOverlayColor)
-                    }
-                    is TextureSource.Single -> {
-                        @Suppress("deprecation")
-                        val sprite = CLIENT.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX).apply(source.spriteId)
+                            Pair(sprite, cachedOverlayColor)
+                        }
+                        is TextureSource.Single -> {
+                            @Suppress("deprecation")
+                            val sprite =
+                                CLIENT.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX).apply(source.spriteId)
 
-                        Pair(sprite, cachedOverlayColor)
-                    }
-                }
-            }
-
-            val (sprite, color) = when (overlay) {
-                null -> {
-                    val sprite = sprites[direction, spriteIndex]
-                    val color = if (sprites.hasColor(direction, spriteIndex)) {
-                        storedColor
-                    } else {
-                        null
-                    }
-
-                    Pair(sprite, color)
-                }
-                else -> {
-                    handleTexture(overlay.textureSource) ?: return false // don't render when there's no texture for this quad
-                }
-            }
-
-            Pair(sprite, color)
-        }
-
-        if (color != null) {
-            qe.spriteColor(0, color, color, color, color)
-        }
-
-        val (uSource, vSource) = when (direction) {
-            Direction.DOWN  -> Pair(qe::x,                qe::z andThen ::flip)
-            Direction.UP    -> Pair(qe::x,                qe::z)
-            Direction.NORTH -> Pair(qe::x andThen ::flip, qe::y andThen ::flip)
-            Direction.SOUTH -> Pair(qe::x,                qe::y andThen ::flip)
-            Direction.EAST  -> Pair(qe::z andThen ::flip, qe::y andThen ::flip)
-            Direction.WEST  -> Pair(qe::z,                qe::y andThen ::flip)
-        }
-
-        val (us, vs) = Float4(
-            uSource(0),
-            uSource(1),
-            uSource(2),
-            uSource(3)
-        ).let { origUs ->
-            Float4(vSource(0), vSource(1), vSource(2), vSource(3))
-                .let { origVs ->
-                fun handleOffsetter(offsetter: Offsetter, orig: Float4): Float4? =
-                    when (offsetter) {
-                        is Offsetter.Remap ->
-                            offsetter[orig] ?: orig
-                        Offsetter.Zero -> {
-                            val (min, max) = minMax(orig.a, orig.b)
-                            val delta = max - min
-
-                            if (orig.a == min) {
-                                Float4(0f, delta, delta, 0f)
-                            } else {
-                                Float4(delta, 0f, 0f, delta)
-                            }
+                            Pair(sprite, cachedOverlayColor)
                         }
                     }
+                }
+
+                val (sprite, color) = when (overlay) {
+                    null -> {
+                        val sprite = sprites[direction, spriteIndex]
+                        val color = if (sprites.hasColor(direction, spriteIndex)) {
+                            storedColor
+                        } else {
+                            null
+                        }
+
+                        Pair(sprite, color)
+                    }
+                    else -> {
+                        handleTexture(overlay.textureSource)
+                            ?: return false // don't render when there's no texture for this quad
+                    }
+                }
 
                 val offsets = if (overlay?.offsets != null) {
                     overlay.offsets[direction]?.let { offsetters ->
                         when (offsetters) {
                             is Offsetters.U ->
-                                Pair(handleOffsetter(offsetters.uOffsetter, origUs) ?: origUs, origVs)
+                                Pair(offsetters.uOffsetter.apply(origUs), origVs)
                             is Offsetters.V ->
-                                Pair(origUs, handleOffsetter(offsetters.vOffsetter, origVs) ?: origVs)
+                                Pair(origUs, offsetters.vOffsetter.apply(origVs))
                             is Offsetters.UV ->
-                                Pair(
-                                    handleOffsetter(offsetters.uOffsetter, origUs) ?: origUs,
-                                    handleOffsetter(offsetters.vOffsetter, origVs) ?: origVs
-                                )
+                                Pair(offsetters.uOffsetter.apply(origUs), offsetters.vOffsetter.apply(origVs))
                         }
                     }
                 } else {
                     null
                 }
 
-                offsets ?: Pair(origUs, origVs)
+                val (us, vs) = offsets ?: Pair(origUs, origVs)
+
+                Tuple4(sprite, color, us, vs)
             }
         }
+
+        if (color != null) {
+            qe.spriteColor(0, color, color, color, color)
+        }
+
+        qe.material(material)
 
         qe
             .sprite(0, 0,
