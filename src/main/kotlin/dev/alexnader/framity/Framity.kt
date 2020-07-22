@@ -150,6 +150,8 @@ fun clientInit() {
         register(MOD.id("block/mycelium_side_overlay"))
         register(MOD.id("block/hay_side_overlay"))
         register(MOD.id("block/path_side_overlay"))
+        register(MOD.id("block/crimson_nylium_side_overlay"))
+        register(MOD.id("block/warped_nylium_side_overlay"))
     }})
 
     ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(OverlayAssetsListener)

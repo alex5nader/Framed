@@ -1,0 +1,15 @@
+{
+  "parent": "framity:framity/overlays/grass_shaped.json",
+  "textureSource": {
+    "sided": [
+      {
+        "sides": [ "up" ],
+        "texture": "minecraft:block/warped_nylium"
+      },
+      {
+        "sides": [ "north", "south", "east", "west" ],
+        "texture": "framity:block/warped_nylium_side_overlay"
+      }
+    ]
+  }
+}
