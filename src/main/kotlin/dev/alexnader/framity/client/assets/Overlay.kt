@@ -1,47 +1,87 @@
 package dev.alexnader.framity.client.assets
 
+import com.google.gson.JsonElement
+import dev.alexnader.framity.GSON
+import dev.alexnader.framity.LOGGER
+import dev.alexnader.framity.MOD
 import dev.alexnader.framity.util.*
+import dev.alexnader.framity.util.json.*
+import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener
 import net.minecraft.block.BlockState
+import net.minecraft.resource.ResourceManager
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction
+import net.minecraft.util.profiler.Profiler
 import net.minecraft.util.registry.Registry
+import java.io.IOException
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executor
+import java.util.function.Supplier
 import kotlin.math.max
 import kotlin.math.min
 
-private object DirectionParser : JsonParser<Direction> {
-    override fun invoke(ctx: JsonParseContext) =
-        when (ctx.string) {
-            "down" -> Direction.DOWN
-            "up" -> Direction.UP
-            "north" -> Direction.NORTH
-            "south" -> Direction.SOUTH
-            "east" -> Direction.EAST
-            "west" -> Direction.WEST
-            else -> ctx.error("Invalid direction.")
-        }
-}
+private val OverlayInfoMap: MutableMap<Identifier, OverlayInfo> = mutableMapOf()
 
-private object IdentifierParser : JsonParser<Identifier> {
-    override fun invoke(ctx: JsonParseContext) =
-        Identifier(ctx.string)
-}
+fun getOverlay(id: Identifier?) =
+    id?.let { OverlayInfoMap[it] }
+fun getValidOverlay(id: Identifier?) =
+    id?.let { OverlayInfoMap[it] as? OverlayInfo.Complete? }
 
-private fun <T> makeSidedMapParserUsing(parser: JsonParser<T>) =
-    { arrCtx: JsonParseContext ->
-        arrCtx.flatMap { objCtx ->
-            val value = objCtx.runParserOnMember("value", parser)
-            objCtx.getMember("sides").map { sideCtx ->
-                Pair(sideCtx.runParser(DirectionParser), value)
+object OverlayAssetsListener : SimpleResourceReloadListener<Collection<Identifier>> {
+    private val id = MOD.id("listener/assets/overlay")
+    override fun getFabricId() = id
+
+    private fun loadOverlay(manager: ResourceManager, rootOverlayId: Identifier) {
+        val dependencies = mutableSetOf<Identifier>()
+
+        fun loadOverlayRec(overlayId: Identifier) {
+            val ctx = GSON.fromJson(manager.getResource(overlayId).inputStream.bufferedReader(), JsonElement::class.java).toContext(overlayId.toString())
+
+            ctx.runParser(OverlayInfo.DependenciesParser).forEach {
+                if (!dependencies.add(it)) {
+                    ctx.error("Circular dependency: $it and $overlayId")
+                }
+                loadOverlayRec(it)
             }
-        }.toMap()
+
+            OverlayInfoMap[overlayId] = ctx.runParser(OverlayInfo.Parser)
+        }
+
+        if (rootOverlayId !in OverlayInfoMap) {
+            loadOverlayRec(rootOverlayId)
+        }
     }
+
+    override fun load(
+        manager: ResourceManager,
+        profiler: Profiler,
+        executor: Executor
+    ): CompletableFuture<Collection<Identifier>> = CompletableFuture.supplyAsync(Supplier {
+        manager.findResources("framity/overlays") { s -> s.endsWith(".json") }
+    }, executor)
+
+    override fun apply(
+        data: Collection<Identifier>,
+        manager: ResourceManager,
+        profiler: Profiler,
+        executor: Executor
+    ): CompletableFuture<Void> = CompletableFuture.runAsync(Runnable {
+        data.forEach { overlayId ->
+            try {
+                loadOverlay(manager, overlayId)
+            } catch (e: IOException) {
+                LOGGER.error("Error while loading a Framity overlay: $e")
+            } catch (e: JsonParseException) {
+                LOGGER.error("Error while parsing a Framity overlay: $e")
+            }
+        }
+    }, executor)
+}
 
 sealed class OverlayInfo {
     object DependenciesParser : JsonParser<List<Identifier>> {
         override fun invoke(ctx: JsonParseContext): List<Identifier> {
-            val parent = ctx.runParserOnNullableMember("parent",
-                IdentifierParser
-            )
+            val parent = ctx.getOrNull("parent")?.runParser(IdentifierParser)
 
             return parent?.let { listOf(it) } ?: listOf()
         }
@@ -49,22 +89,14 @@ sealed class OverlayInfo {
 
     object Parser : JsonParser<OverlayInfo> {
         override fun invoke(ctx: JsonParseContext): OverlayInfo {
-            val parent = ctx.runParserOnNullableMember("parent",
-                IdentifierParser
-            )
+            val parent = ctx.getOrNull("parent")?.runParser(IdentifierParser)
             val parentInfo = parent?.let { getOverlay(it) }
 
-            val textureSource = ctx.runParserOnNullableMember("textureSource",
-                TextureSource.Parser
-            )
+            val textureSource = ctx.getOrNull("textureSource")?.runParser(TextureSource.Parser)
                 ?: parentInfo?.textureSource
-            val coloredLike = ctx.runParserOnNullableMember("coloredLike",
-                ColoredLike.Parser
-            )
+            val coloredLike = ctx.getOrNull("coloredLike")?.runParser(ColoredLike.Parser)
                 ?: parentInfo?.coloredLike
-            val offsets = ctx.runParserOnNullableMember("offsets",
-                TextureOffsets.Parser
-            )
+            val offsets = ctx.getOrNull("offsets")?.runParser(TextureOffsets.Parser)
                 ?: parentInfo?.offsets
 
             return if (textureSource == null) {
@@ -161,14 +193,8 @@ sealed class Offsetters {
         object Parser : JsonParser<UV> {
             override fun invoke(ctx: JsonParseContext) =
                 UV(
-                    ctx.runParserOnMember(
-                        "uOffsetter",
-                        Offsetter.Parser
-                    ),
-                    ctx.runParserOnMember(
-                        "vOffsetter",
-                        Offsetter.Parser
-                    )
+                    ctx["uOffsetter"].runParser(Offsetter.Parser),
+                    ctx["vOffsetter"].runParser(Offsetter.Parser)
                 )
         }
     }
@@ -195,14 +221,8 @@ sealed class Offsetter {
             override fun invoke(ctx: JsonParseContext) =
                 Remap(ctx.map { objCtx ->
                     Pair(
-                        objCtx.runParserOnMember(
-                            "from",
-                            Float4.Parser
-                        ),
-                        objCtx.runParserOnMember(
-                            "to",
-                            Float4.Parser
-                        )
+                        objCtx["from"].runParser(Float4.Parser),
+                        objCtx["to"].runParser(Float4.Parser)
                     )
                 }.toMap())
         }
@@ -217,13 +237,7 @@ sealed class Offsetter {
 data class Float4(val a: Float, val b: Float, val c: Float, val d: Float) {
     object Parser : JsonParser<Float4> {
         override fun invoke(ctx: JsonParseContext) =
-            ctx.map(JsonParseContext::float).let { list ->
-                if (list.size != 4) {
-                    ctx.error("Expected 4 elements.")
-                } else {
-                    Float4(list[0], list[1], list[2], list[3])
-                }
-            }
+            ctx.runParser(arrayOfSize(4, JsonParseContext::float) andThen { Float4(it[0], it[1], it[2], it[3]) })
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
