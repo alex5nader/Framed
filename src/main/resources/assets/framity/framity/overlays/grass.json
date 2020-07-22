@@ -4,11 +4,11 @@
     "sided": [
       {
         "sides": [ "up" ],
-        "value": "minecraft:block/grass_block_top"
+        "texture": "minecraft:block/grass_block_top"
       },
       {
         "sides": [ "north", "south", "east", "west" ],
-        "value": "minecraft:block/grass_block_side_overlay"
+        "texture": "minecraft:block/grass_block_side_overlay"
       }
     ]
   },

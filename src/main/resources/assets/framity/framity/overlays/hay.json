@@ -4,11 +4,11 @@
     "sided": [
       {
         "sides": [ "up" ],
-        "value": "minecraft:block/hay_block_top"
+        "texture": "minecraft:block/hay_block_top"
       },
       {
         "sides": [ "north", "south", "east", "west" ],
-        "value": "framity:block/hay_side_overlay"
+        "texture": "framity:block/hay_side_overlay"
       }
     ]
   }

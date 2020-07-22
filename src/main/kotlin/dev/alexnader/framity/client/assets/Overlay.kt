@@ -147,9 +147,7 @@ sealed class TextureSource {
         object Parser : JsonParser<Sided> {
             override fun invoke(ctx: JsonParseContext) =
                 Sided(
-                    makeSidedMapParserUsing(IdentifierParser)(
-                        ctx
-                    )
+                    ctx.runParser(makeSidedMapParserUsing { it["texture"].runParser(IdentifierParser) } )
                 )
         }
     }
