@@ -1,6 +1,0 @@
-{
-  "parent": "framity:block/overlay/trapdoor_top",
-  "textures": {
-    "texture": "framity:block/solid_frame"
-  }
-}

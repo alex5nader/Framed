@@ -185,8 +185,14 @@ sealed class Offsetters {
             )
     }
 
-    data class U(val uOffsetter: Offsetter) : Offsetters()
-    data class V(val vOffsetter: Offsetter) : Offsetters()
+    data class U(val uOffsetter: Offsetter) : Offsetters() {
+        override fun apply(us: Float4, vs: Float4) =
+            Pair(uOffsetter.apply(us), vs)
+    }
+    data class V(val vOffsetter: Offsetter) : Offsetters() {
+        override fun apply(us: Float4, vs: Float4) =
+            Pair(us, vOffsetter.apply(vs))
+    }
     data class UV(val uOffsetter: Offsetter, val vOffsetter: Offsetter) : Offsetters() {
         object Parser : JsonParser<UV> {
             override fun invoke(ctx: JsonParseContext) =
@@ -195,7 +201,12 @@ sealed class Offsetters {
                     ctx["vOffsetter"].runParser(Offsetter.Parser)
                 )
         }
+
+        override fun apply(us: Float4, vs: Float4) =
+            Pair(uOffsetter.apply(us), vOffsetter.apply(vs))
     }
+
+    abstract fun apply(us: Float4, vs: Float4): Pair<Float4, Float4>
 }
 
 /**

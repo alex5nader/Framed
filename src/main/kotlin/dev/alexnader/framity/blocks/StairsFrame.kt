@@ -1,6 +1,6 @@
 package dev.alexnader.framity.blocks
 
-import dev.alexnader.framity.SHAPE_BLOCK_FRAME
+import dev.alexnader.framity.BLOCK_FRAME
 import dev.alexnader.framity.block_entities.FrameEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockEntityProvider
@@ -18,7 +18,7 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 
-class StairsFrame : StairsBlock(SHAPE_BLOCK_FRAME.value.defaultState, FRAME_SETTINGS), BlockEntityProvider, Frame {
+class StairsFrame : StairsBlock(BLOCK_FRAME.value.defaultState, FRAME_SETTINGS), BlockEntityProvider, Frame {
     override fun createBlockEntity(view: BlockView) = FrameEntity()
 
     override val format = FrameEntity.FORMAT
