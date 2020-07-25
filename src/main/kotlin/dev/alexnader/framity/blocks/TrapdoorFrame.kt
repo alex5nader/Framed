@@ -1,5 +1,6 @@
 package dev.alexnader.framity.blocks
 
+import dev.alexnader.framity.FRAME_ENTITY
 import dev.alexnader.framity.block_entities.FrameEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockEntityProvider
@@ -18,7 +19,7 @@ import net.minecraft.world.BlockView
 import net.minecraft.world.World
 
 class TrapdoorFrame : TrapdoorBlock(FRAME_SETTINGS), BlockEntityProvider, Frame {
-    override fun createBlockEntity(view: BlockView) = FrameEntity()
+    override fun createBlockEntity(view: BlockView) = FrameEntity(FRAME_ENTITY.value)
 
     override val format = FrameEntity.FORMAT
     override fun getSlotFor(

@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory
 import net.fabricmc.fabric.api.server.PlayerStream
 import net.minecraft.block.BlockState
+import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.block.entity.LockableContainerBlockEntity
 import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.player.PlayerEntity
@@ -29,8 +30,8 @@ import net.minecraft.util.math.Direction
 import kotlin.math.max
 import kotlin.math.min
 
-open class FrameEntity constructor(format: FrameDataFormat) :
-    LockableContainerBlockEntity(FRAME_ENTITY.value),
+open class FrameEntity constructor(type: BlockEntityType<FrameEntity>, format: FrameDataFormat) :
+    LockableContainerBlockEntity(type),
     ExtendedScreenHandlerFactory,
     RenderAttachmentBlockEntity,
     BlockEntityClientSerializable
@@ -39,7 +40,7 @@ open class FrameEntity constructor(format: FrameDataFormat) :
         val FORMAT = FrameDataFormat(1)
     }
 
-    constructor() : this(FORMAT)
+    constructor(type: BlockEntityType<FrameEntity>) : this(type, FORMAT)
 
     val data = FrameData(format, SectionedList(format, ItemStackEquality) { ItemStack.EMPTY }, FixedSizeList(format.base.size) { null })
 

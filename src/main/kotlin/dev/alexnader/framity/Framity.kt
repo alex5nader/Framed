@@ -76,12 +76,12 @@ val TRAPDOOR_FRAME = MOD.block("trapdoor_frame", TrapdoorFrame())
 
 val FRAME_ENTITY = MOD.blockEntity("frame_entity", ::FrameEntity,
     BLOCK_FRAME.value,
-    SLAB_FRAME.value,
     STAIRS_FRAME.value,
     FENCE_FRAME.value,
     FENCE_GATE_FRAME.value,
     TRAPDOOR_FRAME.value
 )
+val SLAB_FRAME_ENTITY = MOD.blockEntity<FrameEntity>("slab_frame_entity", { type -> FrameEntity(type, SlabFrame.FORMAT) }, SLAB_FRAME.value)
 
 lateinit var FRAME_SCREEN_HANDLER_TYPE: ScreenHandlerType<FrameGuiDescription>
 
