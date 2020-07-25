@@ -1,0 +1,42 @@
+{
+  "parent": "jmx:block/2/jmx_cube_all",
+  "textures": {
+    "all": "framity:block/hollow_frame"
+  },
+  "jmx": {
+    "quad_transform": "framity:non_frex_frame_transform",
+    "textures": {
+      "jmx_tex_particle": "framity:block/hollow_frame",
+      "layered_textures": [
+        { "jmx_tex_all": "framity:block/hollow_frame" },
+        { "jmx_tex_all": null }
+      ]
+    },
+    "materials": {
+      "jmx_mat_all": {
+        "layers": [
+          { "layer": "cutout_mipped" },
+          { "layer": "cutout_mipped" }
+        ]
+      }
+    }
+  },
+  "frex": {
+    "quad_transform": "framity:frex_frame_transform",
+    "textures": {
+      "jmx_tex_particle": "framity:block/hollow_frame",
+      "layered_textures": [
+        { "jmx_tex_all": "framity:block/hollow_frame" },
+        { "jmx_tex_all": null }
+      ]
+    },
+    "materials": {
+      "jmx_mat_all": {
+        "layers": [
+          { "layer": "solid" },
+          { "layer": "cutout_mipped" }
+        ]
+      }
+    }
+  }
+}

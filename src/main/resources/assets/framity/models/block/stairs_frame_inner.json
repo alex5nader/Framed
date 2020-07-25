@@ -1,0 +1,123 @@
+{
+  "credit": "Made with Blockbench",
+  "textures": {
+    "particle": "#all",
+    "all": "framity:block/hollow_frame"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [8, 8, 8],
+      "faces": {
+        "north": {"uv": [8, 8, 16, 16], "texture": "#all", "cullface": "north", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]},
+        "west": {"uv": [0, 8, 8, 16], "texture": "#all", "cullface": "west", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]},
+        "up": {"uv": [0, 0, 8, 8], "texture": "#all", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]},
+        "down": {"uv": [0, 8, 8, 16], "texture": "#all", "cullface": "down", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]}
+      }
+    },
+    {
+      "from": [8, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "north": {"uv": [0, 0, 8, 16], "texture": "#all", "cullface": "north", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]},
+        "east": {"uv": [0, 0, 16, 16], "texture": "#all", "cullface": "east", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]},
+        "south": {"uv": [8, 0, 16, 16], "texture": "#all", "cullface": "south", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]},
+        "west": {"uv": [0, 0, 16, 16], "texture": "#all", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]},
+        "up": {"uv": [8, 0, 16, 16], "texture": "#all", "cullface": "up", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]},
+        "down": {"uv": [8, 0, 16, 16], "texture": "#all", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]}
+      }
+    },
+    {
+      "from": [0, 0, 8],
+      "to": [8, 16, 16],
+      "faces": {
+        "north": {"uv": [8, 0, 16, 16], "texture": "#all", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]},
+        "south": {"uv": [0, 0, 8, 16], "texture": "#all", "cullface": "south", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]},
+        "west": {"uv": [8, 0, 16, 16], "texture": "#all", "cullface": "west", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]},
+        "up": {"uv": [0, 8, 8, 16], "texture": "#all", "cullface": "up", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]},
+        "down": {"uv": [0, 0, 8, 8], "texture": "#all", "jmx_material": "#jmx_mat_all", "layered_textures": [
+          { "jmx_tex": "#jmx_tex_all" },
+          { "jmx_tex": "#jmx_tex_all" }
+        ]}
+      }
+    }
+  ],
+  "jmx": {
+    "quad_transform": "framity:non_frex_frame_transform",
+    "textures": {
+      "particle": "framity:block/hollow_frame",
+      "layered_textures": [
+        { "jmx_tex_all": "framity:block/hollow_frame" },
+        { "jmx_tex_all": null }
+      ]
+    },
+    "materials": {
+      "jmx_mat_all": {
+        "layers": [
+          { "layer": "cutout_mipped" },
+          { "layer": "cutout_mipped" }
+        ]
+      }
+    }
+  },
+  "frex": {
+    "quad_transform": "framity:frex_frame_transform",
+    "textures": {
+      "particle": "framity:block/hollow_frame",
+      "layered_textures": [
+        { "jmx_tex_all": "framity:block/hollow_frame" },
+        { "jmx_tex_all": null }
+      ]
+    },
+    "materials": {
+      "jmx_mat_all": {
+        "layers": [
+          { "layer": "cutout_mipped" },
+          { "layer": "cutout_mipped" }
+        ]
+      }
+    }
+  }
+}

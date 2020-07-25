@@ -1,0 +1,42 @@
+{
+  "parent": "jmx:block/2/jmx_template_fence_gate_open",
+  "textures": {
+    "texture": "framity:block/solid_frame"
+  },
+  "jmx": {
+    "quad_transform": "framity:non_frex_frame_transform",
+    "textures": {
+      "particle": "framity:block/solid_frame",
+      "layered_textures": [
+        { "jmx_texture": "framity:block/solid_frame" },
+        { "jmx_texture": null }
+      ]
+    },
+    "materials": {
+      "jmx_mat_all": {
+        "layers": [
+          { "layer": "cutout_mipped" },
+          { "layer": "cutout_mipped" }
+        ]
+      }
+    }
+  },
+  "frex": {
+    "quad_transform": "framity:frex_frame_transform",
+    "textures": {
+      "particle": "framity:block/solid_frame",
+      "layered_textures": [
+        { "jmx_texture": "framity:block/solid_frame" },
+        { "jmx_texture": null }
+      ]
+    },
+    "materials": {
+      "jmx_mat_all": {
+        "layers": [
+          { "layer": "cutout_mipped" },
+          { "layer": "cutout_mipped" }
+        ]
+      }
+    }
+  }
+}

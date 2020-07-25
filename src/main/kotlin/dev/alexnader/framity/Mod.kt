@@ -1,10 +1,8 @@
 package dev.alexnader.framity
 
 import dev.alexnader.framity.util.WithId
-import dev.alexnader.framity.client.model.FramityModelVariantProvider
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder
-import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry
 import net.minecraft.block.Block
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityType
@@ -19,7 +17,7 @@ import java.util.function.Supplier
 
 private fun String.withNamespace(namespace: String) = Identifier(namespace, this)
 
-class Mod(private val modId: String, private val modelVariantProvider: FramityModelVariantProvider) {
+class Mod(private val modId: String) {
     private data class ItemGroupInfo(val items: MutableList<String>, val icon: () -> ItemStack)
     private data class ItemInfo(val item: Item)
     private data class DelegatedModelInfo(val delegate: WithId<Block>, val partCount: Int, val sprites: List<SpriteIdentifier>)
@@ -67,10 +65,6 @@ class Mod(private val modId: String, private val modelVariantProvider: FramityMo
 
         fun renderLayer(layer: RenderLayer) = this.apply {
             this@Mod.blocks[this.id]?.let { it.renderLayer = layer }
-        }
-
-        fun hasDelegateModel(source: WithId<Block>, sprites: List<SpriteIdentifier>, partCount: Int) = this.apply {
-            this@Mod.blocks[this.id]?.let { it.delegatedModel = DelegatedModelInfo(source, partCount, sprites) }
         }
 
         fun done() = WithId(this.id, this.block)
@@ -123,10 +117,7 @@ class Mod(private val modId: String, private val modelVariantProvider: FramityMo
     }
 
     fun registerClient() {
-        ModelLoadingRegistry.INSTANCE.registerVariantProvider { this.modelVariantProvider }
-
         for ((_, block) in this.blocks) {
-            block.delegatedModel?.let { (source, partCount, sprites) -> this@Mod.modelVariantProvider.registerModelsFor(block.block, source.value, partCount, sprites) }
             block.renderLayer?.let { BlockRenderLayerMap.INSTANCE.putBlock(block.block,  it) }
         }
     }
