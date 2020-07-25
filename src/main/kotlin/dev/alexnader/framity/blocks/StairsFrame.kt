@@ -77,14 +77,7 @@ class StairsFrame : StairsBlock(BLOCK_FRAME.value.defaultState, FRAME_SETTINGS),
     ) =
         frame_createScreenHandlerFactory(state, world, pos)
 
-    override fun onStateReplaced(
-        state: BlockState,
-        world: World,
-        pos: BlockPos,
-        newState: BlockState,
-        moved: Boolean
-    ) =
-        frame_onStateReplaced(state, world, pos, newState, moved) { super.onStateReplaced(state, world, pos, newState, moved) }
+    // don't override onStateReplacecd because super defers to baseBlockState which calls frame_onStateReplaced
 
     override fun onBlockBreakStart(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity) =
         frame_onBlockBreakStart(state, world, pos, player) { super.onBlockBreakStart(state, world, pos, player) }
