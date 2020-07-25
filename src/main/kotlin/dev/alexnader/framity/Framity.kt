@@ -19,6 +19,7 @@ import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry
 import net.minecraft.block.*
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.texture.SpriteAtlasTexture
 import net.minecraft.client.util.ModelIdentifier
@@ -27,6 +28,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.resource.ResourceType
 import net.minecraft.screen.ScreenHandlerContext
 import net.minecraft.screen.ScreenHandlerType
+import net.minecraft.util.Identifier
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
@@ -107,6 +109,14 @@ fun clientInit() {
 
     @Suppress("deprecation")
     ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEX).register(ClientSpriteRegistryCallback { _, registry -> with(registry) {
+        val texStart = "textures/".length
+        val pngLen = ".png".length
+
+        val resourceManager = MinecraftClient.getInstance().resourceManager
+        resourceManager.findResources("textures/framity") { s -> s.endsWith(".png") }.forEach { tex ->
+            register(Identifier(tex.namespace, tex.path.substring(texStart, tex.path.length - pngLen)))
+        }
+
         register(MOD.id("block/snow_side_overlay"))
         register(MOD.id("block/mycelium_side_overlay"))
         register(MOD.id("block/hay_side_overlay"))
