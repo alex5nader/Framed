@@ -44,12 +44,12 @@ private fun MutableQuadView.sprite(sprite: Sprite, us: Float4, vs: Float4, sprit
 
 private fun QuadView.getUvs(direction: Direction): Pair<Float4, Float4> {
     val (uSource, vSource) = when (direction) {
-        Direction.DOWN -> Pair(this::x andThen ::clamp01, this::z andThen ::clamp01 andThen ::flip)
-        Direction.UP -> Pair(this::x andThen ::clamp01, this::z andThen ::clamp01)
+        Direction.DOWN  -> Pair(this::x andThen ::clamp01,                this::z andThen ::clamp01 andThen ::flip)
+        Direction.UP    -> Pair(this::x andThen ::clamp01,                this::z andThen ::clamp01)
         Direction.NORTH -> Pair(this::x andThen ::clamp01 andThen ::flip, this::y andThen ::clamp01 andThen ::flip)
-        Direction.SOUTH -> Pair(this::x andThen ::clamp01, this::y andThen ::clamp01 andThen ::flip)
-        Direction.EAST -> Pair(this::z andThen ::clamp01 andThen ::flip, this::y andThen ::clamp01 andThen ::flip)
-        Direction.WEST -> Pair(this::z andThen ::clamp01, this::y andThen ::clamp01 andThen ::flip)
+        Direction.SOUTH -> Pair(this::x andThen ::clamp01,                this::y andThen ::clamp01 andThen ::flip)
+        Direction.EAST  -> Pair(this::z andThen ::clamp01 andThen ::flip, this::y andThen ::clamp01 andThen ::flip)
+        Direction.WEST  -> Pair(this::z andThen ::clamp01,                this::y andThen ::clamp01 andThen ::flip)
     }
 
     return Pair(Float4(uSource(0), uSource(1), uSource(2), uSource(3)), Float4(vSource(0), vSource(1), vSource(2), vSource(3)))
@@ -59,14 +59,13 @@ const val WHITE      = 0x00FFFFFF
 const val FULL_ALPHA = 0xFF000000.toInt()
 
 sealed class FrameTransform(
-    defaultSprite: Sprite,
     blockView: BlockRenderView,
     protected val state: BlockState,
     pos: BlockPos,
     randomSupplier: Supplier<Random>
 ) : RenderContext.QuadTransform {
     protected data class Data(
-        val sprites: SpriteSource,
+        val sprites: SpriteSource?,
         val overlay: OverlayInfo.Complete?,
         val cachedOverlayColor: Int?,
         val color: Int
@@ -111,12 +110,12 @@ sealed class FrameTransform(
             val model = CLIENT.blockRenderManager.getModel(baseState)
 
             val (color, sprites) = if (baseState == null) {
-                Pair(WHITE, SpriteSource.Default(defaultSprite, null, model, randomSupplier.get()))
+                Pair(WHITE, null)
             } else {
                 val color = ColorProviderRegistry.BLOCK.get(baseState.block)?.let { colorProvider ->
                     FULL_ALPHA or colorProvider.getColor(baseState, blockView, pos, 1)
                 } ?: WHITE
-                Pair(color, SpriteSource.Set(baseState, model, randomSupplier.get()))
+                Pair(color, SpriteSource(baseState, model, randomSupplier.get()))
             }
             val overlay = getValidOverlay(overlayIds[i])
             val cachedOverlayColor = overlay?.coloredLike?.let { coloredLike ->
@@ -142,8 +141,8 @@ sealed class FrameTransform(
         )
     }
 
-    class NonFrex(defaultSprite: Sprite, blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>) :
-        FrameTransform(defaultSprite, blockView, state, pos, randomSupplier)
+    class NonFrex(blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>) :
+        FrameTransform(blockView, state, pos, randomSupplier)
     {
         private val transformedIndex: EnumMap<Direction, Int> = EnumMap(Direction::class.java)
 
@@ -152,7 +151,6 @@ sealed class FrameTransform(
 
             override fun getForBlock(blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>): RenderContext.QuadTransform =
                 NonFrex(
-                    CLIENT.bakedModelManager.getModel(BlockModels.getModelId(state)).sprite,
                     blockView,
                     state,
                     pos,
@@ -168,39 +166,21 @@ sealed class FrameTransform(
 
             val partIndex = getPartIndex(qe, direction)
 
-            val (sprites, overlay, cachedOverlayColor, storedColor) = data[partIndex]
+            val (maybeSprites, overlay, cachedOverlayColor, storedColor) = data[partIndex]
 
-            val (sprite, color, us, vs) = run {
+            val (spriteAndColor, us, vs) = run {
                 val (origUs, origVs) = qe.getUvs(direction)
 
                 if (quadIndex % 2 == 0) {
-                    if (sprites is SpriteSource.Default) {
-                        return true
-                    }
-
-                    val spriteIndex = quadIndex % sprites.getCount(direction)
-
-                    val sprite = sprites[direction, spriteIndex]
-                    val color = if (sprites.hasColor(direction, spriteIndex)) {
-                        storedColor
-                    } else {
-                        null
-                    }
-
-                    Tuple4(sprite, color, origUs, origVs)
+                    maybeSprites?.let { sprites ->
+                        Triple(sprites.getSpriteAndColor(direction, quadIndex % sprites.getCount(direction), storedColor), origUs, origVs)
+                    } ?: return true
                 } else {
-                    val spriteIndex = quadIndex % sprites.getCount(direction)
-
-                    val (sprite, color) = when (overlay) {
+                    val spriteAndColor = when (overlay) {
                         null -> {
-                            val sprite = sprites[direction, spriteIndex]
-                            val color = if (sprites.hasColor(direction, spriteIndex)) {
-                                storedColor
-                            } else {
-                                null
+                            maybeSprites?.let { sprites ->
+                                sprites.getSpriteAndColor(direction, quadIndex % sprites.getCount(direction), storedColor)
                             }
-
-                            Pair(sprite, color)
                         }
                         else -> {
                             getSpriteOrNull(direction, overlay.textureSource)
@@ -215,29 +195,33 @@ sealed class FrameTransform(
                         ?.apply(origUs, origVs)
                         ?: Pair(origUs, origVs)
 
-                    Tuple4(sprite, color, us, vs)
+                    Triple(spriteAndColor, us, vs)
                 }
             }
 
-            if (color != null) {
-                qe.spriteColor(0, color, color, color, color)
-            }
+            when (spriteAndColor) {
+                null -> qe.spriteColor(0, 0, 0, 0, 0)
+                else -> spriteAndColor.let { (sprite, color) ->
+                    qe.sprite(sprite, us, vs, 0)
 
-            qe.sprite(sprite, us, vs, 0)
+                    if (color != null) {
+                        qe.spriteColor(0, color, color, color, color)
+                    }
+                }
+            }
 
             return true
         }
     }
 
-    class Frex(defaultSprite: Sprite, blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>) :
-        FrameTransform(defaultSprite, blockView, state, pos, randomSupplier)
+    class Frex(blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>) :
+        FrameTransform(blockView, state, pos, randomSupplier)
     {
         object Source : QuadTransformRegistry.QuadTransformSource {
             override fun getForItem(stack: ItemStack?, randomSupplier: Supplier<Random>?): Nothing? = null
 
             override fun getForBlock(blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>) =
                 Frex(
-                    CLIENT.bakedModelManager.getModel(BlockModels.getModelId(state)).sprite,
                     blockView,
                     state,
                     pos,
@@ -250,46 +234,50 @@ sealed class FrameTransform(
 
             val partIndex = getPartIndex(qe, direction)
 
-            val (sprites, overlay, cachedOverlayColor, storedColor) = data[partIndex]
+            val (maybeSprites, overlay, cachedOverlayColor, storedColor) = data[partIndex]
 
             val (origUs, origVs) = qe.getUvs(direction)
 
             //region Base
-            if (sprites !is SpriteSource.Default) {
-                val sprite = sprites[direction, 0]
+            maybeSprites?.let { sprites ->
+                val spriteAndColor = sprites.getSpriteAndColor(direction, 0, storedColor)
 
-                if (sprites.hasColor(direction, 0)) {
-                    qe.spriteColor(0, storedColor, storedColor, storedColor, storedColor)
+                if (spriteAndColor != null) {
+                    val (sprite, color) = spriteAndColor
+                    qe.sprite(sprite, origUs, origVs, 0)
+
+                    if (color != null) {
+                        qe.spriteColor(0, color, color, color, color)
+                    }
                 }
-
-                qe.sprite(sprite, origUs, origVs, 0)
             }
             //endregion Base
 
             //region Overlay
-            when (overlay) {
+            val spriteAndColor = when (overlay) {
                 null -> {
-                    if (sprites.hasColor(direction, 1)) {
-                        qe.spriteColor(1, storedColor, storedColor, storedColor, storedColor)
-                    }
-
-                    sprites[direction, 1]
+                    maybeSprites?.getSpriteAndColor(direction, 1, storedColor)
                 }
                 else -> {
-                    if (cachedOverlayColor != null) {
-                        qe.spriteColor(1, cachedOverlayColor, cachedOverlayColor, cachedOverlayColor, cachedOverlayColor)
-                    }
-
                     getSpriteOrNull(direction, overlay.textureSource)
+                        ?.let { Pair(it, cachedOverlayColor) }
                 }
-            }?.let { sprite ->
-                val (us, vs) = overlay
-                    ?.offsets
-                    ?.get(direction)
-                    ?.apply(origUs, origVs)
-                    ?: Pair(origUs, origVs)
+            }
+            when (spriteAndColor) {
+                null -> qe.spriteColor(1, 0, 0, 0, 0)
+                else -> spriteAndColor.let { (sprite, color) ->
+                    val (us, vs) = overlay
+                        ?.offsets
+                        ?.get(direction)
+                        ?.apply(origUs, origVs)
+                        ?: Pair(origUs, origVs)
 
-                qe.sprite(sprite, us, vs, 1)
+                    qe.sprite(sprite, us, vs, 1)
+
+                    if (color != null) {
+                        qe.spriteColor(1, color, color, color, color)
+                    }
+                }
             }
             //endregion Overlay
 

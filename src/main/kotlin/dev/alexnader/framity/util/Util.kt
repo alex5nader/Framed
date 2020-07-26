@@ -1,6 +1,9 @@
 package dev.alexnader.framity.util
 
 import dev.alexnader.framity.LOGGER
+import dev.alexnader.framity.mixin.AccessibleBakedQuad
+import net.minecraft.client.render.model.BakedQuad
+import net.minecraft.client.texture.Sprite
 import net.minecraft.item.ItemStack
 import net.minecraft.state.State
 import net.minecraft.state.property.Property
@@ -49,3 +52,5 @@ inline fun <T> T.log(message: T.() -> Any): T {
     LOGGER.info(this.message())
     return this
 }
+
+val BakedQuad.sprite: Sprite get() = (this as AccessibleBakedQuad).sprite
