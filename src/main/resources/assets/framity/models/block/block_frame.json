@@ -33,7 +33,7 @@
     "materials": {
       "jmx_mat_all": {
         "layers": [
-          { "layer": "solid" },
+          { "layer": "cutout_mipped" },
           { "layer": "cutout_mipped" }
         ]
       }
