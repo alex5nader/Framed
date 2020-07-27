@@ -6,7 +6,7 @@ import dev.alexnader.framity.FRAMERS_HAMMER
 import dev.alexnader.framity.SPECIAL_ITEMS
 import dev.alexnader.framity.block_entities.FrameEntity
 import dev.alexnader.framity.data.hasOverlay
-import dev.alexnader.framity.items.HammerData
+import dev.alexnader.framity.items.FramersHammer
 import dev.alexnader.framity.util.FixedSizeList
 import dev.alexnader.framity.util.equalsIgnoring
 import dev.alexnader.framity.util.minus
@@ -355,7 +355,7 @@ where
     val hammer = player.offHandStack.takeIf { it.item == FRAMERS_HAMMER.value } ?: return callSuper()
     val tag = hammer.tag ?: return callSuper()
     val frameEntity = world.getBlockEntity(pos) as? FrameEntity ?: return callSuper()
-    val hammerData = HammerData.fromTag(tag)
+    val hammerData = FramersHammer.Data.fromTag(tag)
 
     hammerData.applySettings(this, state, frameEntity, player, world) { callSuper() }
 }
