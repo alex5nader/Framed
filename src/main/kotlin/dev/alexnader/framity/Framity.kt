@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package dev.alexnader.framity
 
 import com.google.gson.Gson
@@ -10,6 +12,7 @@ import dev.alexnader.framity.client.gui.FrameScreen
 import dev.alexnader.framity.items.FramersHammer
 import dev.alexnader.framity.client.model.FrameTransform
 import dev.alexnader.framity.data.OverlayDataListener
+import dev.alexnader.framity.items.FramersBrush
 import grondag.jmx.api.QuadTransformRegistry
 import net.fabricmc.fabric.api.`object`.builder.v1.block.FabricBlockSettings
 import net.fabricmc.fabric.api.`object`.builder.v1.client.model.FabricModelPredicateProviderRegistry
@@ -48,6 +51,9 @@ val UV_TEST = MOD.block("uv_test", Block(FabricBlockSettings.of(Material.STONE))
 
 @JvmField
 val FRAMERS_HAMMER: WithId<Item> = MOD.item("framers_hammer", FramersHammer())
+    .itemGroup("framity")
+    .done()
+val FRAMERS_BRUSH: WithId<Item> = MOD.item("framers_brush", FramersBrush())
     .itemGroup("framity")
     .done()
 
@@ -92,7 +98,6 @@ val SLAB_FRAME_ENTITY = MOD.blockEntity<FrameEntity>("slab_frame_entity", { type
 
 lateinit var FRAME_SCREEN_HANDLER_TYPE: ScreenHandlerType<FrameGuiDescription>
 
-@Suppress("unused")
 fun init() {
     MOD.register()
 
@@ -103,7 +108,6 @@ fun init() {
     ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(OverlayDataListener)
 }
 
-@Suppress("unused")
 fun clientInit() {
     MOD.registerClient()
 
