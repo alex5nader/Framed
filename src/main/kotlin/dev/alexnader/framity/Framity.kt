@@ -75,13 +75,18 @@ val TRAPDOOR_FRAME = MOD.block("trapdoor_frame", TrapdoorFrame())
     .hasItem(Item.Settings(), "framity")
     .renderLayer(RenderLayer.getCutout())
     .done()
+val DOOR_FRAME = MOD.block("door_frame", DoorFrame())
+    .hasItem(Item.Settings(), "framity")
+    .renderLayer(RenderLayer.getCutout())
+    .done()
 
 val FRAME_ENTITY = MOD.blockEntity("frame_entity", ::FrameEntity,
     BLOCK_FRAME.value,
     STAIRS_FRAME.value,
     FENCE_FRAME.value,
     FENCE_GATE_FRAME.value,
-    TRAPDOOR_FRAME.value
+    TRAPDOOR_FRAME.value,
+    DOOR_FRAME.value
 )
 val SLAB_FRAME_ENTITY = MOD.blockEntity<FrameEntity>("slab_frame_entity", { type -> FrameEntity(type, SlabFrame.FORMAT) }, SLAB_FRAME.value)
 
