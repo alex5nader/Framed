@@ -30,6 +30,7 @@ repositories {
         name = "dblsaiko"
         url = "https://maven.dblsaiko.net/"
     }
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
@@ -51,12 +52,9 @@ dependencies {
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
 
     modApi ("grondag:frex-${project.mc_tag}:${project.frex_version}.+") { transitive = false }
-    // remove next line if you want JMX to be an optional dependency
-    include "grondag:frex-${project.mc_tag}:${project.frex_version}.+"
-
     modImplementation ("grondag:jmx-${project.mc_tag}:${project.jmx_version}.+") { transitive = false }
-    // remove next line if you want JMX to be an optional dependency
-    include "grondag:jmx-${project.mc_tag}:${project.jmx_version}.+"
+
+    modImplementation "com.github.siphalor:nbt-crafting:1.16-2.0-SNAPSHOT"
 }
 
 processResources {
