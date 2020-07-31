@@ -11,15 +11,21 @@
   "contact": {
     "homepage": "https://alexnader.dev/"
   },
-  "license": "CC0-1.0",
+  "license": "MIT",
   "icon": "assets/framity/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.alexnader.framity.FramityKt::init"
+      {
+        "value": "dev.alexnader.framity.Framity",
+        "adapter": "scala"
+      }
     ],
     "client": [
-      "dev.alexnader.framity.FramityKt::clientInit"
+      {
+        "value": "dev.alexnader.framity.client.FramityClient",
+        "adapter": "scala"
+      }
     ]
   },
   "mixins": [
@@ -28,7 +34,7 @@
   "depends": {
     "fabricloader": ">=0.7.1",
     "fabric": "*",
-    "fabric-language-kotlin": "*",
+    "fabric-language-scala": "*",
     "minecraft": "1.16.x",
     "nbtcrafting": "*",
     "libgui": "*",

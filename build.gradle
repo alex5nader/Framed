@@ -1,26 +1,21 @@
 plugins {
     id 'fabric-loom'
     id 'maven-publish'
-    id "org.jetbrains.kotlin.jvm"
+    id 'scala'
 }
 
-//noinspection GroovyUnusedAssignment
 sourceCompatibility = JavaVersion.VERSION_1_8
-//noinspection GroovyUnusedAssignment
 targetCompatibility = JavaVersion.VERSION_1_8
 
-//noinspection GroovyUnusedAssignment
 archivesBaseName = project.archives_base_name
-//noinspection GroovyAssignabilityCheck
 version = project.mod_version
-//noinspection GroovyAssignabilityCheck
 group = project.maven_group
 
 minecraft {
 }
 
-
 repositories {
+    mavenLocal()
     maven { url = "http://maven.fabricmc.net/" }
     maven {
         name = "CottonMC"
@@ -34,15 +29,13 @@ repositories {
 }
 
 dependencies {
-    //to change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
+    modImplementation "net.fabricmc:fabric-language-scala:${project.scala_version}"
 
     implementation 'com.google.code.gson:gson:2.8.6'
 
@@ -81,7 +74,6 @@ tasks.withType(JavaCompile) {
 // if it is present.
 // If you remove this task, sources will not be generated.
 task sourcesJar(type: Jar, dependsOn: classes) {
-    //noinspection GrDeprecatedAPIUsage
     classifier = "sources"
     from sourceSets.main.allSource
 }
@@ -93,17 +85,12 @@ jar {
 // configure the maven publication
 publishing {
     publications {
-        //noinspection GroovyAssignabilityCheck
         mavenJava(MavenPublication) {
             // add all the jars that should be included when publishing to maven
-            //noinspection GroovyAssignabilityCheck
             artifact(remapJar) {
-                //noinspection GroovyAssignabilityCheck
                 builtBy remapJar
             }
-            //noinspection GroovyAssignabilityCheck
             artifact(sourcesJar) {
-                //noinspection GroovyAssignabilityCheck
                 builtBy remapSourcesJar
             }
         }
@@ -113,11 +100,5 @@ publishing {
     repositories {
         // uncomment to publish to the local maven
         // mavenLocal()
-    }
-}
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
     }
 }
