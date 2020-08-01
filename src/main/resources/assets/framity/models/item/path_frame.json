@@ -1,0 +1,9 @@
+{
+  "parent": "block/grass_path",
+  "textures": {
+    "particle": "framity:block/solid_frame",
+    "top": "framity:block/solid_frame",
+    "side": "framity:block/solid_frame",
+    "bottom": "framity:block/solid_frame"
+  }
+}

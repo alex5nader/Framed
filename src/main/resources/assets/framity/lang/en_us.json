@@ -8,6 +8,7 @@
   "block.framity.fence_gate_frame": "Fence Gate Frame",
   "block.framity.trapdoor_frame": "Trapdoor Frame",
   "block.framity.door_frame": "Door Frame",
+  "block.framity.path_frame": "Path Frame",
   "block.framity.slope_frame": "Slope Frame",
   "itemGroup.framity.framity": "Framity",
   "gui.framity.frame.base_label": "Base",
