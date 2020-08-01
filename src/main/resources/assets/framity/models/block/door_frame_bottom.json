@@ -1,15 +1,15 @@
 {
   "parent": "jmx:block/2/jmx_door_bottom",
   "textures": {
-    "top": "framity:block/hollow_frame",
-    "bottom": "framity:block/hollow_frame"
+    "top": "framity:block/solid_frame",
+    "bottom": "framity:block/solid_frame"
   },
   "jmx": {
     "quad_transform": "framity:non_frex_frame_transform",
     "textures": {
-      "jmx_tex_particle": "framity:block/hollow_frame",
+      "jmx_tex_particle": "framity:block/solid_frame",
       "layered_textures": [
-        { "jmx_tex_top": "framity:block/hollow_frame", "jmx_tex_bottom": "framity:block/hollow_frame" },
+        { "jmx_tex_top": "framity:block/solid_frame", "jmx_tex_bottom": "framity:block/solid_frame" },
         { "jmx_tex_top": null, "jmx_tex_bottom": null }
       ]
     },
@@ -25,9 +25,9 @@
   "frex": {
     "quad_transform": "framity:frex_frame_transform",
     "textures": {
-      "jmx_tex_particle": "framity:block/hollow_frame",
+      "jmx_tex_particle": "framity:block/solid_frame",
       "layered_textures": [
-        { "jmx_tex_top": "framity:block/hollow_frame", "jmx_tex_bottom": "framity:block/hollow_frame" },
+        { "jmx_tex_top": "framity:block/solid_frame", "jmx_tex_bottom": "framity:block/solid_frame" },
         { "jmx_tex_top": null, "jmx_tex_bottom": null }
       ]
     },
