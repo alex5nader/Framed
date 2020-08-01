@@ -31,7 +31,6 @@ object FrameBlock {
   }
 }
 
-//noinspection ScalaDeprecation
 trait FrameBlock extends Block with BlockEntityProvider with FrameAccess {
   this
     .asInstanceOf[DefaultStateAccess]
@@ -44,15 +43,14 @@ trait FrameBlock extends Block with BlockEntityProvider with FrameAccess {
     builder.add(Properties.LIT, FrameBlock.Properties.HasRedstone)
   }
 
+  //noinspection ScalaDeprecation
   override def emitsRedstonePower(state: BlockState): Boolean = state.get(FrameBlock.Properties.HasRedstone)
 
+  //noinspection ScalaDeprecation
   override def getWeakRedstonePower(state: BlockState, world: BlockView, pos: BlockPos, direction: Direction): Int =
     if (state.get(FrameBlock.Properties.HasRedstone)) 15 else 0
 
-  override def isSideInvisible(state: BlockState, stateFrom: BlockState, direction: Direction): Boolean = {
-    super.isSideInvisible(state, stateFrom, direction) || stateFrom.isOf(this)
-  }
-
+  //noinspection ScalaDeprecation
   override def onSyncedBlockEvent(state: BlockState, world: World, pos: BlockPos, `type`: Int, data: Int): Boolean = {
     super.onSyncedBlockEvent(state, world, pos, `type`, data)
     world.getBlockEntity(pos) match {
@@ -61,6 +59,7 @@ trait FrameBlock extends Block with BlockEntityProvider with FrameAccess {
     }
   }
 
+  //noinspection ScalaDeprecation
   override def createScreenHandlerFactory(state: BlockState, world: World, pos: BlockPos): NamedScreenHandlerFactory =
     world.getBlockEntity(pos).asInstanceOf[NamedScreenHandlerFactory]
 
@@ -88,6 +87,7 @@ trait FrameBlock extends Block with BlockEntityProvider with FrameAccess {
     frameEntity.markDirty()
   }
 
+  //noinspection ScalaDeprecation
   override def onStateReplaced(oldState: BlockState, world: World, pos: BlockPos, newState: BlockState, moved: Boolean): Unit = {
     if (world.isClient || oldState.getBlock == newState.getBlock) {
       return
@@ -111,6 +111,7 @@ trait FrameBlock extends Block with BlockEntityProvider with FrameAccess {
     }
   }
 
+  //noinspection ScalaDeprecation
   override def onBlockBreakStart(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity): Unit = {
     super.onBlockBreakStart(state, world, pos, player)
 
@@ -137,6 +138,7 @@ trait FrameBlock extends Block with BlockEntityProvider with FrameAccess {
     posToPlayer(pos) = player
   }
 
+  //noinspection ScalaDeprecation
   override def onUse(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult = {
     val frameEntity = world.getBlockEntity(pos) match {
       case frameEntity: FrameEntity => frameEntity

@@ -1,7 +1,7 @@
 package dev.alexnader.framity
 
 import dev.alexnader.framity.Framity.Mod
-import dev.alexnader.framity.block.frame.{FrameBlock, SinglePart, SlabParts}
+import dev.alexnader.framity.block.frame.{CullingFrameBlock, FrameBlock, SinglePart, SlabParts}
 import dev.alexnader.framity.block_entity.{FrameEntityProvider, SlabFrameEntityProvider}
 import dev.alexnader.framity.mod.Registerer._
 import dev.alexnader.framity.mod.WithId
@@ -20,8 +20,8 @@ package object block {
     .solidBlock((_, _, _) => false)
     .lightLevel((state: BlockState) => if (state.get(Properties.LIT)) 15 else 0)
 
-  val BlockFrame: WithId[Block] = new Block(FrameSettings) with FrameBlock with SinglePart with FrameEntityProvider withId "block_frame"
-  val SlabFrame: WithId[Block] = new SlabBlock(FrameSettings) with FrameBlock with SlabParts with SlabFrameEntityProvider withId "slab_frame"
+  val BlockFrame: WithId[Block] = new Block(FrameSettings) with CullingFrameBlock with SinglePart with FrameEntityProvider withId "block_frame"
+  val SlabFrame: WithId[Block] = new SlabBlock(FrameSettings) with CullingFrameBlock with SlabParts with SlabFrameEntityProvider withId "slab_frame"
   val StairsFrame: WithId[Block] = new StairsBlock(BlockFrame.getDefaultState, FrameSettings) with FrameBlock with SinglePart with FrameEntityProvider withId "stairs_frame"
   val FenceFrame: WithId[Block] = new FenceBlock(FrameSettings) with FrameBlock with SinglePart with FrameEntityProvider withId "fence_frame"
   val FenceGateFrame: WithId[Block] = new FenceGateBlock(FrameSettings) with FrameBlock with SinglePart with FrameEntityProvider withId "fence_gate_frame"
