@@ -93,7 +93,7 @@ trait Registerer extends Mod {
     blockEntityType
   }
 
-  def addItemGroup(adder: ItemGroupAdder): Unit = {
+  def addItemGroup(adder: WithId[ItemGroupAdder]): Unit = {
     itemGroups(adder.id) = adder
   }
 

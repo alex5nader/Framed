@@ -5,7 +5,8 @@ import dev.alexnader.framity.gui.FrameGuiDescription
 import dev.alexnader.framity.item.{FramersHammer, addItems}
 import dev.alexnader.framity.block.addBlocks
 import dev.alexnader.framity.block_entity.addBlockEntityTypes
-import dev.alexnader.framity.mod.{ItemGroupAdder, Registerer}
+import dev.alexnader.framity.mod.{ItemGroupAdder, Registerer, WithId}
+import dev.alexnader.framity.mod.WithId.MakeWithId
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry
@@ -19,7 +20,7 @@ object Framity extends ModInitializer {
 
   val Logger: Logger = LogManager.getLogger("Framity")
 
-  val ItemGroup: ItemGroupAdder = new ItemGroupAdder("framity", () => new ItemStack(FramersHammer)) addTo Mod
+  val ItemGroup: WithId[ItemGroupAdder] = new ItemGroupAdder(() => new ItemStack(FramersHammer)) withId "framity"
 
   lazy val FrameScreenHandlerType: ScreenHandlerType[FrameGuiDescription] =
     ScreenHandlerRegistry.registerExtended(Mod.id("frame_screen_handler"), (syncId, inventory, buf) =>
@@ -27,6 +28,7 @@ object Framity extends ModInitializer {
     )
 
   override def onInitialize(): Unit = {
+    Mod.addItemGroup(ItemGroup)
     addBlocks
     addBlockEntityTypes
     addItems
