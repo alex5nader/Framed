@@ -3,8 +3,7 @@ package dev.alexnader.framity
 import dev.alexnader.framity.Framity.Mod
 import dev.alexnader.framity.block._
 import dev.alexnader.framity.block.frame.FrameData
-import dev.alexnader.framity.mod.Registerer.register
-import dev.alexnader.framity.mod.WithId
+import dev.alexnader.framity.mod.{Registerer, WithId}
 import dev.alexnader.framity.mod.WithId._
 import net.minecraft.block.BlockEntityProvider
 import net.minecraft.block.entity.{BlockEntity, BlockEntityType}
@@ -31,8 +30,8 @@ package object block_entity {
     override def createBlockEntity(world: BlockView): BlockEntity = new FrameEntity(SlabFrameEntityType, SlabSections)
   }
 
-  register blockEntityType FrameEntityType
-  register blockEntityType SlabFrameEntityType
-
-  def init(): Unit = ()
+  def addBlockEntityTypes(implicit registerer: Registerer): Unit = {
+    registerer.addBlockEntityType(FrameEntityType)
+    registerer.addBlockEntityType(SlabFrameEntityType)
+  }
 }

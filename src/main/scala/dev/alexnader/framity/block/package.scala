@@ -3,8 +3,7 @@ package dev.alexnader.framity
 import dev.alexnader.framity.Framity.Mod
 import dev.alexnader.framity.block.frame.{CullingFrameBlock, FrameBlock, SinglePart, SlabParts}
 import dev.alexnader.framity.block_entity.{FrameEntityProvider, SlabFrameEntityProvider}
-import dev.alexnader.framity.mod.Registerer._
-import dev.alexnader.framity.mod.WithId
+import dev.alexnader.framity.mod.{Registerer, WithId}
 import dev.alexnader.framity.mod.WithId._
 import net.fabricmc.fabric.api.`object`.builder.v1.block.FabricBlockSettings
 import net.minecraft.block.{Block, BlockState, DoorBlock, FenceBlock, FenceGateBlock, Material, SlabBlock, StairsBlock, TrapdoorBlock}
@@ -29,14 +28,14 @@ package object block {
   val DoorFrame: WithId[Block] = new DoorBlock(FrameSettings) with FrameBlock with SinglePart with FrameEntityProvider withId "door_frame"
   val PathFrame: WithId[Block] = new PathBlock(FrameSettings) with FrameBlock with SinglePart with FrameEntityProvider withId "path_frame"
 
-  register blockWithItem (BlockFrame, Framity.ItemGroup)
-  register blockWithItem (SlabFrame, Framity.ItemGroup)
-  register blockWithItem (StairsFrame, Framity.ItemGroup)
-  register blockWithItem (FenceFrame, Framity.ItemGroup)
-  register blockWithItem (FenceGateFrame, Framity.ItemGroup)
-  register blockWithItem (TrapdoorFrame, Framity.ItemGroup)
-  register blockWithItem (DoorFrame, Framity.ItemGroup)
-  register blockWithItem (PathFrame, Framity.ItemGroup)
-
-  def init(): Unit = ()
+  def addBlocks(implicit registerer: Registerer): Unit = {
+    registerer.addBlockWithItem(BlockFrame, Framity.ItemGroup)
+    registerer.addBlockWithItem(SlabFrame, Framity.ItemGroup)
+    registerer.addBlockWithItem(StairsFrame, Framity.ItemGroup)
+    registerer.addBlockWithItem(FenceFrame, Framity.ItemGroup)
+    registerer.addBlockWithItem(FenceGateFrame, Framity.ItemGroup)
+    registerer.addBlockWithItem(TrapdoorFrame, Framity.ItemGroup)
+    registerer.addBlockWithItem(DoorFrame, Framity.ItemGroup)
+    registerer.addBlockWithItem(PathFrame, Framity.ItemGroup)
+  }
 }

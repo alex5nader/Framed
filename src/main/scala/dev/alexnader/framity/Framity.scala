@@ -2,7 +2,9 @@ package dev.alexnader.framity
 
 import dev.alexnader.framity.data.overlay
 import dev.alexnader.framity.gui.FrameGuiDescription
-import dev.alexnader.framity.item.FramersHammer
+import dev.alexnader.framity.item.{FramersHammer, addItems}
+import dev.alexnader.framity.block.addBlocks
+import dev.alexnader.framity.block_entity.addBlockEntityTypes
 import dev.alexnader.framity.mod.{ItemGroupAdder, Registerer}
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
@@ -25,10 +27,9 @@ object Framity extends ModInitializer {
     )
 
   override def onInitialize(): Unit = {
-    // initialize package objects because they won't initialize themselves
-    dev.alexnader.framity.block.init()
-    dev.alexnader.framity.item.init()
-    dev.alexnader.framity.block_entity.init()
+    addBlocks
+    addBlockEntityTypes
+    addItems
 
     Mod.register()
 
