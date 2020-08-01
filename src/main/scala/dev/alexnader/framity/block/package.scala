@@ -26,7 +26,7 @@ package object block {
   val FenceGateFrame: WithId[Block] = new FenceGateBlock(FrameSettings) with FrameBlock with SinglePart with FrameEntityProvider withId "fence_gate_frame"
   val TrapdoorFrame: WithId[Block] = new TrapdoorBlock(FrameSettings) with FrameBlock with SinglePart with FrameEntityProvider withId "trapdoor_frame"
   val DoorFrame: WithId[Block] = new DoorBlock(FrameSettings) with FrameBlock with SinglePart with FrameEntityProvider withId "door_frame"
-  val PathFrame: WithId[Block] = new PathBlock(FrameSettings) with FrameBlock with SinglePart with FrameEntityProvider withId "path_frame"
+  val PathFrame: WithId[Block] = new PathBlock(FrameSettings) with CullingFrameBlock with SinglePart with FrameEntityProvider withId "path_frame"
 
   def addBlocks(implicit registerer: Registerer): Unit = {
     registerer.addBlockWithItem(BlockFrame, Framity.ItemGroup)
