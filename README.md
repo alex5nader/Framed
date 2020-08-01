@@ -14,20 +14,13 @@ placed into the world, they are not able to be placed into a frame.
     </a>
 </p>
 
-<p align="center">
-    <a title="Fabric Language Kotlin"
-       href="https://minecraft.curseforge.com/projects/fabric-language-kotlin"
-       target="_blank"
-       rel="noopener noreferrer"
-       >
-        <img style="display: block; margin-left: auto; margin-right: auto;"
-             src="https://i.imgur.com/c1DH9VL.png"
-             alt=""
-             width="171"
-             height="50"
-             />
-    </a>
-</p>
+Framity requires the following mods:
+
+- [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)
+- [Fabric Language Scala](https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala)
+- [LibGui](https://www.curseforge.com/minecraft/mc-mods/libgui)
+- [JMX](https://www.curseforge.com/minecraft/mc-mods/jmx)
+- [Frex](https://www.curseforge.com/minecraft/mc-mods/frex)
 
 ## Download
 
@@ -60,9 +53,13 @@ Without them, this project would never have become more than a cool idea.
   - `src/main/resources/assets/framity/textures/block/solid_frame.png`
   - `src/main/resources/assets/framity/textures/block/hollow_frame.ase`
   - `src/main/resources/assets/framity/textures/block/hollow_frame.png`
+  - `src/main/resources/assets/framity/textures/item/brush.ase`
+  - `src/main/resources/assets/framity/textures/item/brush.png`
+  - `src/main/resources/assets/framity/textures/item/door_frame.png`
   - `src/main/resources/assets/framity/textures/item/hammer.ase`
   - `src/main/resources/assets/framity/textures/item/hammer.png`
   - `src/main/resources/assets/framity/textures/item/hammer_partial.png`
   - `src/main/resources/assets/framity/textures/item/hammer_whole.png`
+  - `src/main/resources/assets/framity/textures/item/palette.aseprite`
   - `src/main/resources/assets/framity/icon.png`
 - All other files are licensed under the [MIT License](LICENSE_MIT.md).
