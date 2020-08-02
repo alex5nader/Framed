@@ -25,7 +25,7 @@ object FrameData {
     val SpecialIndex: Int = 2
 
     def fromTag(tag: ListTag): Sections = {
-      Sections(makeSections(tag.iterator.asScala map (_.asInstanceOf[IntTag].getInt)))
+      new Sections(makeSections(tag.iterator.asScala map (_.asInstanceOf[IntTag].getInt)))
     }
 
     private def makeSections(sizes: Iterator[Int]): Array[Range] = {
@@ -38,7 +38,7 @@ object FrameData {
     }
   }
 
-  case class Sections(private val sections: Array[Range]) {
+  class Sections(private val sections: Array[Range]) {
     def this(partCount: Int, otherSizes: Int*) = this(Sections.makeSections(Iterator(partCount) ++ Iterator(partCount) ++ Iterator(SpecialItems.map.size) ++ otherSizes.iterator))
 
     def apply(sectionIndex: Int): Range = sections(sectionIndex)
@@ -84,6 +84,20 @@ object FrameData {
       sections foreach (s => tag.add(IntTag.of(s.size)))
 
       tag
+    }
+
+    def canEqual(other: Any): Boolean = other.isInstanceOf[Sections]
+
+    override def equals(other: Any): Boolean = other match {
+      case that: Sections =>
+        (that canEqual this) &&
+          (sections sameElements that.sections)
+      case _ => false
+    }
+
+    override def hashCode(): Int = {
+      val state = Seq(sections)
+      state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
     }
   }
 
