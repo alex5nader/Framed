@@ -1,6 +1,7 @@
 {
   "item.framity.framers_hammer": "Framer's Hammer",
   "item.framity.framers_brush": "Framer's Brush",
+  "item.framity.torch_frame": "Torch Frame",
   "block.framity.block_frame": "Block Frame",
   "block.framity.slab_frame": "Slab Frame",
   "block.framity.stairs_frame": "Stairs Frame",
@@ -9,7 +10,8 @@
   "block.framity.trapdoor_frame": "Trapdoor Frame",
   "block.framity.door_frame": "Door Frame",
   "block.framity.path_frame": "Path Frame",
-  "block.framity.slope_frame": "Slope Frame",
+  "block.framity.torch_frame": "Torch Frame",
+  "block.framity.wall_torch_frame": "Torch Frame",
   "itemGroup.framity.framity": "Framity",
   "gui.framity.frame.base_label": "Base",
   "gui.framity.frame.overlay_label": "Overlay",
