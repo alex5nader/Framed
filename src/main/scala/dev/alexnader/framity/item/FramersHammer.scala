@@ -24,9 +24,9 @@ object FramersHammer extends Item(new Item.Settings().maxCount(1)) {
 
     implicit def valueToVal(value: Value): Val = value.asInstanceOf[Val]
 
-    val CopyNone: Value = Val("copy_any")
-    val CopyPartial: Value = Val("copy_partial")
-    val CopyAll: Value = Val("copy_all")
+    val CopyNone: Value = Val("no_copy")
+    val CopyPartial: Value = Val("partial_copy")
+    val CopyAll: Value = Val("whole_copy")
 
     def default: Value = CopyNone
 
