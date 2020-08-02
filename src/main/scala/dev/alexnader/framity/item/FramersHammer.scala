@@ -155,7 +155,7 @@ object FramersHammer extends Item(new Item.Settings().maxCount(1)) {
     }
 
     if (player.isSneaking) {
-      player.sendMessage(new TranslatableText("gui.framity.framers_hammmer.copy_settings"), true)
+      player.sendMessage(new TranslatableText("gui.framity.framers_hammer.copy_settings"), true)
       tag.put("storedData", frameEntity.data.toTag)
 
       ActionResult.SUCCESS
