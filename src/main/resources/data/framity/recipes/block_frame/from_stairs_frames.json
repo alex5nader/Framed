@@ -3,9 +3,19 @@
   "ingredients": [
     {
       "item": "framity:stairs_frame"
+    },
+    {
+      "item": "framity:stairs_frame"
+    },
+    {
+      "item": "framity:stairs_frame"
+    },
+    {
+      "item": "framity:stairs_frame"
     }
   ],
   "result": {
-    "item": "framity:block_frame"
+    "item": "framity:block_frame",
+    "count": 3
   }
 }

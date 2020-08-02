@@ -1,17 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "F  ",
-    "FF ",
-    "FFF"
+    "C",
+    "F"
   ],
   "key": {
+    "C": {
+      "tag": "minecraft:coals"
+    },
     "F": {
       "item": "framity:block_frame"
     }
   },
   "result": {
-    "item": "framity:stairs_frame",
-    "count": 8
+    "item": "framity:torch_frame",
+    "count": 4
   }
 }

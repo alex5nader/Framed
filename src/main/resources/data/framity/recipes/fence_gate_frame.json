@@ -1,17 +1,18 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "F  ",
-    "FF ",
-    "FFF"
+    "|F|",
+    "|F|"
   ],
   "key": {
+    "|": {
+      "item": "minecraft:stick"
+    },
     "F": {
       "item": "framity:block_frame"
     }
   },
   "result": {
-    "item": "framity:stairs_frame",
-    "count": 8
+    "item": "framity:fence_gate_frame"
   }
 }

@@ -1,8 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "F  ",
-    "FF ",
+    "FFF",
     "FFF"
   ],
   "key": {
@@ -11,7 +10,7 @@
     }
   },
   "result": {
-    "item": "framity:stairs_frame",
-    "count": 8
+    "item": "framity:trapdoor_frame",
+    "count": 2
   }
 }

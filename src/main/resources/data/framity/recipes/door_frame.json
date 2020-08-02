@@ -1,19 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "  /",
-    " /F",
-    "/FF"
+    "FF",
+    "FF",
+    "FF"
   ],
   "key": {
-    "/": {
-      "item": "minecraft:stick"
-    },
     "F": {
       "item": "framity:block_frame"
     }
   },
   "result": {
-    "item": "framity:slope_frame"
+    "item": "framity:door_frame",
+    "count": 3
   }
 }

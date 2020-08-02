@@ -2,10 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "framity:slab_frame"
-    },
-    {
-      "item": "framity:slab_frame"
+      "item": "framity:path_frame"
     }
   ],
   "result": {
