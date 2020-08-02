@@ -8,7 +8,7 @@
       },
       {
         "sides": [ "north", "south", "east", "west" ],
-        "texture": "framity:block/warped_nylium_side_overlay"
+        "texture": "framity:framity/warped_nylium_side_overlay"
       }
     ]
   }

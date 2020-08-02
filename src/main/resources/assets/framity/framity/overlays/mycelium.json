@@ -8,7 +8,7 @@
       },
       {
         "sides": [ "north", "south", "east", "west" ],
-        "texture": "framity:block/mycelium_side_overlay"
+        "texture": "framity:framity/mycelium_side_overlay"
       }
     ]
   }

@@ -8,7 +8,7 @@
       },
       {
         "sides": [ "north", "south", "east", "west" ],
-        "texture": "framity:block/hay_side_overlay"
+        "texture": "framity:framity/hay_side_overlay"
       }
     ]
   }

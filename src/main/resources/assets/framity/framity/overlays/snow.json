@@ -8,7 +8,7 @@
       },
       {
         "sides": [ "north", "south", "east", "west" ],
-        "texture": "framity:block/snow_side_overlay"
+        "texture": "framity:framity/snow_side_overlay"
       }
     ]
   }
