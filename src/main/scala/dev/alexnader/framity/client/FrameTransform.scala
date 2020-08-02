@@ -81,6 +81,10 @@ object FrameTransform {
     private val transformedIndex: ju.EnumMap[Direction, Int] = new ju.EnumMap(classOf[Direction])
 
     override def transform(mqv: MutableQuadView): Boolean = {
+      if (mqv.tag() == 1) {
+        return true
+      }
+
       val direction = mqv.lightFace()
 
       val quadIndex = transformedIndex.getOrDefault(direction, 0)

@@ -1,0 +1,105 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "#torch",
+    "torch": "framity:block/torch_frame"
+  },
+  "elements": [
+    {
+      "from": [ 7, 0, 7 ],
+      "to": [ 9, 8, 9 ],
+      "faces": {
+        "down": { "uv": [ 7, 13, 9, 15 ], "texture": "#torch",
+          "jmx_material": "#jmx_mat_all",
+          "layered_textures": [
+            { "jmx_tex": "#jmx_tex_torch" },
+            { "jmx_tex": "#jmx_tex_torch" }
+          ] },
+        "west": { "uv": [ 7, 8, 9, 16 ], "texture": "#torch",
+          "jmx_material": "#jmx_mat_all",
+          "layered_textures": [
+            { "jmx_tex": "#jmx_tex_torch" },
+            { "jmx_tex": "#jmx_tex_torch" }
+          ] },
+        "east": { "uv": [ 7, 8, 9, 16 ], "texture": "#torch",
+          "jmx_material": "#jmx_mat_all",
+          "layered_textures": [
+            { "jmx_tex": "#jmx_tex_torch" },
+            { "jmx_tex": "#jmx_tex_torch" }
+          ] },
+        "north": { "uv": [ 7, 8, 9, 16 ], "texture": "#torch",
+          "jmx_material": "#jmx_mat_all",
+          "layered_textures": [
+            { "jmx_tex": "#jmx_tex_torch" },
+            { "jmx_tex": "#jmx_tex_torch" }
+          ] },
+        "south": { "uv": [ 7, 8, 9, 16 ], "texture": "#torch",
+          "jmx_material": "#jmx_mat_all",
+          "layered_textures": [
+            { "jmx_tex": "#jmx_tex_torch" },
+            { "jmx_tex": "#jmx_tex_torch" }
+          ] }
+      }
+    },
+    {
+      "from": [ 7, 8, 7 ],
+      "to": [ 9, 10, 9 ],
+      "shade": false,
+      "faces": {
+        "up":   { "uv": [ 7, 6, 9, 8 ], "texture": "#torch", "jmx_material": "#jmx_mat_fire" },
+        "west": { "uv": [ 7, 6, 9, 8 ], "texture": "#torch", "jmx_material": "#jmx_mat_fire" },
+        "east": { "uv": [ 7, 6, 9, 8 ], "texture": "#torch", "jmx_material": "#jmx_mat_fire" },
+        "north": { "uv": [ 7, 6, 9, 8 ], "texture": "#torch", "jmx_material": "#jmx_mat_fire" },
+        "south": { "uv": [ 7, 6, 9, 8 ], "texture": "#torch", "jmx_material": "#jmx_mat_fire" }
+      }
+    }
+  ],
+  "jmx": {
+    "quad_transform": "framity:non_frex_frame_transform",
+    "textures": {
+      "particle": "framity:block/torch_frame",
+      "layered_textures": [
+        { "jmx_tex_torch": "framity:block/torch_frame" },
+        { "jmx_tex_torch": null }
+      ]
+    },
+    "materials": {
+      "jmx_mat_fire": {
+        "tag": 1,
+        "layers": [
+          { "layer": "cutout", "ao": false, "emissive": true }
+        ]
+      },
+      "jmx_mat_all": {
+        "layers": [
+          { "layer": "cutout_mipped", "ao": false },
+          { "layer": "cutout_mipped", "ao": false }
+        ]
+      }
+    }
+  },
+  "frex": {
+    "quad_transform": "framity:frex_frame_transform",
+    "textures": {
+      "particle": "framity:block/torch_frame",
+      "layered_textures": [
+        { "jmx_tex_torch": "framity:block/torch_frame" },
+        { "jmx_tex_torch": null }
+      ]
+    },
+    "materials": {
+      "jmx_mat_fire": {
+        "tag": 1,
+        "layers": [
+          { "layer": "cutout", "ao": false, "emissive": true }
+        ]
+      },
+      "jmx_mat_all": {
+        "layers": [
+          { "layer": "cutout_mipped", "ao": false },
+          { "layer": "cutout_mipped", "ao": false }
+        ]
+      }
+    }
+  }
+}

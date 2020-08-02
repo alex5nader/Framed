@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "framity:block/wall_torch_frame"
+    },
+    "facing=north": {
+      "model": "framity:block/wall_torch_frame",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "framity:block/wall_torch_frame",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "framity:block/wall_torch_frame",
+      "y": 180
+    }
+  }
+}
