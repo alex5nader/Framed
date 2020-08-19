@@ -1,13 +1,13 @@
 package dev.alexnader.framity.gui.dsl
 
-import net.minecraft.text.{LiteralText, Text, TranslatableText}
+import net.minecraft.text.{LiteralText, TranslatableText}
 
 object Text {
   object translatable {
-    def text(key: String): Text = new TranslatableText(key)
+    def text(key: String): net.minecraft.text.Text = new TranslatableText(key)
   }
 
   object literal {
-    def text(text: String): Text = new LiteralText(text)
+    def text(text: String): net.minecraft.text.Text = new LiteralText(text)
   }
 }
