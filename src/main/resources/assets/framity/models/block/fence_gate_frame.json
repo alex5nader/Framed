@@ -13,7 +13,7 @@
       ]
     },
     "materials": {
-      "jmx_mat_all": {
+      "jmx_material": {
         "layers": [
           { "layer": "cutout_mipped" },
           { "layer": "cutout_mipped" }
@@ -31,7 +31,7 @@
       ]
     },
     "materials": {
-      "jmx_mat_all": {
+      "jmx_material": {
         "layers": [
           { "layer": "cutout_mipped" },
           { "layer": "cutout_mipped" }

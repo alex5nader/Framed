@@ -24,6 +24,7 @@ object Offsetter {
 
       JsonParser.seqOf(itemParser) mapResult { _.toMap.pipe(Remap.apply) }
     }
+
   }
 
   case class Remap(map: Map[(Float, Float, Float, Float), (Float, Float, Float, Float)]) extends Offsetter {
