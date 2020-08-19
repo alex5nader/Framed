@@ -1,7 +1,7 @@
 package dev.alexnader.framity.util.json
 
 import dev.alexnader.framity.util.collect.{CollectIterable, Collectors}
-import dev.alexnader.framity.util.json.dsl._
+import dev.alexnader.framity.util.json.JsonParser.seqOf
 import net.minecraft.recipe.Ingredient
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction
@@ -16,14 +16,14 @@ object Parsers {
       case direction => Right(direction)
     }
 
-  implicit def sidedMap[A](implicit parser: JsonParser[A]): JsonParser[Map[Direction, A]] = {
-    val itemParser: JsonParser[(Seq[Direction], A)] =
-      parse field "sides" using ((parse seq) using DirectionParser) pairWith parser
+  def sidedMap[A](implicit parser: JsonParser[A]): JsonParser[Map[Direction, A]] = {
+    implicit val itemParser: JsonParser[(Seq[Direction], A)] =
+      JsonParser.fieldOf[Seq[Direction]]("sides") pairWith parser
 
-    (parse seq) using itemParser mapResult { _ flatMap { case (dirs, tex) => dirs map ((_, tex)) } toMap }
+    JsonParser.seqOf[(Seq[Direction], A)] mapResult { _.flatMap { case (dirs, tex) => dirs map ((_, tex)) }.toMap }
   }
 
-  implicit val IngredientParser: JsonParser[Ingredient] = context => context catchErrors Ingredient.fromJson(context json)
+  implicit val IngredientParser: JsonParser[Ingredient] = context => context catchErrors Ingredient.fromJson(context.json)
 
   def arrayOfSize[A](size: Int)(implicit parser: JsonParser[A]): JsonParser[Seq[A]] = context => {
     context.asArr flatMap { arr =>

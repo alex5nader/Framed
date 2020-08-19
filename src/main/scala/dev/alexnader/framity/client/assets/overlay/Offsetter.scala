@@ -2,7 +2,9 @@ package dev.alexnader.framity.client.assets.overlay
 
 import dev.alexnader.framity.util.ScalaExtensions.MinMax
 import dev.alexnader.framity.util.json.JsonParser
-import dev.alexnader.framity.util.json.dsl.parse
+import dev.alexnader.framity.util.json.JsonParser.tuple4
+
+import scala.util.chaining._
 
 object Offsetter {
 
@@ -14,12 +16,13 @@ object Offsetter {
   object Remap {
 
     implicit val Parser: JsonParser[Remap] = {
-      val float4Parser: JsonParser[(Float, Float, Float, Float)] = JsonParser.tuple4 { _.asFloat }
-      val itemParser: JsonParser[((Float, Float, Float, Float), (Float, Float, Float, Float))] =
-        parse field "from" using float4Parser pairWith
-          (parse field "to" using float4Parser)
+      val itemParser: JsonParser[((Float, Float, Float, Float), (Float, Float, Float, Float))] = {
+        implicit val floatParser: JsonParser[Float] = _.asFloat
+        JsonParser.fieldOf[(Float, Float, Float, Float)]("from") pairWith
+          JsonParser.fieldOf("to")
+      }
 
-      (parse seq) using itemParser mapResult { pairs => Remap(pairs.toMap) }
+      JsonParser.seqOf(itemParser) mapResult { _.toMap.pipe(Remap.apply) }
     }
   }
 

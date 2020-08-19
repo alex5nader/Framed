@@ -9,12 +9,16 @@ package object json {
     def pairWith[B](implicit other: JsonParser[B]): JsonParser[(A, B)] = context =>
       context.parse(this) flatMap { resA => context.parse[B] map { (resA, _ ) } }
 
-    def mapResult[B](f: A => B): JsonParser[B] = context => context.parse(this).map(f)
+    def mapResult[B](f: A => B): JsonParser[B] = _.parse(this).map(f)
 
     def flatMapResult[B](f: A => JsonParseResult[B]): JsonParser[B] = _.parse(this).flatMap(f)
   }
 
   object JsonParser {
+    implicit def seqOf[A](implicit parser: JsonParser[A]): JsonParser[Seq[A]] = _.arrayItems.flatMap(_.map(_.parse[A]).collectTo(Collectors.either))
+
+    implicit def fieldOf[A](key: String)(implicit parser: JsonParser[A]): JsonParser[A] = _(key).flatMap(_.parse[A])
+
     def sumType[A](cases: (String, JsonParser[A])*)(context: JsonParseContext): JsonParseResult[A] = {
       context.asObj.flatMap(obj => {
         val (key, parser) = cases.find { case (key, _) => obj.has(key) } match {

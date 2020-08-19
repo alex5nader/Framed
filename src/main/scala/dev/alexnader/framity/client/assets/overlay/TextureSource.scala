@@ -2,7 +2,6 @@ package dev.alexnader.framity.client.assets.overlay
 
 import dev.alexnader.framity.util.json.JsonParser
 import dev.alexnader.framity.util.json.Parsers.sidedMap
-import dev.alexnader.framity.util.json.dsl.parse
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction
 
@@ -22,12 +21,10 @@ object TextureSource {
   case class Single(spriteId: Identifier) extends TextureSource
 
   object Sided {
-    private implicit val identifierParser: JsonParser[Identifier] = {
-      import dev.alexnader.framity.util.json.Parsers.IdentifierParser
-      parse field "texture" using IdentifierParser
-    }
+    private implicit val identifierParser: JsonParser[Identifier] =
+      JsonParser.fieldOf("texture")(dev.alexnader.framity.util.json.Parsers.IdentifierParser)
 
-    implicit val Parser: JsonParser[Sided] = _.parse[Map[Direction, Identifier]] map Sided.apply
+    implicit val Parser: JsonParser[Sided] = _.parse(sidedMap[Identifier]) map Sided.apply
   }
 
   case class Sided(map: Map[Direction, Identifier]) extends TextureSource

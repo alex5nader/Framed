@@ -5,7 +5,6 @@ import java.util.concurrent.{CompletableFuture, Executor}
 
 import com.google.gson.{Gson, JsonElement}
 import dev.alexnader.framity.Framity
-import dev.alexnader.framity.util.json.dsl.parse
 import dev.alexnader.framity.util.json.{JsonParseContext, JsonParser}
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener
 import net.minecraft.item.ItemStack
@@ -29,10 +28,8 @@ package object overlay {
   def getOverlayId(stack: ItemStack): Option[Identifier] = triggers.iterator find (_._1.test(stack)) map (_._2)
 
   object Listener extends SimpleResourceReloadListener[Iterable[Identifier]] {
-    private implicit val triggerIngredientParser: JsonParser[Ingredient] = {
-      import dev.alexnader.framity.util.json.Parsers.IngredientParser
-      parse field "trigger" using IngredientParser
-    }
+    private implicit val triggerIngredientParser: JsonParser[Ingredient] =
+      JsonParser.fieldOf("trigger")(dev.alexnader.framity.util.json.Parsers.IngredientParser)
 
     override val getFabricId: Identifier = Framity.Mod.id("listener/data/overlay")
 

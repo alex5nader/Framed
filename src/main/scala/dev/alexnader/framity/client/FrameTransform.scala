@@ -148,7 +148,7 @@ sealed abstract class FrameTransform(blockView: BlockRenderView, state: BlockSta
       attachment.asInstanceOf[View[(Option[BlockState], Option[Identifier])]]
     }
 
-    attachment map { case (baseState, overlayId) =>
+    attachment.map { case (baseState, overlayId) =>
       val (color, sprites) = baseState match {
         case Some(baseState) => (
           Option(ColorProviderRegistry.BLOCK.get(baseState.getBlock)).map(_.getColor(baseState, blockView, pos, 1) | 0xFF000000).getOrElse(0xFFFFFFFF),
@@ -165,7 +165,7 @@ sealed abstract class FrameTransform(blockView: BlockRenderView, state: BlockSta
             .map(_ | 0xFF000000)
         )
       FrameTransform.Data(sprites, overlay, cachedOverlayColor, color)
-    } toArray
+    }.toArray
   }
 
   protected def getPartIndex(mqv: MutableQuadView, direction: Direction): Int = {
