@@ -14,7 +14,13 @@
       ]
     },
     "materials": {
-      "jmx_material": {
+      "jmx_mat_bottom": {
+        "layers": [
+          { "layer": "cutout_mipped" },
+          { "layer": "cutout_mipped" }
+        ]
+      },
+      "jmx_mat_top": {
         "layers": [
           { "layer": "cutout_mipped" },
           { "layer": "cutout_mipped" }
@@ -32,7 +38,13 @@
       ]
     },
     "materials": {
-      "jmx_material": {
+      "jmx_mat_bottom": {
+        "layers": [
+          { "layer": "cutout_mipped" },
+          { "layer": "cutout_mipped" }
+        ]
+      },
+      "jmx_mat_top": {
         "layers": [
           { "layer": "cutout_mipped" },
           { "layer": "cutout_mipped" }
