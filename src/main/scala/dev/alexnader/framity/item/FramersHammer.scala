@@ -14,6 +14,8 @@ import net.minecraft.text.TranslatableText
 import net.minecraft.util.{ActionResult, Hand, TypedActionResult}
 import net.minecraft.world.World
 
+import scala.language.implicitConversions
+
 object FramersHammer extends Item(new Item.Settings().maxCount(1)) {
 
   object Mode extends Enumeration {

@@ -9,7 +9,7 @@ object SingleItemSlot extends ((Inventory, Int, Int, Int) => SingleItemSlot) {
 }
 
 class SingleItemSlot(inventory: Inventory, index: Int, x: Int, y: Int) extends ValidatedSlot(inventory, index, x, y) {
-  override def getMaxStackAmount: Int = 1
+  override def getMaxItemCount: Int = 1
 
-  override def getMaxStackAmount(stack: ItemStack): Int = 1
+  override def getMaxItemCount(stack: ItemStack): Int = 1
 }

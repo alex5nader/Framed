@@ -1,7 +1,6 @@
 package dev.alexnader.framity.util.json
 
 import dev.alexnader.framity.util.collect.{CollectIterable, Collectors}
-import dev.alexnader.framity.util.json.JsonParser.seqOf
 import net.minecraft.recipe.Ingredient
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction
@@ -18,7 +17,7 @@ object Parsers {
 
   def sidedMap[A](implicit parser: JsonParser[A]): JsonParser[Map[Direction, A]] = {
     implicit val itemParser: JsonParser[(Seq[Direction], A)] =
-      JsonParser.fieldOf[Seq[Direction]]("sides") pairWith parser
+      JsonParser.fieldOf("sides")(JsonParser.seqOf[Direction]) pairWith parser
 
     JsonParser.seqOf[(Seq[Direction], A)] mapResult { _.flatMap { case (dirs, tex) => dirs map ((_, tex)) }.toMap }
   }

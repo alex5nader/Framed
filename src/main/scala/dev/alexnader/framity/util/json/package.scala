@@ -15,9 +15,9 @@ package object json {
   }
 
   object JsonParser {
-    implicit def seqOf[A](implicit parser: JsonParser[A]): JsonParser[Seq[A]] = _.arrayItems.flatMap(_.map(_.parse[A]).collectTo(Collectors.either))
+    def seqOf[A](implicit parser: JsonParser[A]): JsonParser[Seq[A]] = _.arrayItems.flatMap(_.map(_.parse[A]).collectTo(Collectors.either))
 
-    implicit def fieldOf[A](key: String)(implicit parser: JsonParser[A]): JsonParser[A] = _(key).flatMap(_.parse[A])
+    def fieldOf[A](key: String)(implicit parser: JsonParser[A]): JsonParser[A] = _(key).flatMap(_.parse[A])
 
     def sumType[A](cases: (String, JsonParser[A])*)(context: JsonParseContext): JsonParseResult[A] = {
       context.asObj.flatMap(obj => {

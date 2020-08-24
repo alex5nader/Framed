@@ -3,7 +3,7 @@ package dev.alexnader.framity.block.frame
 import com.mojang.serialization.Dynamic
 import dev.alexnader.framity.util.MinecraftUtil.CompoundTagExt
 import net.minecraft.block.BlockState
-import net.minecraft.datafixer.NbtOps
+import net.minecraft.nbt.NbtOps
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.{CompoundTag, IntTag, ListTag}
 

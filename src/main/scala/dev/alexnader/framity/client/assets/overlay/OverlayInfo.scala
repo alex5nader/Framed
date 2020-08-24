@@ -24,7 +24,7 @@ object OverlayInfo {
         optionalFieldParser[OverlayInfo]("parent")(_.parse[Identifier].map(dependencies.apply)) pairWith
         optionalFieldParser[TextureSource]("textureSource") pairWith
         optionalFieldParser[ColoredLike]("coloredLike") pairWith
-        optionalFieldParser[Map[Direction, Offsetters]]("offsets")
+        optionalFieldParser("offsets")(sidedMap[Offsetters])
       ) map { case (((parent, textureSource), coloredLike), offsets) =>
         OverlayInfo(parent, textureSource, coloredLike, offsets)
       }
