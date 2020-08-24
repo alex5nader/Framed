@@ -36,7 +36,6 @@
     "fabric": "*",
     "fabric-language-scala": "*",
     "minecraft": "1.16.x",
-    "nbtcrafting": "*",
     "libgui": "*",
     "json-model-extensions": "*",
     "frex": "*"

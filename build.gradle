@@ -46,8 +46,6 @@ dependencies {
 
     modApi ("grondag:frex-${project.mc_tag}:${project.frex_version}.+") { transitive = false }
     modImplementation ("grondag:jmx-${project.mc_tag}:${project.jmx_version}.+") { transitive = false }
-
-    modImplementation "com.github.siphalor:nbt-crafting:1.16-2.0-SNAPSHOT"
 }
 
 processResources {
