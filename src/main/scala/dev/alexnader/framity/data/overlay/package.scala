@@ -31,7 +31,7 @@ package object overlay {
     private implicit val triggerIngredientParser: JsonParser[Ingredient] =
       JsonParser.fieldOf("trigger")(dev.alexnader.framity.util.json.Parsers.IngredientParser)
 
-    override val getFabricId: Identifier = Framity.Mod.id("listener/data/overlay")
+    override val getFabricId: Identifier = Framity.id("listener/data/overlay")
 
     override def load(resourceManager: ResourceManager, profiler: Profiler, executor: Executor): CompletableFuture[Iterable[Identifier]] = CompletableFuture.supplyAsync(() => {
       triggers.clear()

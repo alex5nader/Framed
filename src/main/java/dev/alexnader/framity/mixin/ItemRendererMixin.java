@@ -30,7 +30,7 @@ public abstract class ItemRendererMixin {
     @Redirect(method = "getHeldItemModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemModels;getModel(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;"))
     BakedModel getModelProxy(ItemModels itemModels, ItemStack stack) {
         if (stack.getItem() == FramersHammer$.MODULE$) {
-            return itemModels.getModelManager().getModel(new ModelIdentifier(Framity$.MODULE$.Mod().id("framers_hammer_none"), "inventory"));
+            return itemModels.getModelManager().getModel(new ModelIdentifier(Framity$.MODULE$.id("framers_hammer_none"), "inventory"));
         }
         return itemModels.getModel(stack);
     }
@@ -39,7 +39,7 @@ public abstract class ItemRendererMixin {
     BakedModel getHeldItemModelProxy(ItemRenderer itemRenderer, ItemStack stack, World world, LivingEntity entity) {
         if (stack.getItem() == FramersHammer$.MODULE$) {
             ClientWorld clientWorld = world instanceof ClientWorld ? (ClientWorld) world : null;
-            BakedModel model = models.getModelManager().getModel(new ModelIdentifier(Framity$.MODULE$.Mod().id("framers_hammer"), "inventory"));
+            BakedModel model = models.getModelManager().getModel(new ModelIdentifier(Framity$.MODULE$.id("framers_hammer"), "inventory"));
             BakedModel model2 = model.getOverrides().apply(model, stack, clientWorld, entity);
             return model2 == null ? models.getModelManager().getMissingModel() : model2;
         }

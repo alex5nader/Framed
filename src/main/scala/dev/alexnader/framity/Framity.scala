@@ -2,40 +2,42 @@ package dev.alexnader.framity
 
 import dev.alexnader.framity.data.overlay
 import dev.alexnader.framity.gui.FrameGuiDescription
-import dev.alexnader.framity.item.{FramersHammer, addItems}
-import dev.alexnader.framity.block.addBlocks
-import dev.alexnader.framity.block_entity.addBlockEntityTypes
-import dev.alexnader.framity.mod.{ItemGroupAdder, Registerer, WithId}
-import dev.alexnader.framity.mod.WithId.MakeWithId
+import dev.alexnader.framity.item.{FramersHammer, registerItems}
+import dev.alexnader.framity.block.registerBlocks
+import dev.alexnader.framity.block_entity.registerBlockEntityTypes
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry
 import net.minecraft.item.ItemStack
 import net.minecraft.resource.ResourceType
 import net.minecraft.screen.{ScreenHandlerContext, ScreenHandlerType}
+import net.minecraft.util.Identifier
 import org.apache.logging.log4j.{LogManager, Logger}
 
+import scala.jdk.CollectionConverters._
+
 object Framity extends ModInitializer {
-  implicit val Mod: Registerer = Registerer `for` "framity"
+  val namespace: String = "framity"
+
+  def id(path: String) = new Identifier(namespace, path)
 
   val Logger: Logger = LogManager.getLogger("Framity")
 
-  val ItemGroup: WithId[ItemGroupAdder] = new ItemGroupAdder(() => new ItemStack(FramersHammer)) withId "framity"
-
-  lazy val FrameScreenHandlerType: ScreenHandlerType[FrameGuiDescription] =
-    ScreenHandlerRegistry.registerExtended(Mod.id("frame_screen_handler"), (syncId, inventory, buf) =>
-      new FrameGuiDescription(syncId, inventory, ScreenHandlerContext.create(inventory.player.world, buf.readBlockPos))
-    )
+  var FrameScreenHandlerType: ScreenHandlerType[FrameGuiDescription] = _
 
   override def onInitialize(): Unit = {
-    Mod.addItemGroup(ItemGroup)
-    addBlocks
-    addBlockEntityTypes
-    addItems
+    registerBlockEntityTypes()
+    val items = registerBlocks() ++ registerItems()
 
-    Mod.register()
+    FabricItemGroupBuilder.create(id("framity"))
+      .appendItems { list => list.addAll(items.map { new ItemStack(_) }.asJava) }
+      .icon(() => new ItemStack(FramersHammer))
+      .build()
 
-    FrameScreenHandlerType
+    FrameScreenHandlerType = ScreenHandlerRegistry.registerExtended(id("frame_screen_handler"), (syncId, inventory, buf) =>
+      new FrameGuiDescription(syncId, inventory, ScreenHandlerContext.create(inventory.player.world, buf.readBlockPos))
+    )
 
     ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(overlay.Listener)
   }

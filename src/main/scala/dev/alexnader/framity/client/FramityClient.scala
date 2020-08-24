@@ -19,7 +19,7 @@ import net.minecraft.util.Identifier
 
 object FramityClient extends ClientModInitializer {
   override def onInitializeClient(): Unit = {
-    QuadTransformRegistry.INSTANCE.register(Framity.Mod.id("non_frex_frame_transform"), FrameTransform.NonFrex.Source)
+    QuadTransformRegistry.INSTANCE.register(Framity.id("non_frex_frame_transform"), FrameTransform.NonFrex.Source)
 //    QuadTransformRegistry.INSTANCE.register(Framity.Mod.id("frex_frame_transform"), FrameTransform.Frex.Source)
 
     ScreenRegistry.register(Framity.FrameScreenHandlerType, FrameScreen)
@@ -35,9 +35,9 @@ object FramityClient extends ClientModInitializer {
     ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(overlay.Listener)
 
     ModelLoadingRegistry.INSTANCE.registerAppender((_, out) => {
-      out.accept(new ModelIdentifier(Framity.Mod.id("framers_hammer_none"), "inventory"))
+      out.accept(new ModelIdentifier(Framity.id("framers_hammer_none"), "inventory"))
     })
 
-    FabricModelPredicateProviderRegistry.register(FramersHammer, Framity.Mod.id("hammer_mode"), FramersHammer.ModelPredicate)
+    FabricModelPredicateProviderRegistry.register(FramersHammer, Framity.id("hammer_mode"), FramersHammer.ModelPredicate)
   }
 }

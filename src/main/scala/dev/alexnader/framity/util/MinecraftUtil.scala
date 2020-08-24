@@ -4,6 +4,7 @@ import net.minecraft.inventory.Inventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.{CompoundTag, Tag}
 import net.minecraft.util.math.Vec3d
+import net.minecraft.util.registry.Registry
 
 object MinecraftUtil {
   implicit class CompoundTagExt(myTag: CompoundTag) {
@@ -27,5 +28,17 @@ object MinecraftUtil {
 
   implicit class Vec3dExt(`this`: Vec3d) {
     def -(that: Vec3d): Vec3d = `this`.subtract(that)
+  }
+
+  implicit class RegistryExt[A](registry: Registry[A]) {
+    def register(value: WithId[A]): A = {
+      Registry.register(registry, value.id, value)
+    }
+
+    def register(values: WithId[A]*): Seq[A] = {
+      values map { value =>
+        Registry.register(registry, value.id, value.contained)
+      }
+    }
   }
 }

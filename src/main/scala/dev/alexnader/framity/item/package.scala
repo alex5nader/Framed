@@ -1,13 +1,18 @@
 package dev.alexnader.framity
 
-import dev.alexnader.framity.mod.Registerer
-import dev.alexnader.framity.mod.WithId._
+import dev.alexnader.framity.util.WithId.MakeWithId
+import dev.alexnader.framity.util.MinecraftUtil.RegistryExt
+import dev.alexnader.framity.util.WithId
 import net.minecraft.item.{Item, WallStandingBlockItem}
+import net.minecraft.util.registry.Registry
 
 package object item {
-  def addItems(implicit registerer: Registerer): Unit = {
-    registerer.addItem(FramersHammer withId "framers_hammer", Framity.ItemGroup)
+  val TorchFrameItem: WithId[Item] = new WallStandingBlockItem(block.TorchFrame, block.WallTorchFrame, new Item.Settings) withId Framity.id("torch_frame")
 
-    registerer.addItem(new WallStandingBlockItem(block.TorchFrame, block.WallTorchFrame, new Item.Settings) withId "torch_frame", Framity.ItemGroup)
+  def registerItems(): Seq[Item] = {
+    Registry.ITEM.register(
+      FramersHammer withId Framity.id("framers_hammer"),
+      TorchFrameItem
+    )
   }
 }

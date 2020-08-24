@@ -24,7 +24,7 @@ package object overlay {
   }
 
   object Listener extends SimpleResourceReloadListener[Iterable[Identifier]] {
-    override val getFabricId: Identifier = Framity.Mod.id("listener/assets/overlay")
+    override val getFabricId: Identifier = Framity.id("listener/assets/overlay")
 
     private def loadOverlayAndDependencies(resourceManager: ResourceManager, rootOverlayId: Identifier): JsonParseResult[Unit] = {
       val loadedDependencies = mutable.Set[Identifier]()
