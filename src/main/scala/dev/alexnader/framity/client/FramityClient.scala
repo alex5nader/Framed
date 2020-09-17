@@ -20,7 +20,7 @@ import net.minecraft.util.Identifier
 object FramityClient extends ClientModInitializer {
   override def onInitializeClient(): Unit = {
     QuadTransformRegistry.INSTANCE.register(Framity.id("non_frex_frame_transform"), FrameTransform.NonFrex.Source)
-//    QuadTransformRegistry.INSTANCE.register(Framity.Mod.id("frex_frame_transform"), FrameTransform.Frex.Source)
+    QuadTransformRegistry.INSTANCE.register(Framity.id("frex_frame_transform"), FrameTransform.Frex.Source)
 
     ScreenRegistry.register(Framity.FrameScreenHandlerType, FrameScreen)
 

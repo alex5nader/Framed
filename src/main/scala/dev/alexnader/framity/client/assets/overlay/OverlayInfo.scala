@@ -45,4 +45,10 @@ case class OverlayInfo(parent: Option[OverlayInfo], _textureSource: Option[Textu
   def offsets: Option[Map[Direction, Offsetters]] = getFromParent(_._offsets)
 
   def isValid: Boolean = textureSource.isDefined
+
+  def getUvs(direction: Direction, us: (Float, Float, Float, Float), vs: (Float, Float, Float, Float)): Option[((Float, Float, Float, Float), (Float, Float, Float, Float))] = {
+    this.offsets
+      .flatMap { _.get(direction) }
+      .map { _(us, vs) }
+  }
 }
