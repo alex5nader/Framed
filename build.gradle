@@ -39,7 +39,9 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.6'
 
-    modImplementation "io.github.cottonmc:LibGui:${project.libgui_version}"
+    modImplementation ("io.github.cottonmc:LibGui:${project.libgui_version}") {
+        exclude group: "net.fabricmc.fabric-api"
+    }
 
     compileOnly "org.apiguardian:apiguardian-api:1.0.0"
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
