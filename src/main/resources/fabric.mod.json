@@ -40,7 +40,5 @@
     "json-model-extensions": "*",
     "frex": "*"
   },
-  "conflicts": {
-    "canvas": "*"
-  }
+  "conflicts": {}
 }
