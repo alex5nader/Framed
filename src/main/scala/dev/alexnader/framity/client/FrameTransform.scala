@@ -22,7 +22,7 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.{BlockPos, Direction, MathHelper, Vec3d}
 import net.minecraft.world.BlockRenderView
 import grondag.frex.api.{Renderer => FrexRenderer}
-import grondag.frex.api.material.{RenderMaterial => FrexRenderMaterial}
+import grondag.frex.api.material.{MaterialMap, RenderMaterial => FrexRenderMaterial}
 
 import scala.collection.View
 
@@ -62,20 +62,18 @@ object FrameTransform {
     case TextureSource.Single(id) => Option(MinecraftClient.getInstance.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX).apply(id))
   }
 
-  private def applySpriteAndColor(mqv: MutableQuadView, maybeSpriteAndColor: Option[(Sprite, Option[Int])], us: (Float, Float, Float, Float), vs: (Float, Float, Float, Float), spriteIndex: Int): Boolean = {
-    maybeSpriteAndColor.map { case (sprite, maybeColor) =>
-      mqv.sprite(0, spriteIndex, MathHelper.lerp(us._1, sprite.getMinU, sprite.getMaxU), MathHelper.lerp(vs._1, sprite.getMinV, sprite.getMaxV))
-      mqv.sprite(1, spriteIndex, MathHelper.lerp(us._2, sprite.getMinU, sprite.getMaxU), MathHelper.lerp(vs._2, sprite.getMinV, sprite.getMaxV))
-      mqv.sprite(2, spriteIndex, MathHelper.lerp(us._3, sprite.getMinU, sprite.getMaxU), MathHelper.lerp(vs._3, sprite.getMinV, sprite.getMaxV))
-      mqv.sprite(3, spriteIndex, MathHelper.lerp(us._4, sprite.getMinU, sprite.getMaxU), MathHelper.lerp(vs._4, sprite.getMinV, sprite.getMaxV))
+  private def applySpriteAndColor(mqv: MutableQuadView, sprite: Sprite, maybeColor: Option[Int], us: (Float, Float, Float, Float), vs: (Float, Float, Float, Float), spriteIndex: Int): Unit = {
+    mqv.sprite(0, spriteIndex, MathHelper.lerp(us._1, sprite.getMinU, sprite.getMaxU), MathHelper.lerp(vs._1, sprite.getMinV, sprite.getMaxV))
+    mqv.sprite(1, spriteIndex, MathHelper.lerp(us._2, sprite.getMinU, sprite.getMaxU), MathHelper.lerp(vs._2, sprite.getMinV, sprite.getMaxV))
+    mqv.sprite(2, spriteIndex, MathHelper.lerp(us._3, sprite.getMinU, sprite.getMaxU), MathHelper.lerp(vs._3, sprite.getMinV, sprite.getMaxV))
+    mqv.sprite(3, spriteIndex, MathHelper.lerp(us._4, sprite.getMinU, sprite.getMaxU), MathHelper.lerp(vs._4, sprite.getMinV, sprite.getMaxV))
 
-      maybeColor.tapEach { color =>
-        mqv.spriteColor(spriteIndex, color, color, color, color)
-      }
-    }.isDefined
+    maybeColor.tapEach { color =>
+      mqv.spriteColor(spriteIndex, color, color, color, color)
+    }
   }
 
-  protected case class Data(maybeSprites: Option[SpriteSource], maybeOverlay: Option[OverlayInfo], maybeCachedOverlayColor: Option[Int], color: Int)
+  protected case class Data(maybeSprites: Option[(SpriteSource, BlockState)], maybeOverlay: Option[OverlayInfo], maybeCachedOverlayColor: Option[Int], color: Int)
 
   object NonFrex {
     object Source extends QuadTransformSource {
@@ -115,12 +113,12 @@ object FrameTransform {
         if (quadIndex % 2 == 0) { // base quads are first, overlay quads are second
           maybeSprites match {
             case None => return true // don't transform if this quad is base and there's nothing to apply
-            case Some(sprites) =>
+            case Some((sprites, _)) =>
               (findMaybeSpriteAndColor(sprites), origUs, origVs)
           }
         } else {
           val maybeSpriteAndColor = maybeOverlay match {
-            case None => maybeSprites.flatMap(findMaybeSpriteAndColor) // if no overlay, check if base model has more than 1 quad per face and use that
+            case None => maybeSprites.flatMap { case (sprites, _) => findMaybeSpriteAndColor(sprites) } // if no overlay, check if base model has more than 1 quad per face and use that
             case Some(overlay) =>
               val maybeSprite = overlay.textureSource.map(textureSource => getSprite(direction, textureSource)) match {
                 case Some(None) => return false // there is a texture to use but it doesn't have anything on this direction
@@ -139,7 +137,9 @@ object FrameTransform {
         }
       }
 
-      applySpriteAndColor(mqv, maybeSpriteAndColor, us, vs, 0)
+      maybeSpriteAndColor.tapEach { case (sprite, maybeColor) =>
+        applySpriteAndColor(mqv, sprite, maybeColor, us, vs, 0)
+      }
 
       maybeSpriteAndColor.isDefined
     }
@@ -162,39 +162,48 @@ object FrameTransform {
       val (origUs, origVs) = getUvs(mqv, direction)
 
       //#region Base
-      maybeSprites.tapEach { sprites =>
-        applySpriteAndColor(mqv, sprites(direction, 0, color), origUs, origVs, 0)
-      }
+      maybeSprites
+        .flatMap { case (sprites, baseState) => sprites(direction, 0, color).map((_, baseState)) }
+        .tapEach { case ((sprite, maybeColor), baseState) =>
+          val mat = MaterialMap.get(baseState).getMapped(sprite)
+          if (mat != null) {
+            mqv.material(RendererAccess.INSTANCE.getRenderer.asInstanceOf[FrexRenderer].materialFinder.copyFrom(mat.asInstanceOf[FrexRenderMaterial]).spriteDepth(2).find())
+          }
+
+          applySpriteAndColor(mqv, sprite, maybeColor, origUs, origVs, 0)
+        }
       //#endregion
 
       //#region Overlay
-      val (maybeOverlaySpriteAndColor, us, vs) = maybeOverlay match {
+      def setMatDepthTo1(): Unit = {
+        mqv.material(RendererAccess.INSTANCE.getRenderer.asInstanceOf[FrexRenderer].materialFinder.copyFrom(mqv.material().asInstanceOf[FrexRenderMaterial]).spriteDepth(1).find())
+      }
+
+      maybeOverlay match {
         case Some(overlay) =>
-          val maybeOverlaySpriteAndColor = {
-            val maybeSprite = overlay.textureSource
-              .flatMap { getSprite(direction, _) }
-
-            if (maybeSprite.isEmpty) {
-              mqv.material(RendererAccess.INSTANCE.getRenderer.asInstanceOf[FrexRenderer].materialFinder.copyFrom(mqv.material().asInstanceOf[FrexRenderMaterial]).spriteDepth(1).find())
-            }
-
-            maybeSprite.map((_, maybeCachedOverlayColor))
-          }
-
           val (us, vs) = overlay.getUvs(direction, origUs, origVs).getOrElse((origUs, origVs))
 
-          (maybeOverlaySpriteAndColor, us, vs)
-        case None =>
-          val maybeOverlaySpriteAndColor = maybeSprites
-            .flatMap { _(direction, 1, color) }
+          val maybeSprite = overlay.textureSource
+            .flatMap { getSprite(direction, _) }
 
-          if (maybeOverlaySpriteAndColor.isEmpty) {
-            mqv.material(RendererAccess.INSTANCE.getRenderer.asInstanceOf[FrexRenderer].materialFinder.copyFrom(mqv.material().asInstanceOf[FrexRenderMaterial]).spriteDepth(1).find())
+          maybeSprite match {
+            case None =>
+              setMatDepthTo1()
+            case Some(sprite) =>
+              applySpriteAndColor(mqv, sprite, maybeCachedOverlayColor, us, vs, 1)
           }
+        case None =>
+          val depth1 = maybeSprites
+            .flatMap { case (sprites, _) => sprites(direction, 1, color) }
+            .map { case (sprite, maybeColor) =>
+              applySpriteAndColor(mqv, sprite, maybeColor, origUs, origVs, 1)
+            }
+            .isEmpty
 
-          (maybeOverlaySpriteAndColor, origUs, origVs)
+          if (depth1) {
+            setMatDepthTo1()
+          }
       }
-      applySpriteAndColor(mqv, maybeOverlaySpriteAndColor, us, vs, 1)
       //#endregion
 
       true
@@ -219,7 +228,7 @@ sealed abstract class FrameTransform(blockView: BlockRenderView, state: BlockSta
       val (color, sprites) = baseState match {
         case Some(baseState) => (
           Option(ColorProviderRegistry.BLOCK.get(baseState.getBlock)).map(_.getColor(baseState, blockView, pos, 1) | 0xFF000000).getOrElse(0xFFFFFFFF),
-          Some(new SpriteSource(baseState, MinecraftClient.getInstance.getBlockRenderManager.getModel(baseState), randomSupplier.get)),
+          Some((new SpriteSource(baseState, MinecraftClient.getInstance.getBlockRenderManager.getModel(baseState), randomSupplier.get), baseState)),
         )
         case None => (0xFFFFFFFF, None)
       }
