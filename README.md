@@ -45,21 +45,7 @@ for acting as an example of how to read assets/data.
 me use assets from the original
 [Carpenter's Blocks](https://www.curseforge.com/minecraft/mc-mods/carpenters-blocks).
 
-Without them, this project would never have become more than a cool idea.
-
 ## License
 
-- All assets from and inspired by Carpenter's Blocks are licensed under the [LGPL v2.1](LICENSE_LGPL.md). This includes the following paths:
-  - `src/main/resources/assets/framity/textures/block/solid_frame.png`
-  - `src/main/resources/assets/framity/textures/block/hollow_frame.ase`
-  - `src/main/resources/assets/framity/textures/block/hollow_frame.png`
-  - `src/main/resources/assets/framity/textures/item/brush.ase`
-  - `src/main/resources/assets/framity/textures/item/brush.png`
-  - `src/main/resources/assets/framity/textures/item/door_frame.png`
-  - `src/main/resources/assets/framity/textures/item/hammer.ase`
-  - `src/main/resources/assets/framity/textures/item/hammer.png`
-  - `src/main/resources/assets/framity/textures/item/hammer_partial.png`
-  - `src/main/resources/assets/framity/textures/item/hammer_whole.png`
-  - `src/main/resources/assets/framity/textures/item/palette.aseprite`
-  - `src/main/resources/assets/framity/icon.png`
-- All other files are licensed under the [MIT License](LICENSE_MIT.md).
+Framity is licensed under the [LGPL v2.1](LICENSE.md).
+
