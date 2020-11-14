@@ -26,14 +26,14 @@ public class FrameGuiDescription extends SyncedGuiDescription {
 
         WGridPanel root = new WGridPanel(9);
 
-        root.add(centered(label("gui.framity.base_label")), 1, 2, 8, 2);
+        root.add(centered(label("gui.framity.frame.base_label")), 1, 2, 8, 2);
 
         root.add(
             slotRow(SingleItemSlots::new, blockInventory, frame.sections().base()),
             5 - frame.sections().base().size(), 4
         );
 
-        root.add(centered(label("gui.framity.overlay_label")), 9, 2, 8, 2);
+        root.add(centered(label("gui.framity.frame.overlay_label")), 9, 2, 8, 2);
 
         root.add(
             slotRow(SingleItemSlots::new, blockInventory, frame.sections().overlay()),
