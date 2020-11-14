@@ -37,7 +37,7 @@ public class Framity2Client implements ClientModInitializer {
         ScreenRegistry.register(META.FRAME_SCREEN_HANDLER_TYPE, FrameScreen.FACTORY);
 
         //noinspection deprecation
-        ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEX).register((atlas, registry) -> {
+        ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).register((atlas, registry) -> {
             int textureStart = "textures/".length();
             int pngLen = ".png".length();
 

@@ -87,6 +87,7 @@ public abstract class FrameTransform implements RenderContext.QuadTransform {
         Stream<Pair<Optional<BlockState>, Optional<Identifier>>> attachment =
             (Stream<Pair<Optional<BlockState>, Optional<Identifier>>>) ((RenderAttachedBlockView) brv).getBlockEntityRenderAttachment(pos);
 
+        //noinspection ConstantConditions
         data = attachment.map(pair -> {
             Optional<BlockState> maybeBaseState = pair.getFirst();
 
@@ -270,7 +271,7 @@ public abstract class FrameTransform implements RenderContext.QuadTransform {
                         //noinspection deprecation
                         maybeSpriteAndColor = Pair.of(
                             MinecraftClient.getInstance()
-                                .getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX)
+                                .getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE)
                                 .apply(spriteId),
                             data.maybeCachedOverlayColor
                         );

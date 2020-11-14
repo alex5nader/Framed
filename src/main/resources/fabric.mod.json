@@ -28,7 +28,6 @@
   "depends": {
     "fabricloader": ">=0.7.1",
     "fabric": "*",
-    "fabric-language-scala": "*",
     "minecraft": "1.16.x",
     "libgui": "*",
     "json-model-extensions": "*",
