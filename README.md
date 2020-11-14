@@ -14,13 +14,11 @@ placed into the world, they are not able to be placed into a frame.
     </a>
 </p>
 
-Framity requires the following mods:
-
-- [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)
-- [Fabric Language Scala](https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala)
-- [LibGui](https://www.curseforge.com/minecraft/mc-mods/libgui)
-- [JMX](https://www.curseforge.com/minecraft/mc-mods/jmx)
-- [Frex](https://www.curseforge.com/minecraft/mc-mods/frex)
+Framity depends on [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api),
+[LibGui](https://www.curseforge.com/minecraft/mc-mods/libgui),
+[JMX](https://www.curseforge.com/minecraft/mc-mods/jmx), and
+[FREX](https://www.curseforge.com/minecraft/mc-mods/frex), but you only need to install 
+[Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)!
 
 ## Download
 
