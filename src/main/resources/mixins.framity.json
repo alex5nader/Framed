@@ -1,14 +1,16 @@
 {
   "required": true,
-  "package": "dev.alexnader.framity.mixin",
+  "package": "dev.alexnader.framity2.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "DefaultStateAccess",
-    "GetItemBeforeEmpty"
+    "local.FrameBehaviourMixin",
+    "local.SinglePartFrameMixin",
+    "mc.DefaultStateAccess",
+    "mc.GetItemBeforeEmpty"
   ],
   "client": [
-    "AccessibleBakedQuad",
-    "ItemRendererMixin"
+    "mc.BakedQuadAccess",
+    "mc.ItemRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

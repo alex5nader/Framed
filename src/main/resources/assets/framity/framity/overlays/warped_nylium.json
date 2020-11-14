@@ -4,11 +4,15 @@
     "sided": [
       {
         "sides": [ "up" ],
-        "texture": "minecraft:block/warped_nylium"
+        "value": {
+          "texture": "minecraft:block/warped_nylium"
+        }
       },
       {
         "sides": [ "north", "south", "east", "west" ],
-        "texture": "framity:framity/warped_nylium_side_overlay"
+        "value": {
+          "texture": "framity:framity/warped_nylium_side_overlay"
+        }
       }
     ]
   }

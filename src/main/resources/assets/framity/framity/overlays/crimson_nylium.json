@@ -4,11 +4,15 @@
     "sided": [
       {
         "sides": [ "up" ],
-        "texture": "minecraft:block/crimson_nylium"
+        "value": {
+          "texture": "minecraft:block/crimson_nylium"
+        }
       },
       {
         "sides": [ "north", "south", "east", "west" ],
-        "texture": "framity:framity/crimson_nylium_side_overlay"
+        "value": {
+          "texture": "framity:framity/crimson_nylium_side_overlay"
+        }
       }
     ]
   }

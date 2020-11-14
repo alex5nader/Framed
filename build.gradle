@@ -1,7 +1,7 @@
 plugins {
     id 'fabric-loom'
     id 'maven-publish'
-    id 'scala'
+//    id 'scala'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -35,7 +35,7 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation "net.fabricmc:fabric-language-scala:${project.scala_version}"
+//    modImplementation "net.fabricmc:fabric-language-scala:${project.scala_version}"
 
     implementation 'com.google.code.gson:gson:2.8.6'
 

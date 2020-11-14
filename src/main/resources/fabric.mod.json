@@ -16,16 +16,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      {
-        "value": "dev.alexnader.framity.Framity",
-        "adapter": "scala"
-      }
+      "dev.alexnader.framity2.Framity2"
     ],
     "client": [
-      {
-        "value": "dev.alexnader.framity.client.FramityClient",
-        "adapter": "scala"
-      }
+      "dev.alexnader.framity2.client.Framity2Client"
     ]
   },
   "mixins": [

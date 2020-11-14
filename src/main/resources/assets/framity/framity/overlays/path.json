@@ -4,11 +4,15 @@
     "sided": [
       {
         "sides": [ "up" ],
-        "texture": "minecraft:block/grass_path_top"
+        "value": {
+          "texture": "minecraft:block/grass_path_top"
+        }
       },
       {
         "sides": [ "north", "south", "east", "west" ],
-        "texture": "framity:framity/path_side_overlay"
+        "value": {
+          "texture": "framity:framity/path_side_overlay"
+        }
       }
     ]
   }

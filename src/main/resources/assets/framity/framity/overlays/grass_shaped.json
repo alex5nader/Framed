@@ -2,8 +2,10 @@
   "offsets": [
     {
       "sides": [ "north", "south", "east", "west" ],
-      "vOffsetter": {
-        "zero": {}
+      "value": {
+        "vOffsetter": {
+          "framity:zero": { }
+        }
       }
     }
   ]
