@@ -23,15 +23,15 @@ public class ValidQuery {
     public static class ItemStackValidQuery {
         private final ItemStack stack;
 
-        public ItemStackValidQuery(ItemStack stack) {
+        public ItemStackValidQuery(final ItemStack stack) {
             this.stack = stack;
         }
 
-        public Optional<BlockState> isValidForBase(Function<BlockItem, Optional<BlockState>> toState, World world, BlockPos pos) {
-            Item item = stack.getItem();
+        public Optional<BlockState> isValidForBase(final Function<BlockItem, Optional<BlockState>> toState, final World world, final BlockPos pos) {
+            final Item item = stack.getItem();
 
             if (item instanceof BlockItem) {
-                BlockItem blockItem = (BlockItem) item;
+                final BlockItem blockItem = (BlockItem) item;
                 if (blockItem.getBlock() instanceof Frame) {
                     return Optional.empty();
                 } else {
@@ -54,11 +54,11 @@ public class ValidQuery {
     public static class BlockStateValidQuery {
         private final BlockState state;
 
-        public BlockStateValidQuery(BlockState state) {
+        public BlockStateValidQuery(final BlockState state) {
             this.state = state;
         }
 
-        public boolean isValidForBase(World world, BlockPos pos) {
+        public boolean isValidForBase(final World world, final BlockPos pos) {
             if (state.getBlock() instanceof BlockEntityProvider && state.getRenderType() != BlockRenderType.MODEL) {
                 return false;
             }
@@ -67,11 +67,11 @@ public class ValidQuery {
         }
     }
 
-    public static ItemStackValidQuery checkIf(ItemStack stack) {
+    public static ItemStackValidQuery checkIf(final ItemStack stack) {
         return new ItemStackValidQuery(stack);
     }
 
-    public static BlockStateValidQuery checkIf(BlockState state) {
+    public static BlockStateValidQuery checkIf(final BlockState state) {
         return new BlockStateValidQuery(state);
     }
 }

@@ -5,12 +5,12 @@ import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import net.minecraft.inventory.Inventory;
 
 public class SingleItemSlots extends WItemSlot {
-    public SingleItemSlots(Inventory inventory, int startIndex, int slotsWide, int slotsHigh, boolean big) {
+    public SingleItemSlots(final Inventory inventory, final int startIndex, final int slotsWide, final int slotsHigh, final boolean big) {
         super(inventory, startIndex, slotsWide, slotsHigh, big);
     }
 
     @Override
-    protected ValidatedSlot createSlotPeer(Inventory inventory, int index, int x, int y) {
+    protected ValidatedSlot createSlotPeer(final Inventory inventory, final int index, final int x, final int y) {
         return new ValidatedSingleItemSlot(inventory, index, x, y);
     }
 }

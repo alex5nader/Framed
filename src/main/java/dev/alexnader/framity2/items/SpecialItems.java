@@ -3,7 +3,6 @@ package dev.alexnader.framity2.items;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Streams;
 import com.mojang.datafixers.util.Pair;
-import dev.alexnader.framity2.Framity2;
 import dev.alexnader.framity2.block.entity.FrameBlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -22,7 +21,7 @@ public class SpecialItems {
         private final int offset;
         private final BooleanProperty property;
 
-        public SpecialItem(int offset, BooleanProperty property) {
+        public SpecialItem(final int offset, final BooleanProperty property) {
             this.offset = offset;
             this.property = property;
         }
@@ -31,15 +30,11 @@ public class SpecialItems {
             return offset;
         }
 
-        public BooleanProperty property() {
-            return property;
-        }
-
-        public void onAdd(World world, FrameBlockEntity frame) {
+        public void onAdd(final World world, final FrameBlockEntity frame) {
             world.setBlockState(frame.getPos(), world.getBlockState(frame.getPos()).with(property, true));
         }
 
-        public void onRemove(World world, FrameBlockEntity frame) {
+        public void onRemove(final World world, final FrameBlockEntity frame) {
             world.setBlockState(frame.getPos(), world.getBlockState(frame.getPos()).with(property, false));
         }
     }
@@ -47,7 +42,7 @@ public class SpecialItems {
     public final Map<Item, SpecialItem> MAP;
 
     {
-        List<Pair<Item, BooleanProperty>> pairs = Lists.newArrayList(
+        final List<Pair<Item, BooleanProperty>> pairs = Lists.newArrayList(
             Pair.of(Items.GLOWSTONE_DUST, Properties.LIT),
             Pair.of(Items.REDSTONE, PROPERTIES.HAS_REDSTONE)
         );

@@ -4,7 +4,7 @@ import dev.alexnader.framity2.util.ConstructorCallback;
 import net.minecraft.block.FenceGateBlock;
 
 public class FenceGateFrame extends FenceGateBlock implements ConstructorCallback {
-    public FenceGateFrame(Settings settings) {
+    public FenceGateFrame(final Settings settings) {
         super(settings);
         onConstructor();
     }

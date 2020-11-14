@@ -3,10 +3,11 @@
   "package": "dev.alexnader.framity2.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "local.FrameBehaviourMixin",
-    "local.SinglePartFrameMixin",
-    "mc.DefaultStateAccess",
-    "mc.GetItemBeforeEmpty"
+    "local.FrameBehaviour",
+    "local.FrameEntityProvider",
+    "local.SinglePartFrame",
+    "mc.GetItemBeforeEmpty",
+    "mc.ModelLoaderDebugMixin"
   ],
   "client": [
     "mc.BakedQuadAccess",

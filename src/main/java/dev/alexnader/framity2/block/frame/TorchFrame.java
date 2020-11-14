@@ -5,7 +5,7 @@ import net.minecraft.block.TorchBlock;
 import net.minecraft.particle.ParticleTypes;
 
 public class TorchFrame extends TorchBlock implements ConstructorCallback {
-    public TorchFrame(Settings settings) {
+    public TorchFrame(final Settings settings) {
         super(settings, ParticleTypes.FLAME);
         onConstructor();
     }

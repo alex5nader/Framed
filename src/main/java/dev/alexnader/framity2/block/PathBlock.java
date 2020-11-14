@@ -10,7 +10,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 
 public class PathBlock extends Block implements ConstructorCallback {
-    public PathBlock(Settings settings) {
+    public PathBlock(final Settings settings) {
         super(settings);
         onConstructor();
     }
@@ -23,19 +23,19 @@ public class PathBlock extends Block implements ConstructorCallback {
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean hasSidedTransparency(BlockState state) {
+    public boolean hasSidedTransparency(final BlockState state) {
         return true;
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    public VoxelShape getOutlineShape(final BlockState state, final BlockView world, final BlockPos pos, final ShapeContext context) {
         return SHAPE;
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
+    public boolean canPathfindThrough(final BlockState state, final BlockView world, final BlockPos pos, final NavigationType type) {
         return false;
     }
 }

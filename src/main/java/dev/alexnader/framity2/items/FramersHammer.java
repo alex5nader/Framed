@@ -28,8 +28,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class FramersHammer extends Item {
-    public FramersHammer() {
-        super(new Item.Settings().maxCount(1));
+    public FramersHammer(final Settings settings) {
+        super(settings);
     }
 
     public enum CopyMode {
@@ -38,7 +38,7 @@ public class FramersHammer extends Item {
         public final int id;
         public final String translationKey;
 
-        CopyMode(int id, String translationKey) {
+        CopyMode(final int id, final String translationKey) {
             this.id = id;
             this.translationKey = translationKey;
         }
@@ -49,17 +49,17 @@ public class FramersHammer extends Item {
 
         public static final CopyMode DEFAULT = NONE;
 
-        public static Optional<CopyMode> fromString(String string) {
+        public static Optional<CopyMode> fromString(final String string) {
             return Arrays.stream(values()).filter(s -> s.translationKey.equals(string)).findFirst();
         }
 
-        public static CopyMode fromStringOrDefault(String string) {
+        public static CopyMode fromStringOrDefault(final String string) {
             return fromString(string).orElse(DEFAULT);
         }
     }
 
     public static class Data {
-        public static Data fromTag(CompoundTag tag) {
+        public static Data fromTag(final CompoundTag tag) {
             return new Data(
                 tag.contains("storedData")
                     ? FrameData.fromTag(tag.getCompound("storedData"))
@@ -75,22 +75,13 @@ public class FramersHammer extends Item {
         FrameData storedData;
         private final CopyMode mode;
 
-        public Data(@Nullable FrameData storedData, CopyMode mode) {
+        public Data(@Nullable final FrameData storedData, final CopyMode mode) {
             this.storedData = storedData;
             this.mode = mode;
         }
 
-        @Nullable
-        public FrameData storedData() {
-            return storedData;
-        }
-
-        public CopyMode mode() {
-            return mode;
-        }
-
-        public boolean applySettings(FrameSlotInfo slotInfo, BlockState state, FrameBlockEntity frame, PlayerEntity player, World world) {
-            FrameData storedData = this.storedData;
+        public boolean applySettings(final FrameSlotInfo slotInfo, final BlockState state, final FrameBlockEntity frame, final PlayerEntity player, final World world) {
+            final FrameData storedData = this.storedData;
             if (storedData == null) {
                 return false;
             }
@@ -113,7 +104,7 @@ public class FramersHammer extends Item {
                         .forEach(pair -> frame.setStack(pair.getSecond(), pair.getFirst().copy()));
                 }
             } else {
-                boolean requireAllItems;
+                final boolean requireAllItems;
                 switch (mode) {
                 case NONE:
                     return false;
@@ -127,7 +118,7 @@ public class FramersHammer extends Item {
                     throw new IllegalStateException("Unreachable.");
                 }
 
-                Map<Item, Integer> itemSlotToFrameSlot = IntStream.range(0, storedData.items().length)
+                final Map<Item, Integer> itemSlotToFrameSlot = IntStream.range(0, storedData.items().length)
                     .boxed()
                     .map(i -> new Pair<>(storedData.items()[i], i))
                     .flatMap(pair -> {
@@ -140,13 +131,13 @@ public class FramersHammer extends Item {
                     })
                     .collect(Pair.toMap());
 
-                Map<Integer, Integer> playerSlotToFrameSlot = IntStream.range(0, player.inventory.size())
+                final Map<Integer, Integer> playerSlotToFrameSlot = IntStream.range(0, player.inventory.size())
                     .boxed()
                     .map(i -> new Pair<>(Optional.of(player.inventory.getStack(i)).filter(s -> !s.isEmpty()), i))
                     .flatMap(pair -> {
-                        Optional<ItemStack> maybeStack = pair.getFirst();
+                        final Optional<ItemStack> maybeStack = pair.getFirst();
                         if (maybeStack.isPresent()) {
-                            Item item = maybeStack.get().getItem();
+                            final Item item = maybeStack.get().getItem();
                             if (itemSlotToFrameSlot.containsKey(item)) {
                                 return Stream.of(new Pair<>(pair.getSecond(), itemSlotToFrameSlot.get(item)));
                             } else {
@@ -163,9 +154,9 @@ public class FramersHammer extends Item {
                 }
 
                 if (!world.isClient) {
-                    for (Map.Entry<Integer, Integer> entry : playerSlotToFrameSlot.entrySet()) {
-                        int playerSlot = entry.getKey();
-                        int frameSlot = entry.getValue();
+                    for (final Map.Entry<Integer, Integer> entry : playerSlotToFrameSlot.entrySet()) {
+                        final int playerSlot = entry.getKey();
+                        final int frameSlot = entry.getValue();
 
                         if (frame.getStack(frameSlot).getItem() != player.inventory.getStack(playerSlot).getItem() && slotInfo.absoluteSlotIsValid(frame, state, frameSlot)) {
                             if (!frame.getStack(frameSlot).isEmpty()) {
@@ -190,9 +181,9 @@ public class FramersHammer extends Item {
             .orElse(CopyMode.DEFAULT)
             .id;
 
-    private CompoundTag getTagOrAssignDefault(ItemStack stack) {
+    private CompoundTag getTagOrAssignDefault(final ItemStack stack) {
         if (stack.getTag() == null) {
-            CompoundTag tag = new CompoundTag();
+            final CompoundTag tag = new CompoundTag();
             tag.putString("mode", CopyMode.DEFAULT.toString());
             stack.setTag(tag);
         }
@@ -200,27 +191,27 @@ public class FramersHammer extends Item {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        CompoundTag tag = getTagOrAssignDefault(context.getStack());
-        Data data = Data.fromTag(tag);
+    public ActionResult useOnBlock(final ItemUsageContext context) {
+        final CompoundTag tag = getTagOrAssignDefault(context.getStack());
+        final Data data = Data.fromTag(tag);
 
-        BlockPos pos = context.getBlockPos();
-        World world = context.getWorld();
-        BlockState state = world.getBlockState(pos);
+        final BlockPos pos = context.getBlockPos();
+        final World world = context.getWorld();
+        final BlockState state = world.getBlockState(pos);
 
-        Block block = state.getBlock();
+        final Block block = state.getBlock();
         if (!(block instanceof FrameSlotInfo)) {
             return super.useOnBlock(context);
         }
-        FrameSlotInfo slotInfo = (FrameSlotInfo) block;
+        final FrameSlotInfo slotInfo = (FrameSlotInfo) block;
 
-        BlockEntity blockEntity = world.getBlockEntity(pos);
+        final BlockEntity blockEntity = world.getBlockEntity(pos);
         if (!(blockEntity instanceof FrameBlockEntity)) {
             return super.useOnBlock(context);
         }
-        FrameBlockEntity frame = (FrameBlockEntity) blockEntity;
+        final FrameBlockEntity frame = (FrameBlockEntity) blockEntity;
 
-        PlayerEntity player = context.getPlayer();
+        final PlayerEntity player = context.getPlayer();
         if (player == null) {
             return super.useOnBlock(context);
         }
@@ -240,16 +231,16 @@ public class FramersHammer extends Item {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    public TypedActionResult<ItemStack> use(final World world, final PlayerEntity user, final Hand hand) {
         if (!user.isSneaking()) {
             return super.use(world, user, hand);
         }
 
-        ItemStack stack = user.getStackInHand(hand);
-        CompoundTag tag = getTagOrAssignDefault(stack);
-        CopyMode mode = CopyMode.fromStringOrDefault(tag.getString("mode"));
+        final ItemStack stack = user.getStackInHand(hand);
+        final CompoundTag tag = getTagOrAssignDefault(stack);
+        final CopyMode mode = CopyMode.fromStringOrDefault(tag.getString("mode"));
 
-        CopyMode newMode = mode.next();
+        final CopyMode newMode = mode.next();
         tag.putString("mode", newMode.toString());
         user.sendMessage(new TranslatableText("gui.framity.framers_hammer." + newMode.translationKey), true);
 

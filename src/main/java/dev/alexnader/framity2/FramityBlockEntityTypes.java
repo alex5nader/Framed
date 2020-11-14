@@ -1,7 +1,6 @@
 package dev.alexnader.framity2;
 
 import dev.alexnader.framity2.block.entity.FrameBlockEntity;
-import dev.alexnader.framity2.block.frame.data.Sections;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.registry.Registry;
 
@@ -13,9 +12,9 @@ public class FramityBlockEntityTypes extends Registrar<BlockEntityType<?>> {
         super(Registry.BLOCK_ENTITY_TYPE);
     }
 
-    public final BlockEntityType<FrameBlockEntity> FRAME_BET = register(
+    public final BlockEntityType<FrameBlockEntity> FRAME = register(
         BlockEntityType.Builder.create(
-            () -> new FrameBlockEntity(this.FRAME_BET, new Sections(1)),
+            () -> new FrameBlockEntity(this.FRAME, META.FRAME_SECTIONS),
             BLOCKS.BLOCK_FRAME,
             BLOCKS.STAIRS_FRAME,
             BLOCKS.FENCE_FRAME,
@@ -26,9 +25,9 @@ public class FramityBlockEntityTypes extends Registrar<BlockEntityType<?>> {
         META.id("frame")
     );
 
-    public final BlockEntityType<FrameBlockEntity> SLAB_FRAME_BET = register(
+    public final BlockEntityType<FrameBlockEntity> SLAB_FRAME = register(
         BlockEntityType.Builder.create(
-            () -> new FrameBlockEntity(this.SLAB_FRAME_BET, new Sections(2)),
+            () -> new FrameBlockEntity(this.SLAB_FRAME, META.SLAB_FRAME_SECTIONS),
             BLOCKS.SLAB_FRAME
         ).build(null),
         META.id("slab_frame")

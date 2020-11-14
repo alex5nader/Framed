@@ -25,23 +25,18 @@ public class Framity2Client implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         QuadTransformRegistry.INSTANCE.register(
-            META.id("non_frex_frame_transform"),
-            FrameTransform.NonFrex.SOURCE
+            META.id("frame_transform"),
+            FrameTransform.SOURCE
         );
-        //TODO frex quad transform
-//        QuadTransformRegistry.INSTANCE.register(
-//            META.id("frex_frame_transform"),
-//            FrameTransform.Frex.SOURCE
-//        );
 
         ScreenRegistry.register(META.FRAME_SCREEN_HANDLER_TYPE, FrameScreen.FACTORY);
 
         //noinspection deprecation
         ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).register((atlas, registry) -> {
-            int textureStart = "textures/".length();
-            int pngLen = ".png".length();
+            final int textureStart = "textures/".length();
+            final int pngLen = ".png".length();
 
-            for (Identifier id : MinecraftClient.getInstance().getResourceManager().findResources("textures/framity", s->s.endsWith(".png"))) {
+            for (final Identifier id : MinecraftClient.getInstance().getResourceManager().findResources("textures/framity", s->s.endsWith(".png"))) {
                 registry.register(new Identifier(id.getNamespace(), id.getPath().substring(textureStart, id.getPath().length() - pngLen)));
             }
         });

@@ -4,7 +4,7 @@ import dev.alexnader.framity2.util.ConstructorCallback;
 import net.minecraft.block.DoorBlock;
 
 public class DoorFrame extends DoorBlock implements ConstructorCallback {
-    public DoorFrame(Settings settings) {
+    public DoorFrame(final Settings settings) {
         super(settings);
         onConstructor();
     }

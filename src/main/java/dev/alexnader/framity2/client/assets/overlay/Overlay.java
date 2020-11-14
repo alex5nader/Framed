@@ -5,75 +5,55 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 
-import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 import static dev.alexnader.framity2.Framity2.CODECS;
 import static dev.alexnader.framity2.client.Framity2Client.CLIENT_OVERLAYS;
+import static dev.alexnader.framity2.util.FunctionalUtil.orElseFlatGet;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class Overlay {
-    public static final Codec<Identifier> PARENT_CODEC = RecordCodecBuilder.create(inst -> inst.group(
-        Identifier.CODEC.fieldOf("parent").forGetter(i -> i)
+    public static final Codec<Optional<Identifier>> PARENT_CODEC = RecordCodecBuilder.create(inst -> inst.group(
+        Identifier.CODEC.optionalFieldOf("parent").forGetter(i -> i)
     ).apply(inst, i -> i));
 
     public static final Codec<Overlay> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-        Identifier.CODEC.fieldOf("parent").forGetter(o -> o.parent),
-        TextureSource.CODEC.fieldOf("textureSource").forGetter(o -> o.textureSource),
-        ColoredLike.CODEC.fieldOf("coloredLike").forGetter(o -> o.coloredLike),
-        CODECS.sidedMapOf(Offsetters.CODEC).fieldOf("offsets").forGetter(o -> o.sidedOffsetters)
+        Identifier.CODEC.optionalFieldOf("parent").forGetter(o -> o.parent),
+        TextureSource.CODEC.optionalFieldOf("textureSource").forGetter(o -> o.textureSource),
+        ColoredLike.CODEC.optionalFieldOf("coloredLike").forGetter(o -> o.coloredLike),
+        CODECS.sidedMapOf(Offsetters.CODEC).optionalFieldOf("offsets").forGetter(o -> o.sidedOffsetters)
     ).apply(inst, Overlay::new));
 
-    private final @Nullable Identifier parent;
-    private final @Nullable TextureSource textureSource;
-    private final @Nullable ColoredLike coloredLike;
-    private final @Nullable Map<Direction, Offsetters> sidedOffsetters;
+    private final Optional<Identifier> parent;
+    private final Optional<TextureSource> textureSource;
+    private final Optional<ColoredLike> coloredLike;
+    private final Optional<Map<Direction, Offsetters>> sidedOffsetters;
 
-    public Overlay(@Nullable Identifier parent, @Nullable TextureSource textureSource, @Nullable ColoredLike coloredLike, @Nullable Map<Direction, Offsetters> sidedOffsetters) {
+    public Overlay(final Optional<Identifier> parent, final Optional<TextureSource> textureSource, final Optional<ColoredLike> coloredLike, final Optional<Map<Direction, Offsetters>> sidedOffsetters) {
         this.parent = parent;
         this.textureSource = textureSource;
         this.coloredLike = coloredLike;
         this.sidedOffsetters = sidedOffsetters;
     }
 
-    @Nullable
-    public Identifier parent() {
-        return parent;
+    private <A> Optional<A> getFromParent(final Function<Overlay, Optional<A>> key) {
+        return orElseFlatGet(
+            key.apply(this),
+            () -> parent.flatMap(parent -> CLIENT_OVERLAYS.getOverlayFor(parent)).flatMap(key)
+        );
     }
 
-    public boolean isValid() {
-        return textureSource() != null;
+    public Optional<TextureSource> textureSource() {
+        return getFromParent(Overlay::textureSource);
     }
 
-    @Nullable
-    public TextureSource textureSource() {
-        if (textureSource != null) {
-            return textureSource;
-        } else if (parent != null) {
-            return CLIENT_OVERLAYS.getOverlayFor(parent).textureSource();
-        } else {
-            return null;
-        }
+    public Optional<ColoredLike> coloredLike() {
+        return getFromParent(Overlay::coloredLike);
     }
 
-    @Nullable
-    public ColoredLike coloredLike() {
-        if (coloredLike != null) {
-            return coloredLike;
-        } else if (parent != null) {
-            return CLIENT_OVERLAYS.getOverlayFor(parent).coloredLike();
-        } else {
-            return null;
-        }
-    }
-
-    @Nullable
-    public Map<Direction, Offsetters> sidedOffsetters() {
-        if (sidedOffsetters != null) {
-            return sidedOffsetters;
-        } else if (parent != null) {
-            return CLIENT_OVERLAYS.getOverlayFor(parent).sidedOffsetters();
-        } else {
-            return null;
-        }
+    public Optional<Map<Direction, Offsetters>> sidedOffsetters() {
+        return getFromParent(Overlay::sidedOffsetters);
     }
 }

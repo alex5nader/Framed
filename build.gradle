@@ -35,8 +35,6 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-//    modImplementation "net.fabricmc:fabric-language-scala:${project.scala_version}"
-
     implementation 'com.google.code.gson:gson:2.8.6'
 
     modImplementation ("io.github.cottonmc:LibGui:${project.libgui_version}") {

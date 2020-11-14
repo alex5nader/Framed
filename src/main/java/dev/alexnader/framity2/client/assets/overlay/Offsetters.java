@@ -21,9 +21,9 @@ public class Offsetters {
 
     public Offsetters(
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        @Nonnull Optional<Offsetter> u,
+        @Nonnull final Optional<Offsetter> u,
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        @Nonnull Optional<Offsetter> v
+        @Nonnull final Optional<Offsetter> v
     ) {
         this.u = u;
         this.v = v;

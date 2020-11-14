@@ -5,7 +5,6 @@ import dev.alexnader.framity2.block.frame.data.FrameData;
 import dev.alexnader.framity2.block.frame.data.Sections;
 import dev.alexnader.framity2.gui.FrameGuiDescription;
 import dev.alexnader.framity2.items.SpecialItems;
-import dev.alexnader.framity2.mixin.mc.GetItemBeforeEmpty;
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -28,17 +27,15 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.util.Unit;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static dev.alexnader.framity2.Framity2.OVERLAYS;
 import static dev.alexnader.framity2.Framity2.SPECIAL_ITEMS;
 import static dev.alexnader.framity2.util.GetItemBeforeEmptyUtil.getItemBeforeEmpty;
 import static dev.alexnader.framity2.util.ValidQuery.checkIf;
@@ -46,7 +43,7 @@ import static dev.alexnader.framity2.util.ValidQuery.checkIf;
 public class FrameBlockEntity extends LockableContainerBlockEntity implements ExtendedScreenHandlerFactory, RenderAttachmentBlockEntity, BlockEntityClientSerializable {
     public FrameData data;
 
-    public FrameBlockEntity(BlockEntityType<?> type, Sections sections) {
+    public FrameBlockEntity(final BlockEntityType<?> type, final Sections sections) {
         super(type);
 
         data = new FrameData(sections);
@@ -76,7 +73,7 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
         return data.baseStates();
     }
 
-    public void copyFrom(int slot, ItemStack stack, int count, boolean take) {
+    public void copyFrom(final int slot, final ItemStack stack, final int count, final boolean take) {
         final ItemStack newStack = stack.copy();
         final int realCount = Math.min(count, stack.getCount());
 
@@ -95,7 +92,7 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
     }
 
     @Override
-    public boolean isValid(int slot, ItemStack stack) {
+    public boolean isValid(final int slot, final ItemStack stack) {
         switch (sections().findSectionIndexOf(slot)) {
         case Sections.BASE_INDEX:
             return checkIf(stack).isValidForBase(s -> Optional.of(s.getBlock().getDefaultState()), world, pos).isPresent();
@@ -108,7 +105,7 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
         }
     }
 
-    private void beforeRemove(int slot) {
+    private void beforeRemove(final int slot) {
         switch (sections().findSectionIndexOf(slot)) {
         case Sections.BASE_INDEX:
             baseStates()[sections().base().makeRelative(slot)] = Optional.empty();
@@ -124,7 +121,7 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
     }
 
     @Override
-    public ItemStack removeStack(int slot, int amount) {
+    public ItemStack removeStack(final int slot, final int amount) {
         beforeRemove(slot);
 
         return Optional.of(slot)
@@ -143,7 +140,7 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
     }
 
     @Override
-    public ItemStack removeStack(int slot) {
+    public ItemStack removeStack(final int slot) {
         beforeRemove(slot);
 
         markDirty();
@@ -156,7 +153,7 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
     }
 
     @Override
-    public ItemStack getStack(int slot) {
+    public ItemStack getStack(final int slot) {
         return items()[slot].orElse(ItemStack.EMPTY);
     }
 
@@ -171,7 +168,7 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity player) {
+    public boolean canPlayerUse(final PlayerEntity player) {
         return true;
     }
 
@@ -183,10 +180,10 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setStack(final int slot, final ItemStack stack) {
         final int sectionIndex = sections().findSectionIndexOf(slot);
 
-        Runnable setStack = () -> {
+        final Runnable setStack = () -> {
             items()[slot] = Optional.of(stack);
             stack.setCount(Math.min(stack.getCount(), getMaxCountPerStack()));
             markDirty();
@@ -202,14 +199,14 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
                 .map(i -> ((BlockItem) i).getBlock().getDefaultState());
             break;
         case Sections.SPECIAL_INDEX:
-            SpecialItems.SpecialItem old = SPECIAL_ITEMS.MAP.get(getItemBeforeEmpty(getStack(slot)));
+            final SpecialItems.SpecialItem old = SPECIAL_ITEMS.MAP.get(getItemBeforeEmpty(getStack(slot)));
             if (old != null && world != null) {
                 old.onRemove(world, this);
             }
 
             setStack.run();
 
-            SpecialItems.SpecialItem _new = SPECIAL_ITEMS.MAP.get(getStack(slot).getItem());
+            final SpecialItems.SpecialItem _new = SPECIAL_ITEMS.MAP.get(getStack(slot).getItem());
             if (_new != null && world != null) {
                 _new.onAdd(world, this);
             }
@@ -245,44 +242,42 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
         //noinspection UnstableApiUsage
         return Streams.zip(
             Arrays.stream(baseStates()),
-            overlayItems().stream()
-                .map(i -> i.<Identifier>flatMap(i2 -> {
-                    throw new RuntimeException("Overlays are not implemented yet.");
-                })),
-            Pair::new);
+            overlayItems().stream().map(i -> i.flatMap(OVERLAYS::getOverlayId)),
+            Pair::new
+        );
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag tag) {
+    public CompoundTag toTag(final CompoundTag tag) {
         toClientTag(tag);
         return super.toTag(tag);
     }
 
     @Override
-    public void fromTag(BlockState state, CompoundTag tag) {
+    public void fromTag(final BlockState state, final CompoundTag tag) {
         fromClientTag(tag);
         super.fromTag(state, tag);
     }
 
     @Override
-    public CompoundTag toClientTag(CompoundTag tag) {
+    public CompoundTag toClientTag(final CompoundTag tag) {
         tag.put("frameData", data.toTag());
         return tag;
     }
 
     @Override
-    public void fromClientTag(CompoundTag compoundTag) {
+    public void fromClientTag(final CompoundTag compoundTag) {
         data = FrameData.fromTag(compoundTag.getCompound("frameData"));
         this.markDirty();
     }
 
     @Override
-    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+    protected ScreenHandler createScreenHandler(final int syncId, final PlayerInventory playerInventory) {
         return new FrameGuiDescription(syncId, playerInventory, ScreenHandlerContext.create(world, pos));
     }
 
     @Override
-    public void writeScreenOpeningData(ServerPlayerEntity serverPlayerEntity, PacketByteBuf packetByteBuf) {
+    public void writeScreenOpeningData(final ServerPlayerEntity serverPlayerEntity, final PacketByteBuf packetByteBuf) {
         packetByteBuf.writeBlockPos(pos);
     }
 

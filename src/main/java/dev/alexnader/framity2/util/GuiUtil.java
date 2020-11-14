@@ -11,20 +11,20 @@ import net.minecraft.text.TranslatableText;
 public enum GuiUtil {
     ;
 
-    public static WLabel label(String translationKey) {
+    public static WLabel label(final String translationKey) {
         return new WLabel(new TranslatableText(translationKey));
     }
 
-    public static <L extends WLabel> L centered(L label) {
+    public static <L extends WLabel> L centered(final L label) {
         label.setHorizontalAlignment(HorizontalAlignment.CENTER);
         label.setVerticalAlignment(VerticalAlignment.CENTER);
         return label;
     }
 
     public static <S extends WItemSlot> S slotRow(
-        Function5<Inventory, Integer, Integer, Integer, Boolean, S> constructor,
-        Inventory inventory,
-        Section section
+        final Function5<Inventory, Integer, Integer, Integer, Boolean, S> constructor,
+        final Inventory inventory,
+        final Section section
     ) {
         return constructor.apply(inventory, section.start(), section.size(), 1, false);
     }

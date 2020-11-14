@@ -2,7 +2,6 @@ package dev.alexnader.framity2.mixin.local;
 
 import com.mojang.datafixers.util.Function3;
 import com.mojang.datafixers.util.Unit;
-import dev.alexnader.framity2.Framity2;
 import dev.alexnader.framity2.block.FrameSlotInfo;
 import dev.alexnader.framity2.block.entity.FrameBlockEntity;
 import dev.alexnader.framity2.block.frame.*;
@@ -13,7 +12,6 @@ import dev.alexnader.framity2.util.ValidQuery;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.FenceGateBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -51,15 +49,15 @@ import static dev.alexnader.framity2.util.ValidQuery.checkIf;
     SlabFrame.class,
     StairsFrame.class,
     FenceFrame.class,
-    FenceGateBlock.class,
+    FenceGateFrame.class,
     TrapdoorFrame.class,
     DoorFrame.class,
     PathFrame.class,
     TorchFrame.class,
     WallTorchFrame.class
 })
-public abstract class FrameBehaviourMixin extends Block implements BlockEntityProvider, ConstructorCallback, Frame, FrameSlotInfo {
-    public FrameBehaviourMixin(Settings settings) {
+public abstract class FrameBehaviour extends Block implements BlockEntityProvider, ConstructorCallback, Frame, FrameSlotInfo {
+    private FrameBehaviour(final Settings settings) {
         super(settings);
         throw new IllegalStateException("Mixin constructor should never run.");
     }
@@ -72,30 +70,33 @@ public abstract class FrameBehaviourMixin extends Block implements BlockEntityPr
         );
     }
 
-    @Unique
-    private final Map<BlockPos, PlayerEntity> posToPlayer = new HashMap<>();
+    @Unique @Nullable
+    private PlayerEntity breaker;
+
+//    @Unique
+//    private Map<BlockPos, PlayerEntity> posToPlayer = new HashMap<>();
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    public void appendProperties(final StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
         builder.add(Properties.LIT, PROPERTIES.HAS_REDSTONE);
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean emitsRedstonePower(BlockState state) {
+    public boolean emitsRedstonePower(final BlockState state) {
         return state.get(PROPERTIES.HAS_REDSTONE);
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+    public int getWeakRedstonePower(final BlockState state, final BlockView world, final BlockPos pos, final Direction direction) {
         return state.get(PROPERTIES.HAS_REDSTONE) ? 15 : 0;
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean onSyncedBlockEvent(BlockState state, World world, BlockPos pos, int type, int data) {
+    public boolean onSyncedBlockEvent(final BlockState state, final World world, final BlockPos pos, final int type, final int data) {
         super.onSyncedBlockEvent(state, world, pos, type, data);
 
         final @Nullable BlockEntity blockEntity = world.getBlockEntity(pos);
@@ -110,11 +111,11 @@ public abstract class FrameBehaviourMixin extends Block implements BlockEntityPr
     @SuppressWarnings("deprecation")
     @Nullable
     @Override
-    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
+    public NamedScreenHandlerFactory createScreenHandlerFactory(final BlockState state, final World world, final BlockPos pos) {
         return (NamedScreenHandlerFactory) world.getBlockEntity(pos);
     }
 
-    private void removeStack(World world, FrameBlockEntity from, PlayerEntity to, int slot, boolean giveItem) {
+    private void removeStack(final World world, final FrameBlockEntity from, final PlayerEntity to, final int slot, final boolean giveItem) {
         final ItemStack stack = from.removeStack(slot);
         if (!stack.isEmpty() && giveItem) {
             to.inventory.offerOrDrop(world, stack);
@@ -123,7 +124,7 @@ public abstract class FrameBehaviourMixin extends Block implements BlockEntityPr
         }
     }
 
-    private void onHammerRemove(World world, FrameBlockEntity frame, BlockState state, PlayerEntity player, boolean giveItem) {
+    private void onHammerRemove(final World world, final FrameBlockEntity frame, final BlockState state, final PlayerEntity player, final boolean giveItem) {
         world.setBlockState(frame.getPos(), state);
 
         if (player.isSneaking()) {
@@ -132,7 +133,7 @@ public abstract class FrameBehaviourMixin extends Block implements BlockEntityPr
             }
         } else {
             int slot = -1;
-            for (int i = frame.size(); i >= 0; i--) {
+            for (int i = frame.size() - 1; i >= 0; i--) {
                 if (frame.items()[i].isPresent()) {
                     slot = i;
                     break;
@@ -142,19 +143,18 @@ public abstract class FrameBehaviourMixin extends Block implements BlockEntityPr
                 removeStack(world, frame, player, slot, giveItem);
             }
         }
-
-//        frameEntity.markDirty(); //TODO: determine if this is necessary
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public void onStateReplaced(BlockState oldState, World world, BlockPos pos, BlockState newState, boolean moved) {
+    public void onStateReplaced(final BlockState oldState, final World world, final BlockPos pos, final BlockState newState, final boolean moved) {
         if (world.isClient || oldState.getBlock() == newState.getBlock()) {
             return;
         }
 
         final @Nullable BlockEntity blockEntity = world.getBlockEntity(pos);
-        final @Nullable PlayerEntity player = posToPlayer.get(pos);
+        final @Nullable PlayerEntity player = breaker;
+//        final @Nullable PlayerEntity player = posToPlayer.get(pos);
 
         // posToPlayer is only populated in creative mode, so don't give the item
         if (player != null) {
@@ -174,7 +174,7 @@ public abstract class FrameBehaviourMixin extends Block implements BlockEntityPr
 
     @SuppressWarnings("deprecation")
     @Override
-    public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+    public void onBlockBreakStart(final BlockState state, final World world, final BlockPos pos, final PlayerEntity player) {
         super.onBlockBreakStart(state, world, pos, player);
 
         if (world.isClient) {
@@ -192,19 +192,20 @@ public abstract class FrameBehaviourMixin extends Block implements BlockEntityPr
     }
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public void onBreak(final World world, final BlockPos pos, final BlockState state, final PlayerEntity player) {
         super.onBreak(world, pos, state, player);
 
         if (world.isClient || !player.isCreative()) {
             return;
         }
 
-        posToPlayer.put(pos, player);
+        breaker = player;
+//        posToPlayer.put(pos, player);
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(final BlockState state, final World world, final BlockPos pos, final PlayerEntity player, final Hand hand, final BlockHitResult hit) {
         final @Nullable BlockEntity blockEntity = world.getBlockEntity(pos);
 
         if (!(blockEntity instanceof FrameBlockEntity)) {
@@ -216,11 +217,11 @@ public abstract class FrameBehaviourMixin extends Block implements BlockEntityPr
         final @Nullable ItemStack playerStack = player.getMainHandStack();
 
         if (playerStack != null) {
-            Vec3d posInBlock = hit.getPos().subtract(Vec3d.of(hit.getBlockPos()));
-            int relativeSlot = getRelativeSlotAt(state, posInBlock, hit.getSide());
+            final Vec3d posInBlock = hit.getPos().subtract(Vec3d.of(hit.getBlockPos()));
+            final int relativeSlot = getRelativeSlotAt(state, posInBlock, hit.getSide());
 
-            Function3<List<Optional<ItemStack>>, Integer, Supplier<Unit>, ActionResult> swapItems = (slots, absoluteSlot, onSuccess) -> {
-                Optional<ItemStack> maybeStack = slots.get(relativeSlot);
+            final Function3<List<Optional<ItemStack>>, Integer, Supplier<Unit>, ActionResult> swapItems = (slots, absoluteSlot, onSuccess) -> {
+                final Optional<ItemStack> maybeStack = slots.get(relativeSlot);
                 if (playerStack.getItem() != maybeStack.orElse(ItemStack.EMPTY).getItem()) {
                     if (!world.isClient) {
                         if (!player.isCreative() && maybeStack.isPresent()) {
@@ -235,25 +236,25 @@ public abstract class FrameBehaviourMixin extends Block implements BlockEntityPr
                 }
             };
 
-            ValidQuery.ItemStackValidQuery query = checkIf(playerStack);
+            final ValidQuery.ItemStackValidQuery query = checkIf(playerStack);
 
             if (query.isValidForOverlay()) {
-                int absoluteSlot = frame.sections().overlay().makeAbsolute(relativeSlot);
+                final int absoluteSlot = frame.sections().overlay().makeAbsolute(relativeSlot);
                 return swapItems.apply(frame.overlayItems(), absoluteSlot, () -> Unit.INSTANCE);
             }
 
-            Optional<BlockState> maybeBaseState = query.isValidForBase(i -> Optional.ofNullable(i.getBlock().getPlacementState(new ItemPlacementContext(new ItemUsageContext(player, hand, hit)))), world, pos);
+            final Optional<BlockState> maybeBaseState = query.isValidForBase(i -> Optional.ofNullable(i.getBlock().getPlacementState(new ItemPlacementContext(new ItemUsageContext(player, hand, hit)))), world, pos);
             if (maybeBaseState.isPresent()) {
-                int absoluteSlot = frame.sections().base().makeAbsolute(relativeSlot);
-                swapItems.apply(frame.baseItems(), absoluteSlot, () -> {
+                final int absoluteSlot = frame.sections().base().makeAbsolute(relativeSlot);
+                return swapItems.apply(frame.baseItems(), absoluteSlot, () -> {
                     frame.baseStates()[relativeSlot] = maybeBaseState;
                     return Unit.INSTANCE;
                 });
             }
 
             if (query.isValidForSpecial()) {
-                SpecialItems.SpecialItem specialItem = SPECIAL_ITEMS.MAP.get(playerStack.getItem());
-                int slot = frame.sections().special().makeAbsolute(specialItem.offset());
+                final SpecialItems.SpecialItem specialItem = SPECIAL_ITEMS.MAP.get(playerStack.getItem());
+                final int slot = frame.sections().special().makeAbsolute(specialItem.offset());
 
                 if (frame.getStack(slot).isEmpty()) {
                     if (!world.isClient) {
@@ -276,15 +277,15 @@ public abstract class FrameBehaviourMixin extends Block implements BlockEntityPr
     }
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        boolean tryCopy;
+    public void onPlaced(final World world, final BlockPos pos, final BlockState state, @Nullable final LivingEntity placer, final ItemStack itemStack) {
+        final boolean tryCopy;
 
         if (placer instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) placer;
+            final PlayerEntity player = (PlayerEntity) placer;
             if (!(player.getOffHandStack().getItem() == ITEMS.FRAMERS_HAMMER) || player.getOffHandStack().getTag() == null) {
                 tryCopy = false;
             } else {
-                BlockEntity blockEntity = world.getBlockEntity(pos);
+                final BlockEntity blockEntity = world.getBlockEntity(pos);
                 if (blockEntity instanceof FrameBlockEntity) {
                     tryCopy = FramersHammer.Data.fromTag(player.getOffHandStack().getTag()).applySettings(this, state, (FrameBlockEntity) blockEntity, player, world);
                 } else {

@@ -4,14 +4,22 @@ import dev.alexnader.framity2.block.FrameSlotInfo;
 import dev.alexnader.framity2.block.entity.FrameBlockEntity;
 import dev.alexnader.framity2.block.frame.data.Sections;
 import dev.alexnader.framity2.util.ConstructorCallback;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.BlockView;
 
-public class SlabFrame extends SlabBlock implements FrameSlotInfo, ConstructorCallback {
-    public SlabFrame(Settings settings) {
+import javax.annotation.Nullable;
+
+import static dev.alexnader.framity2.Framity2.BLOCK_ENTITY_TYPES;
+import static dev.alexnader.framity2.Framity2.META;
+
+public class SlabFrame extends SlabBlock implements FrameSlotInfo, ConstructorCallback, BlockEntityProvider {
+    public SlabFrame(final Settings settings) {
         super(settings);
         onConstructor();
     }
@@ -20,11 +28,11 @@ public class SlabFrame extends SlabBlock implements FrameSlotInfo, ConstructorCa
     public void onConstructor() {
         throw new IllegalStateException("SlabFrame::onConstructor should be overwritten by mixin.");
     }
-    public static int LOWER_SLOT = 0;
-    public static int UPPER_SLOT = 1;
+    public static final int LOWER_SLOT = 0;
+    public static final int UPPER_SLOT = 1;
 
     @Override
-    public int getRelativeSlotAt(BlockState state, Vec3d posInBlock, Direction side) {
+    public int getRelativeSlotAt(final BlockState state, final Vec3d posInBlock, final Direction side) {
         switch (side) {
         case UP:
             return posInBlock.y == 0.5 ? LOWER_SLOT : UPPER_SLOT;
@@ -36,8 +44,8 @@ public class SlabFrame extends SlabBlock implements FrameSlotInfo, ConstructorCa
     }
 
     @Override
-    public boolean absoluteSlotIsValid(FrameBlockEntity frame, BlockState state, int slot) {
-        int wantedSlot;
+    public boolean absoluteSlotIsValid(final FrameBlockEntity frame, final BlockState state, final int slot) {
+        final int wantedSlot;
         switch (state.get(Properties.SLAB_TYPE)) {
         case DOUBLE:
             return true;
@@ -64,7 +72,13 @@ public class SlabFrame extends SlabBlock implements FrameSlotInfo, ConstructorCa
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean isSideInvisible(BlockState state, BlockState stateFrom, Direction direction) {
+    public boolean isSideInvisible(final BlockState state, final BlockState stateFrom, final Direction direction) {
         return super.isSideInvisible(state, stateFrom, direction) || (state == stateFrom);
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(final BlockView world) {
+        return new FrameBlockEntity(BLOCK_ENTITY_TYPES.SLAB_FRAME, META.SLAB_FRAME_SECTIONS);
     }
 }

@@ -8,14 +8,14 @@ public class Float4 {
     public final float c;
     public final float d;
 
-    public Float4(float a, float b, float c, float d) {
+    public Float4(final float a, final float b, final float c, final float d) {
         this.a = a;
         this.b = b;
         this.c = c;
         this.d = d;
     }
 
-    public static Float4 fromIterator(PrimitiveIterator.OfDouble doubles) {
+    public static Float4 fromIterator(final PrimitiveIterator.OfDouble doubles) {
         return new Float4((float) doubles.nextDouble(), (float) doubles.nextDouble(), (float) doubles.nextDouble(), (float) doubles.nextDouble());
     }
 }

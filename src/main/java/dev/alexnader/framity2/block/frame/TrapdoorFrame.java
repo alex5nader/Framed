@@ -4,7 +4,7 @@ import dev.alexnader.framity2.util.ConstructorCallback;
 import net.minecraft.block.TrapdoorBlock;
 
 public class TrapdoorFrame extends TrapdoorBlock implements ConstructorCallback {
-    public TrapdoorFrame(Settings settings) {
+    public TrapdoorFrame(final Settings settings) {
         super(settings);
         onConstructor();
     }

@@ -7,12 +7,12 @@ public class Section implements Iterable<Integer> {
     private final int start;
     private final int end;
 
-    public Section(int start, int end) {
+    public Section(final int start, final int end) {
         this.start = start;
         this.end = end;
     }
 
-    public static Section exclusive(int start, int end) {
+    public static Section exclusive(final int start, final int end) {
         return new Section(start, end);
     }
 
@@ -28,20 +28,20 @@ public class Section implements Iterable<Integer> {
         return end - start;
     }
 
-    public int makeRelative(int absolute) {
+    public int makeRelative(final int absolute) {
         return absolute - start;
     }
 
-    public int makeAbsolute(int relative) {
+    public int makeAbsolute(final int relative) {
         return relative + start;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Section section = (Section) o;
+        final Section section = (Section) o;
 
         if (start != section.start) return false;
         return end == section.end;
@@ -54,7 +54,7 @@ public class Section implements Iterable<Integer> {
         return result;
     }
 
-    public boolean contains(int i) {
+    public boolean contains(final int i) {
         return start <= i && i < end;
     }
 

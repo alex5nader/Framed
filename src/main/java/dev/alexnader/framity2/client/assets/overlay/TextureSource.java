@@ -6,6 +6,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 
 import java.util.EnumMap;
+import java.util.Optional;
 
 import static dev.alexnader.framity2.Framity2.CODECS;
 
@@ -23,30 +24,28 @@ public abstract class TextureSource {
             }
         });
 
-    public TextureSourceKind kind;
+    public final TextureSourceKind kind;
 
-    protected TextureSource(TextureSourceKind kind) {
+    protected TextureSource(final TextureSourceKind kind) {
         this.kind = kind;
     }
 
-    public TextureSourceKind kind() {
-        return kind;
-    }
-
-    public abstract Identifier textureFor(Direction side);
+    public abstract Optional<Identifier> textureFor(Direction side);
 
     public static class Single extends TextureSource {
-        public static final Codec<Single> SINGLE_CODEC = Identifier.CODEC.xmap(Single::new, s -> s.texture);
+        @SuppressWarnings("OptionalGetWithoutIsPresent")
+        public static final Codec<Single> SINGLE_CODEC = Identifier.CODEC.xmap(Single::new, s -> s.texture.get());
 
-        private final Identifier texture;
+        @SuppressWarnings("OptionalUsedAsFieldOrParameterType") // used to prevent re-wrapping each time texture is requested.
+        private final Optional<Identifier> texture;
 
-        public Single(Identifier texture) {
+        public Single(final Identifier texture) {
             super(TextureSourceKind.SINGLE);
-            this.texture = texture;
+            this.texture = Optional.of(texture);
         }
 
         @Override
-        public Identifier textureFor(Direction side) {
+        public Optional<Identifier> textureFor(final Direction side) {
             return texture;
         }
     }
@@ -59,14 +58,14 @@ public abstract class TextureSource {
 
         private final EnumMap<Direction, Identifier> textureBySide;
 
-        public Sided(EnumMap<Direction, Identifier> textureBySide) {
+        public Sided(final EnumMap<Direction, Identifier> textureBySide) {
             super(TextureSourceKind.SIDED);
             this.textureBySide = textureBySide;
         }
 
         @Override
-        public Identifier textureFor(Direction side) {
-            return textureBySide.get(side);
+        public Optional<Identifier> textureFor(final Direction side) {
+            return Optional.ofNullable(textureBySide.get(side));
         }
     }
 }

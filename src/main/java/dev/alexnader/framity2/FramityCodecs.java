@@ -45,8 +45,8 @@ public class FramityCodecs {
             Identifiable::value
         );
 
-    public <V> Codec<Map<Direction, V>> sidedMapOf(Codec<V> valueCodec) {
-        Codec<Pair<List<Direction>, V>> itemCodec = RecordCodecBuilder.create(inst -> inst.group(
+    public <V> Codec<Map<Direction, V>> sidedMapOf(final Codec<V> valueCodec) {
+        final Codec<Pair<List<Direction>, V>> itemCodec = RecordCodecBuilder.create(inst -> inst.group(
             DIRECTION.listOf().fieldOf("sides").forGetter(Pair::getFirst),
             valueCodec.fieldOf("value").forGetter(Pair::getSecond)
         ).apply(inst, Pair::new));

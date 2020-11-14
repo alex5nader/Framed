@@ -6,7 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.Direction;
 
 public class PathFrame extends PathBlock implements ConstructorCallback {
-    public PathFrame(Settings settings) {
+    public PathFrame(final Settings settings) {
         super(settings);
         onConstructor();
     }
@@ -18,7 +18,7 @@ public class PathFrame extends PathBlock implements ConstructorCallback {
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean isSideInvisible(BlockState state, BlockState stateFrom, Direction direction) {
+    public boolean isSideInvisible(final BlockState state, final BlockState stateFrom, final Direction direction) {
         return super.isSideInvisible(state, stateFrom, direction) || (state == stateFrom);
     }
 }

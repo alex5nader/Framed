@@ -24,12 +24,12 @@ import static dev.alexnader.framity2.Framity2.META;
 public class OverlayAssetListener implements SimpleResourceReloadListener<Collection<Identifier>> {
     private final Map<Identifier, Overlay> overlayInfoMap = new HashMap<>();
 
-    public Overlay getOverlayFor(Identifier id) {
-        return overlayInfoMap.get(id);
+    public Optional<Overlay> getOverlayFor(final Identifier id) {
+        return Optional.ofNullable(overlayInfoMap.get(id));
     }
 
     @Override
-    public CompletableFuture<Collection<Identifier>> load(ResourceManager resourceManager, Profiler profiler, Executor executor) {
+    public CompletableFuture<Collection<Identifier>> load(final ResourceManager resourceManager, final Profiler profiler, final Executor executor) {
         return CompletableFuture.supplyAsync(() -> {
             overlayInfoMap.clear();
 
@@ -37,8 +37,8 @@ public class OverlayAssetListener implements SimpleResourceReloadListener<Collec
         }, executor);
     }
 
-    private DataResult<Unit> parseOverlayAndDependencies(ResourceManager resourceManager, Identifier rootOverlayId) {
-        Set<Identifier> loadedDependencies = new HashSet<>();
+    private DataResult<Unit> parseOverlayAndDependencies(final ResourceManager resourceManager, final Identifier rootOverlayId) {
+        final Set<Identifier> loadedDependencies = new HashSet<>();
 
         if (!overlayInfoMap.containsKey(rootOverlayId)) {
             return parseOverlay(resourceManager, loadedDependencies, rootOverlayId);
@@ -47,23 +47,25 @@ public class OverlayAssetListener implements SimpleResourceReloadListener<Collec
         }
     }
 
-    private DataResult<Unit> parseOverlay(ResourceManager resourceManager, Set<Identifier> loadedDependencies, Identifier overlayId) {
-        JsonElement element;
+    private DataResult<Unit> parseOverlay(final ResourceManager resourceManager, final Set<Identifier> loadedDependencies, final Identifier overlayId) {
+        final JsonElement element;
         try {
             element = new Gson().fromJson(new BufferedReader(new InputStreamReader(resourceManager.getResource(overlayId).getInputStream())), JsonElement.class);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             return DataResult.error("Exception while loading an overlay: " );
         }
 
-        DataResult<Pair<Overlay, JsonElement>> result = Overlay.PARENT_CODEC.decode(JsonOps.INSTANCE, element)
-            .flatMap(pair -> {
-                if (!loadedDependencies.add(pair.getFirst())) {
-                    return DataResult.error("Circular dependency: " + pair.getFirst() + " and " + overlayId + ".");
-                } else {
-                    parseOverlay(resourceManager, loadedDependencies, pair.getFirst());
-                    return DataResult.success(Unit.INSTANCE);
-                }
-            })
+        final DataResult<Pair<Overlay, JsonElement>> result = Overlay.PARENT_CODEC.decode(JsonOps.INSTANCE, element)
+            .flatMap(pair ->
+                pair.getFirst().map(parentId -> {
+                    if (!loadedDependencies.add(parentId)) {
+                        return DataResult.error("Circular dependency: " + pair.getFirst() + " and " + overlayId + ".");
+                    } else {
+                        parseOverlay(resourceManager, loadedDependencies, parentId);
+                        return DataResult.success(Unit.INSTANCE);
+                    }
+                }).orElse(DataResult.success(Unit.INSTANCE))
+            )
             .flatMap(unit -> Overlay.CODEC.decode(JsonOps.INSTANCE, element));
 
         result.get().mapLeft(pair -> {
@@ -75,12 +77,12 @@ public class OverlayAssetListener implements SimpleResourceReloadListener<Collec
     }
 
     @Override
-    public CompletableFuture<Void> apply(Collection<Identifier> identifiers, ResourceManager resourceManager, Profiler profiler, Executor executor) {
+    public CompletableFuture<Void> apply(final Collection<Identifier> identifiers, final ResourceManager resourceManager, final Profiler profiler, final Executor executor) {
         return CompletableFuture.runAsync(() -> {
-            for (Identifier id : identifiers) {
-                DataResult<Unit> result = parseOverlayAndDependencies(resourceManager, id);
+            for (final Identifier id : identifiers) {
+                final DataResult<Unit> result = parseOverlayAndDependencies(resourceManager, id);
 
-                result.get().ifRight(partial -> META.LOGGER.warn("Error while parsing overlay: " + partial.message()));
+                result.get().ifRight(partial -> META.LOGGER.warn("Error while parsing overlay \"" + id + "\" : " + partial.message()));
             }
         }, executor);
     }

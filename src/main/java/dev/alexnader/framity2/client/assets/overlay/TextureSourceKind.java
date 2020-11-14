@@ -6,7 +6,7 @@ public enum TextureSourceKind {
     SINGLE,
     SIDED;
 
-    public static DataResult<TextureSourceKind> fromString(String string) {
+    public static DataResult<TextureSourceKind> fromString(final String string) {
         switch (string) {
         case "single":
             return DataResult.success(SINGLE);

@@ -11,7 +11,7 @@ public class ColoredLike {
 
     private final BlockState colorSource;
 
-    public ColoredLike(BlockState colorSource) {
+    public ColoredLike(final BlockState colorSource) {
         this.colorSource = colorSource;
     }
 

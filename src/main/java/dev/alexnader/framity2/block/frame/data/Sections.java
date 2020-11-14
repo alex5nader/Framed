@@ -1,6 +1,5 @@
 package dev.alexnader.framity2.block.frame.data;
 
-import dev.alexnader.framity2.Framity2;
 import dev.alexnader.framity2.util.Section;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
@@ -18,16 +17,16 @@ public class Sections {
     public static final int OVERLAY_INDEX = 1;
     public static final int SPECIAL_INDEX = 2;
 
-    public static Sections fromTag(ListTag tag) {
+    public static Sections fromTag(final ListTag tag) {
         return new Sections(makeSections(tag.stream().mapToInt(t -> ((IntTag) t).getInt())));
     }
 
-    private static Section[] makeSections(IntStream sizes) {
+    private static Section[] makeSections(final IntStream sizes) {
         int start = 0;
         final int[] sizeArr = sizes.toArray();
         final Section[] sections = new Section[sizeArr.length];
         for (int i = 0, sizeArrLength = sizeArr.length; i < sizeArrLength; i++) {
-            int size = sizeArr[i];
+            final int size = sizeArr[i];
             sections[i] = Section.exclusive(start, start + size);
             start += size;
         }
@@ -36,15 +35,15 @@ public class Sections {
 
     private final Section[] sections;
 
-    public Sections(Section[] sections) {
+    public Sections(final Section[] sections) {
         this.sections = sections;
     }
 
-    public Sections(int partCount, int... otherSizes) {
+    public Sections(final int partCount, final int... otherSizes) {
         this(makeSections(IntStream.concat(IntStream.of(partCount, partCount, SPECIAL_ITEMS.MAP.size()), Arrays.stream(otherSizes))));
     }
 
-    public Section get(int index) {
+    public Section get(final int index) {
         return sections[index];
     }
 
@@ -68,11 +67,11 @@ public class Sections {
         return Section.exclusive(0, sections[sections.length - 1].end());
     }
 
-    public boolean containsSlot(int slot) {
+    public boolean containsSlot(final int slot) {
         return 0 <= slot && slot < sections[sections.length - 1].end();
     }
 
-    public int findSectionIndexOf(int absoluteIndex) {
+    public int findSectionIndexOf(final int absoluteIndex) {
         for (int i = 0; i < sections.length; i++) {
             if (absoluteIndex < sections[i].end()) {
                 return i;
@@ -98,7 +97,7 @@ public class Sections {
     public ListTag toTag() {
         final ListTag tag = new ListTag();
 
-        for (Section section : sections) {
+        for (final Section section : sections) {
             tag.add(IntTag.of(section.size()));
         }
 
@@ -106,11 +105,11 @@ public class Sections {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Sections sections1 = (Sections) o;
+        final Sections sections1 = (Sections) o;
 
         // Probably incorrect - comparing Object[] arrays with Arrays.equals
         return Arrays.equals(sections, sections1.sections);

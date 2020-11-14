@@ -10,7 +10,7 @@ public class FrameScreen extends CottonInventoryScreen<FrameGuiDescription> {
     public static final ScreenRegistry.Factory<FrameGuiDescription, FrameScreen> FACTORY =
         (desc, playerInventory, title) -> new FrameScreen(desc, playerInventory.player, title);
 
-    public FrameScreen(FrameGuiDescription description, PlayerEntity player, Text title) {
+    public FrameScreen(final FrameGuiDescription description, final PlayerEntity player, final Text title) {
         super(description, player, title);
     }
 }

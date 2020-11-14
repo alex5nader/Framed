@@ -7,11 +7,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 public class FrameData {
-    private static Optional<ItemStack>[] itemsFromTag(Sections sections, ListTag tag) {
+    private static Optional<ItemStack>[] itemsFromTag(final Sections sections, final ListTag tag) {
         final Optional<ItemStack>[] items = sections.makeItems();
 
         for (int i = 0, size = tag.size(); i < size; i++) {
@@ -25,7 +24,7 @@ public class FrameData {
         return items;
     }
 
-    private static Optional<BlockState>[] baseStatesFromTag(Sections sections, ListTag tag) {
+    private static Optional<BlockState>[] baseStatesFromTag(final Sections sections, final ListTag tag) {
         final Optional<BlockState>[] baseStates = sections.makeBaseStates();
 
         for (int i = 0, size = tag.size(); i < size; i++) {
@@ -40,7 +39,7 @@ public class FrameData {
         return baseStates;
     }
 
-    public static FrameData fromTag(CompoundTag tag) {
+    public static FrameData fromTag(final CompoundTag tag) {
         final Sections sections = Sections.fromTag(tag.getList("format", 3));
 
         return new FrameData(
@@ -54,13 +53,13 @@ public class FrameData {
     private final Optional<ItemStack>[] items;
     private final Optional<BlockState>[] baseStates;
 
-    public FrameData(Sections sections, Optional<ItemStack>[] items, Optional<BlockState>[] baseStates) {
+    public FrameData(final Sections sections, final Optional<ItemStack>[] items, final Optional<BlockState>[] baseStates) {
         this.sections = sections;
         this.items = items;
         this.baseStates = baseStates;
     }
 
-    public FrameData(Sections sections) {
+    public FrameData(final Sections sections) {
         this(sections, sections.makeItems(), sections.makeBaseStates());
     }
 

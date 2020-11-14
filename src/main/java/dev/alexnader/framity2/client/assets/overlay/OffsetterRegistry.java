@@ -12,11 +12,11 @@ public class OffsetterRegistry {
 
     private static final Map<Identifier, Identifiable<Codec<Offsetter>>> registeredOffsetters = new HashMap<>();
 
-    public static void register(Identifier id, Codec<Offsetter> codec) {
+    public static void register(final Identifier id, final Codec<Offsetter> codec) {
         registeredOffsetters.put(id, new Identifiable<>(codec, id));
     }
 
-    public static Identifiable<Codec<Offsetter>> get(Identifier id) {
+    public static Identifiable<Codec<Offsetter>> get(final Identifier id) {
         return registeredOffsetters.get(id);
     }
 }

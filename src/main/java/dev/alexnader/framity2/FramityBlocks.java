@@ -30,7 +30,7 @@ public class FramityBlocks extends Registrar<Block> {
     public final TorchFrame TORCH_FRAME;
     public final WallTorchFrame WALL_TORCH_FRAME;
 
-    private <A extends Block> A registerWithItem(A block, Identifier id, Item.Settings settings) {
+    private <A extends Block> A registerWithItem(final A block, final Identifier id, final Item.Settings settings) {
         Registry.register(Registry.ITEM, id, new BlockItem(block, settings));
         return register(block, id);
     }
@@ -42,12 +42,14 @@ public class FramityBlocks extends Registrar<Block> {
             .sounds(BlockSoundGroup.WOOD)
             .nonOpaque()
             .solidBlock((a, b, c) -> false)
-            .lightLevel((state) -> state.get(Properties.LIT) ? 15 : 0);
-        final Item.Settings itemSettings = new Item.Settings().group(META.MAIN_ITEM_GROUP);
+            .luminance(state -> state.get(Properties.LIT) ? 15 : 0);
+
+        final Item.Settings itemSettings = new Item.Settings()
+            .group(META.MAIN_ITEM_GROUP);
 
         BLOCK_FRAME = registerWithItem(new BlockFrame(frameSettings), META.id("block_frame"), itemSettings);
         SLAB_FRAME = registerWithItem(new SlabFrame(frameSettings), META.id("slab_frame"), itemSettings);
-        STAIRS_FRAME = registerWithItem(new StairsFrame(frameSettings), META.id("stairs_frame"), itemSettings);
+        STAIRS_FRAME = registerWithItem(new StairsFrame(BLOCK_FRAME.getDefaultState(), frameSettings), META.id("stairs_frame"), itemSettings);
         FENCE_FRAME = registerWithItem(new FenceFrame(frameSettings), META.id("fence_frame"), itemSettings);
         FENCE_GATE_FRAME = registerWithItem(new FenceGateFrame(frameSettings), META.id("fence_gate_frame"), itemSettings);
         TRAPDOOR_FRAME = registerWithItem(new TrapdoorFrame(frameSettings), META.id("trapdoor_frame"), itemSettings);

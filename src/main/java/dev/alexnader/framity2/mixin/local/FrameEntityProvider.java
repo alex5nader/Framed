@@ -1,14 +1,18 @@
 package dev.alexnader.framity2.mixin.local;
 
-import dev.alexnader.framity2.block.FrameSlotInfo;
 import dev.alexnader.framity2.block.entity.FrameBlockEntity;
 import dev.alexnader.framity2.block.frame.*;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.TorchBlock;
 import net.minecraft.block.WallTorchBlock;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
+
+import javax.annotation.Nullable;
+
+import static dev.alexnader.framity2.Framity2.BLOCK_ENTITY_TYPES;
+import static dev.alexnader.framity2.Framity2.META;
 
 @Mixin({
     BlockFrame.class,
@@ -21,18 +25,14 @@ import org.spongepowered.asm.mixin.Mixin;
     TorchBlock.class,
     WallTorchBlock.class
 })
-public abstract class SinglePartFrameMixin implements FrameSlotInfo {
-    private SinglePartFrameMixin() {
+public class FrameEntityProvider implements BlockEntityProvider {
+    private FrameEntityProvider() {
         throw new IllegalStateException("Mixin constructor should not run.");
     }
 
+    @Nullable
     @Override
-    public int getRelativeSlotAt(BlockState state, Vec3d posInBlock, Direction side) {
-        return 0;
-    }
-
-    @Override
-    public boolean absoluteSlotIsValid(FrameBlockEntity frame, BlockState state, int slot) {
-        return frame.sections().containsSlot(slot);
+    public BlockEntity createBlockEntity(final BlockView world) {
+        return new FrameBlockEntity(BLOCK_ENTITY_TYPES.FRAME, META.FRAME_SECTIONS);
     }
 }

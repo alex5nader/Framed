@@ -6,7 +6,7 @@ public class Identifiable<A> {
     private final A value;
     private final Identifier id;
 
-    public Identifiable(A value, Identifier id) {
+    public Identifiable(final A value, final Identifier id) {
         this.value = value;
         this.id = id;
     }

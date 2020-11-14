@@ -119,7 +119,7 @@
     }
   ],
   "jmx": {
-    "quad_transform": "framity:non_frex_frame_transform",
+    "quad_transform": "framity:frame_transform",
     "textures": {
       "particle": "framity:block/hollow_frame",
       "layered_textures": [
@@ -137,7 +137,7 @@
     }
   },
   "frex": {
-    "quad_transform": "framity:frex_frame_transform",
+    "quad_transform": "framity:frame_transform",
     "textures": {
       "particle": "framity:block/hollow_frame",
       "layered_textures": [

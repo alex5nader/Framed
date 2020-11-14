@@ -29,7 +29,7 @@ public abstract class ItemRendererMixin {
     @Shadow public abstract BakedModel getHeldItemModel(ItemStack stack, World world, LivingEntity entity);
 
     @Redirect(method = "getHeldItemModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemModels;getModel(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;"))
-    BakedModel getModelProxy(ItemModels itemModels, ItemStack stack) {
+    BakedModel getModelProxy(final ItemModels itemModels, final ItemStack stack) {
         if (stack.getItem() == ITEMS.FRAMERS_HAMMER) {
             return itemModels.getModelManager().getModel(new ModelIdentifier(META.id("framers_hammer_none"), "inventory"));
         }
@@ -37,11 +37,11 @@ public abstract class ItemRendererMixin {
     }
 
     @Redirect(method = "innerRenderInGui", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemRenderer;getHeldItemModel(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;)Lnet/minecraft/client/render/model/BakedModel;"))
-    BakedModel getHeldItemModelProxy(ItemRenderer itemRenderer, ItemStack stack, World world, LivingEntity entity) {
+    BakedModel getHeldItemModelProxy(final ItemRenderer itemRenderer, final ItemStack stack, final World world, final LivingEntity entity) {
         if (stack.getItem() == ITEMS.FRAMERS_HAMMER) {
-            ClientWorld clientWorld = world instanceof ClientWorld ? (ClientWorld) world : null;
-            BakedModel model = models.getModelManager().getModel(new ModelIdentifier(META.id("framers_hammer"), "inventory"));
-            BakedModel model2 = model.getOverrides().apply(model, stack, clientWorld, entity);
+            final ClientWorld clientWorld = world instanceof ClientWorld ? (ClientWorld) world : null;
+            final BakedModel model = models.getModelManager().getModel(new ModelIdentifier(META.id("framers_hammer"), "inventory"));
+            final BakedModel model2 = model.getOverrides().apply(model, stack, clientWorld, entity);
             return model2 == null ? models.getModelManager().getMissingModel() : model2;
         }
         return this.getHeldItemModel(stack, world, entity);

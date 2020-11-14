@@ -11,7 +11,7 @@ import static dev.alexnader.framity2.Framity2.SPECIAL_ITEMS;
 import static dev.alexnader.framity2.util.GuiUtil.*;
 
 public class FrameGuiDescription extends SyncedGuiDescription {
-    public FrameGuiDescription(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
+    public FrameGuiDescription(final int syncId, final PlayerInventory playerInventory, final ScreenHandlerContext context) {
         this(
             syncId,
             playerInventory,
@@ -21,10 +21,10 @@ public class FrameGuiDescription extends SyncedGuiDescription {
         );
     }
 
-    private FrameGuiDescription(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, FrameBlockEntity frame) {
+    private FrameGuiDescription(final int syncId, final PlayerInventory playerInventory, final ScreenHandlerContext context, final FrameBlockEntity frame) {
         super(META.FRAME_SCREEN_HANDLER_TYPE, syncId, playerInventory, SyncedGuiDescription.getBlockInventory(context, frame.size()), SyncedGuiDescription.getBlockPropertyDelegate(context));
 
-        WGridPanel root = new WGridPanel(9);
+        final WGridPanel root = new WGridPanel(9);
 
         root.add(centered(label("gui.framity.frame.base_label")), 1, 2, 8, 2);
 
