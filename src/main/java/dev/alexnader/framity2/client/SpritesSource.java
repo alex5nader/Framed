@@ -2,6 +2,8 @@ package dev.alexnader.framity2.client;
 
 import com.mojang.datafixers.util.Pair;
 import dev.alexnader.framity2.mixin.mc.BakedQuadAccess;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.model.ModelHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.BakedModel;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.Random;
 
+@Environment(EnvType.CLIENT)
 public class SpritesSource {
     @SuppressWarnings("unchecked")
     private final List<BakedQuad>[] quads = new List[7];

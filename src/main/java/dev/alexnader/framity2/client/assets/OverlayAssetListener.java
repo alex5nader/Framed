@@ -6,6 +6,8 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import dev.alexnader.framity2.client.assets.overlay.Overlay;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -21,11 +23,12 @@ import java.util.concurrent.Executor;
 
 import static dev.alexnader.framity2.Framity2.META;
 
+@Environment(EnvType.CLIENT)
 public class OverlayAssetListener implements SimpleResourceReloadListener<Collection<Identifier>> {
-    private final Map<Identifier, Overlay> overlayInfoMap = new HashMap<>();
+    private final Map<Identifier, Overlay.Some> overlayInfoMap = new HashMap<>();
 
-    public Optional<Overlay> getOverlayFor(final Identifier id) {
-        return Optional.ofNullable(overlayInfoMap.get(id));
+    public Overlay getOverlayFor(final Identifier id) {
+        return Overlay.ofNullable(overlayInfoMap.get(id));
     }
 
     @Override
@@ -55,7 +58,7 @@ public class OverlayAssetListener implements SimpleResourceReloadListener<Collec
             return DataResult.error("Exception while loading an overlay: " );
         }
 
-        final DataResult<Pair<Overlay, JsonElement>> result = Overlay.PARENT_CODEC.decode(JsonOps.INSTANCE, element)
+        final DataResult<Pair<Overlay.Some, JsonElement>> result = Overlay.Some.PARENT_CODEC.decode(JsonOps.INSTANCE, element)
             .flatMap(pair ->
                 pair.getFirst().map(parentId -> {
                     if (!loadedDependencies.add(parentId)) {
@@ -66,7 +69,7 @@ public class OverlayAssetListener implements SimpleResourceReloadListener<Collec
                     }
                 }).orElse(DataResult.success(Unit.INSTANCE))
             )
-            .flatMap(unit -> Overlay.CODEC.decode(JsonOps.INSTANCE, element));
+            .flatMap(unit -> Overlay.Some.CODEC.decode(JsonOps.INSTANCE, element));
 
         result.get().mapLeft(pair -> {
             overlayInfoMap.put(overlayId, pair.getFirst());
@@ -82,7 +85,7 @@ public class OverlayAssetListener implements SimpleResourceReloadListener<Collec
             for (final Identifier id : identifiers) {
                 final DataResult<Unit> result = parseOverlayAndDependencies(resourceManager, id);
 
-                result.get().ifRight(partial -> META.LOGGER.warn("Error while parsing overlay \"" + id + "\" : " + partial.message()));
+                result.get().ifRight(partial -> META.LOGGER.warn("Error while parsing overlay \"" + id + "\": " + partial.message()));
             }
         }, executor);
     }

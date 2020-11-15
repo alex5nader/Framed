@@ -2,11 +2,14 @@ package dev.alexnader.framity2.client.assets.overlay;
 
 import com.mojang.serialization.Codec;
 import dev.alexnader.framity2.util.Identifiable;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Environment(EnvType.CLIENT)
 public class OffsetterRegistry {
     private OffsetterRegistry() { }
 

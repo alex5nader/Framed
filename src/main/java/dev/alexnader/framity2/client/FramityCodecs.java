@@ -1,4 +1,4 @@
-package dev.alexnader.framity2;
+package dev.alexnader.framity2.client;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
@@ -7,6 +7,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.alexnader.framity2.client.assets.overlay.Offsetter;
 import dev.alexnader.framity2.client.assets.overlay.OffsetterRegistry;
 import dev.alexnader.framity2.util.Identifiable;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Environment(EnvType.CLIENT)
 public class FramityCodecs {
     public final Codec<Direction> DIRECTION = Codec.STRING.flatXmap(
         name -> {
@@ -42,7 +45,9 @@ public class FramityCodecs {
         )
         .dispatch(
             o -> OffsetterRegistry.get(o.getId()),
-            Identifiable::value
+            codec -> RecordCodecBuilder.create(inst -> inst.group(
+                codec.value().fieldOf("value").forGetter(c -> c)
+            ).apply(inst, c -> c))
         );
 
     public <V> Codec<Map<Direction, V>> sidedMapOf(final Codec<V> valueCodec) {

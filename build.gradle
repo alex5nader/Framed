@@ -44,10 +44,10 @@ dependencies {
     compileOnly "org.apiguardian:apiguardian-api:1.0.0"
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
 
-    modApi ("grondag:frex-${project.mc_tag}:${project.frex_version}.+") { transitive = false }
-    modImplementation ("grondag:jmx-${project.mc_tag}:${project.jmx_version}.+") { transitive = false }
+    modApi ("grondag:frex-${project.mc_tag}:${project.frex_version}") { transitive = false }
+    modImplementation ("grondag:jmx-${project.mc_tag}:${project.jmx_version}") { transitive = false }
 
-    modRuntime "grondag:canvas-${project.mc_tag}:1.0.+"
+    modRuntime "grondag:canvas-${project.mc_tag}:1.0.1123"
     modRuntime "me.shedaniel.cloth.api:cloth-api:1.4.6"
 }
 

@@ -1,7 +1,10 @@
 package dev.alexnader.framity2.client.util;
 
 import it.unimi.dsi.fastutil.ints.Int2FloatFunction;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
+@Environment(EnvType.CLIENT)
 public class QuadUtil {
     public static float calcCenter(final Int2FloatFunction key) {
         float min = Float.POSITIVE_INFINITY;

@@ -67,8 +67,10 @@ public class OverlayDataListener implements SimpleResourceReloadListener<Collect
         }, executor);
     }
 
+    private final Identifier id = META.id("data/overlay");
+
     @Override
     public Identifier getFabricId() {
-        return null;
+        return id;
     }
 }

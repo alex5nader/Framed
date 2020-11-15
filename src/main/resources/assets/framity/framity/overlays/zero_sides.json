@@ -3,8 +3,9 @@
     {
       "sides": [ "north", "south", "east", "west" ],
       "value": {
-        "vOffsetter": {
-          "framity:zero": { }
+        "v": {
+          "type": "framity:zero",
+          "value": { }
         }
       }
     }

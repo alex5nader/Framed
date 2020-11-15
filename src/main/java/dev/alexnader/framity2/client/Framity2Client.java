@@ -1,10 +1,15 @@
 package dev.alexnader.framity2.client;
 
+import com.mojang.serialization.Codec;
 import dev.alexnader.framity2.client.assets.OverlayAssetListener;
+import dev.alexnader.framity2.client.assets.overlay.OffsetterRegistry;
+import dev.alexnader.framity2.client.assets.overlay.ZeroOffsetter;
 import dev.alexnader.framity2.client.gui.FrameScreen;
 import dev.alexnader.framity2.items.FramersHammer;
 import grondag.jmx.api.QuadTransformRegistry;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
@@ -19,11 +24,19 @@ import net.minecraft.util.Identifier;
 import static dev.alexnader.framity2.Framity2.ITEMS;
 import static dev.alexnader.framity2.Framity2.META;
 
+@Environment(EnvType.CLIENT)
 public class Framity2Client implements ClientModInitializer {
+    public static FramityCodecs CODECS;
+
     public static OverlayAssetListener CLIENT_OVERLAYS;
 
     @Override
     public void onInitializeClient() {
+        final Identifier zeroId = META.id("zero");
+        OffsetterRegistry.register(zeroId, Codec.unit(new ZeroOffsetter(zeroId)));
+
+        Framity2Client.CODECS = new FramityCodecs();
+
         QuadTransformRegistry.INSTANCE.register(
             META.id("frame_transform"),
             FrameTransform.SOURCE
