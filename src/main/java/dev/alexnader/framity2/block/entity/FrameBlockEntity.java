@@ -115,6 +115,7 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
         case Sections.SPECIAL_INDEX:
             //noinspection ConstantConditions
             SPECIAL_ITEMS.MAP.get(getItemBeforeEmpty(getStack(slot))).onRemove(world, this);
+            break;
         default:
             throw new IllegalArgumentException("Invalid slot: " + slot);
         }

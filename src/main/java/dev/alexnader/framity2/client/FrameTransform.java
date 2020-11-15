@@ -7,8 +7,10 @@ import dev.alexnader.framity2.client.assets.overlay.Offsetters;
 import dev.alexnader.framity2.client.assets.overlay.Overlay;
 import dev.alexnader.framity2.client.assets.overlay.TextureSource;
 import dev.alexnader.framity2.util.Float4;
+import grondag.frex.api.material.MaterialMap;
 import grondag.jmx.api.QuadTransformRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
@@ -24,6 +26,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockRenderView;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -41,6 +44,7 @@ public final class FrameTransform implements RenderContext.QuadTransform {
             return new FrameTransform(brv, state, pos, randomSupplier);
         }
 
+        @Nullable
         @Override
         public RenderContext.QuadTransform getForItem(final ItemStack itemStack, final Supplier<Random> supplier) {
             return null;
@@ -66,7 +70,7 @@ public final class FrameTransform implements RenderContext.QuadTransform {
 
         final Pair<Float4, Float4> origUvs = getUvs(mqv, dir);
 
-        final Optional<Pair<Sprite, OptionalInt>> maybeSpriteAndColor;
+        final Optional<Pair<Pair<Sprite, Optional<BlockState>>, OptionalInt>> maybeSpriteAndColor;
         final Float4 us;
         final Float4 vs;
 
@@ -74,22 +78,24 @@ public final class FrameTransform implements RenderContext.QuadTransform {
         // The first quad of a pair is used to render the base texture,
         // while the second quad is used to render the overlay.
 
-        final Function<SpritesSource, Pair<Sprite, OptionalInt>> findMaybeSpriteAndColor =
-            sprites -> sprites.getSpriteAndColor(dir, quadIndex % sprites.getCount(dir), data.color);
+        final Function<Pair<SpritesSource, BlockState>, Pair<Pair<Sprite, Optional<BlockState>>, OptionalInt>> findMaybeSpriteAndColor =
+            pair -> pair.getFirst()
+                .getSpriteAndColor(dir, quadIndex % pair.getFirst().getCount(dir), data.color)
+                .mapFirst(s -> Pair.of(s, Optional.of(pair.getSecond())));
 
         if (quadIndex % 2 == 0) {
             if (!data.sprites.isPresent()) {
                 return true; // no custom texture => stop transforming, show regular texture
             }
 
-            maybeSpriteAndColor = Optional.of(findMaybeSpriteAndColor.apply(data.sprites.get().getFirst()));
+            maybeSpriteAndColor = Optional.of(findMaybeSpriteAndColor.apply(data.sprites.get()));
             us = origUvs.getFirst();
             vs = origUvs.getSecond();
         } else {
             final Optional<Overlay> maybeOverlay = data.overlay;
 
             if (!maybeOverlay.isPresent()) {
-                maybeSpriteAndColor = data.sprites.map(spritesSourceBlockStatePair -> findMaybeSpriteAndColor.apply(spritesSourceBlockStatePair.getFirst()));
+                maybeSpriteAndColor = data.sprites.map(findMaybeSpriteAndColor);
 
                 us = origUvs.getFirst();
                 vs = origUvs.getSecond();
@@ -102,16 +108,21 @@ public final class FrameTransform implements RenderContext.QuadTransform {
                 } else {
                     final TextureSource textureSource = maybeTextureSource.get();
 
-                    final Optional<Identifier> maybeSpriteId = textureSource.textureFor(dir);
-                    if (!maybeSpriteId.isPresent()) {
+                    final Optional<TextureSource.Entry> maybeEntry = textureSource.entryFor(dir);
+
+                    if (!maybeEntry.isPresent()) {
                         return false; // there is an overlay, but it doesn't have a texture for this direction
                     }
+
                     //noinspection deprecation
-                    maybeSpriteAndColor = maybeSpriteId.map(spriteId ->
+                    maybeSpriteAndColor = maybeEntry.map(entry ->
                         Pair.of(
-                            MinecraftClient.getInstance()
-                                .getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE)
-                                .apply(spriteId),
+                            Pair.of(
+                                MinecraftClient.getInstance()
+                                    .getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE)
+                                    .apply(entry.texture),
+                                entry.materialSource
+                            ),
                             data.maybeCachedOverlayColor
                         )
                     );
@@ -137,9 +148,21 @@ public final class FrameTransform implements RenderContext.QuadTransform {
         }
 
         if (maybeSpriteAndColor.isPresent()) {
-            final Pair<Sprite, OptionalInt> spriteAndColor = maybeSpriteAndColor.get();
+            final Pair<Pair<Sprite, Optional<BlockState>>, OptionalInt> spriteAndColor = maybeSpriteAndColor.get();
 
-            applySpriteAndColor(mqv, spriteAndColor.getFirst(), spriteAndColor.getSecond(), us, vs);
+            final Sprite sprite = spriteAndColor.getFirst().getFirst();
+
+            spriteAndColor.getFirst().getSecond().ifPresent(materialSource -> {
+                System.out.println("applying " + materialSource.getBlock() + "'s render material");
+
+                final @Nullable RenderMaterial target = MaterialMap.get(materialSource).getMapped(sprite);
+
+                if (target != null) {
+                    mqv.material(target);
+                }
+            });
+
+            applySpriteAndColor(mqv, sprite, spriteAndColor.getSecond(), us, vs);
             return true;
         } else {
             return false;
