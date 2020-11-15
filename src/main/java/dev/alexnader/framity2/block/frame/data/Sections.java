@@ -59,10 +59,6 @@ public class Sections {
         return get(SPECIAL_INDEX);
     }
 
-    public int itemCount() {
-        return sections[sections.length - 1].end() + 1;
-    }
-
     public Section itemIndices() {
         return Section.exclusive(0, sections[sections.length - 1].end());
     }
@@ -82,7 +78,7 @@ public class Sections {
 
     public Optional<ItemStack>[] makeItems() {
         //noinspection unchecked
-        final Optional<ItemStack>[] items = new Optional[itemCount()];
+        final Optional<ItemStack>[] items = new Optional[sections[sections.length - 1].end()];
         Arrays.fill(items, Optional.empty());
         return items;
     }
