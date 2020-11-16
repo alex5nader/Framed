@@ -1,6 +1,5 @@
 package dev.alexnader.framity2.block.entity;
 
-import com.google.common.collect.Streams;
 import dev.alexnader.framity2.block.frame.data.FrameData;
 import dev.alexnader.framity2.block.frame.data.Sections;
 import dev.alexnader.framity2.gui.FrameGuiDescription;

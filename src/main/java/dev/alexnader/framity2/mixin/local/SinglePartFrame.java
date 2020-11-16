@@ -3,12 +3,15 @@ package dev.alexnader.framity2.mixin.local;
 import dev.alexnader.framity2.block.FrameSlotInfo;
 import dev.alexnader.framity2.block.entity.FrameBlockEntity;
 import dev.alexnader.framity2.block.frame.*;
+import dev.alexnader.framity2.block.frame.data.Sections;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.TorchBlock;
 import net.minecraft.block.WallTorchBlock;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
+
+import static dev.alexnader.framity2.Framity2.META;
 
 @Mixin({
     BlockFrame.class,
@@ -24,6 +27,11 @@ import org.spongepowered.asm.mixin.Mixin;
 public abstract class SinglePartFrame implements FrameSlotInfo {
     private SinglePartFrame() {
         throw new IllegalStateException("Mixin constructor should not run.");
+    }
+
+    @Override
+    public Sections sections() {
+        return META.FRAME_SECTIONS;
     }
 
     @Override

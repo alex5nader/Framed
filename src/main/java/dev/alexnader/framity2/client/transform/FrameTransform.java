@@ -44,14 +44,19 @@ public final class FrameTransform implements RenderContext.QuadTransform {
             return new FrameTransform(brv, state, pos, randomSupplier);
         }
 
-        @Nullable
         @Override
         public RenderContext.QuadTransform getForItem(final ItemStack stack, final Supplier<Random> randomSupplier) {
             System.out.println(stack.getTag());
+            final FrameSlotInfo slotInfo = (FrameSlotInfo) ((BlockItem) stack.getItem()).getBlock();
             if (!stack.hasTag()) {
-                return null;
+                return new FrameTransform(slotInfo, new FrameData(slotInfo.sections()), randomSupplier);
             } else {
-                return new FrameTransform(stack, randomSupplier);
+                //noinspection ConstantConditions // any frame with a tag *should* have these keys
+                return new FrameTransform(
+                    slotInfo,
+                    FrameData.fromTag(stack.getSubTag("BlockEntityTag").getCompound("frameData")),
+                    randomSupplier
+                );
             }
         }
     };
@@ -80,7 +85,10 @@ public final class FrameTransform implements RenderContext.QuadTransform {
         // while the second quad is used to render the overlay.
 
         if (quadIndex % 2 == 0) {
-            return data.baseApplier.apply(mqv, dir, quadIndex, origUvs.getFirst(), origUvs.getSecond(), data.baseColor);
+            data.baseApplier.apply(mqv, dir, quadIndex, origUvs.getFirst(), origUvs.getSecond(), data.baseColor);
+            // ignore return value of baseApplier.apply because it will return false when there's no custom texture
+            // this is bad, because then the regular frame texture wouldn't show either (which should be the case when there's no custom texture)
+            return true;
         } else {
             return data.overlay.match(
                 overlay -> {
@@ -145,14 +153,14 @@ public final class FrameTransform implements RenderContext.QuadTransform {
         }).toArray(Data[]::new);
     }
 
-    private FrameTransform(final ItemStack stack, final Supplier<Random> randomSupplier) {
+    private FrameTransform(final FrameSlotInfo slotInfo, final FrameData frameData, final Supplier<Random> randomSupplier) {
         //noinspection ConstantConditions // player cannot be null while rendering, stack must have tag or this constructor will not run
         this(
-            (FrameSlotInfo) ((BlockItem) stack.getItem()).getBlock(),
+            slotInfo,
             MinecraftClient.getInstance().player.clientWorld,
             MinecraftClient.getInstance().player.getBlockPos(),
             randomSupplier,
-            FrameData.fromTag(stack.getSubTag("BlockEntityTag").getCompound("frameData")).toRenderAttachment()
+            frameData.toRenderAttachment()
         );
     }
 

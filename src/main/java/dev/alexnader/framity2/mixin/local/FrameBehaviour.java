@@ -73,9 +73,6 @@ public abstract class FrameBehaviour extends Block implements BlockEntityProvide
     @Unique @Nullable
     private PlayerEntity breaker;
 
-//    @Unique
-//    private Map<BlockPos, PlayerEntity> posToPlayer = new HashMap<>();
-
     @Override
     public void appendProperties(final StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);

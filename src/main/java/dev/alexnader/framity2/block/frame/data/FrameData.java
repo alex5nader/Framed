@@ -10,6 +10,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.util.Identifier;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -67,7 +68,7 @@ public class FrameData {
         this.baseStates = baseStates;
     }
 
-    public FrameData(final Sections sections) {
+    public FrameData(@Nonnull final Sections sections) {
         this(sections, sections.makeItems(), sections.makeBaseStates());
     }
 
