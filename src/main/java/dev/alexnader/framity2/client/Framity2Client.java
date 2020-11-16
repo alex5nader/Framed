@@ -5,6 +5,7 @@ import dev.alexnader.framity2.client.assets.OverlayAssetListener;
 import dev.alexnader.framity2.client.assets.overlay.OffsetterRegistry;
 import dev.alexnader.framity2.client.assets.overlay.ZeroOffsetter;
 import dev.alexnader.framity2.client.gui.FrameScreen;
+import dev.alexnader.framity2.client.transform.FrameTransform;
 import dev.alexnader.framity2.items.FramersHammer;
 import grondag.jmx.api.QuadTransformRegistry;
 import net.fabricmc.api.ClientModInitializer;

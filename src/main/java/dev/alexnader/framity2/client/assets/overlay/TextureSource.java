@@ -3,14 +3,12 @@ package dev.alexnader.framity2.client.assets.overlay;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.alexnader.framity2.client.assets.MaterialApplier;
-import dev.alexnader.framity2.client.assets.SpriteApplier;
+import dev.alexnader.framity2.client.transform.MaterialApplier;
+import dev.alexnader.framity2.client.transform.SpriteApplier;
 import dev.alexnader.framity2.client.util.ToOptional;
 import dev.alexnader.framity2.util.Float4;
-import grondag.frex.api.material.MaterialMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -21,7 +19,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.Optional;
 import java.util.function.Function;
@@ -49,9 +46,8 @@ public abstract class TextureSource implements ToOptional<TextureSource> {
             this.textureApplier = SpriteApplier.ofNullable(sprite);
 
             final Optional<BlockState> materialSourceState = materialSource.map(id -> Registry.BLOCK.get(id).getDefaultState());
-            final Optional<RenderMaterial> material = materialSourceState.map(state -> MaterialMap.get(state).getMapped(sprite));
 
-            this.materialApplier = MaterialApplier.ofNullable(materialSource.orElse(null), material.orElse(null));
+            this.materialApplier = MaterialApplier.ofSpriteAndBlockState(sprite, materialSourceState.orElse(null));
         }
     }
 

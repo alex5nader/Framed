@@ -1,9 +1,9 @@
-package dev.alexnader.framity2.client;
+package dev.alexnader.framity2.client.transform;
 
 import com.mojang.datafixers.util.Pair;
 import dev.alexnader.framity2.block.FrameSlotInfo;
 import dev.alexnader.framity2.block.frame.Frame;
-import dev.alexnader.framity2.client.assets.ColorApplier;
+import dev.alexnader.framity2.client.BaseApplier;
 import dev.alexnader.framity2.client.assets.overlay.Overlay;
 import dev.alexnader.framity2.util.Float4;
 import grondag.frex.api.material.MaterialMap;
@@ -31,7 +31,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static dev.alexnader.framity2.client.Framity2Client.CLIENT_OVERLAYS;
 import static dev.alexnader.framity2.client.util.QuadUtil.calcCenter;
@@ -75,137 +74,31 @@ public final class FrameTransform implements RenderContext.QuadTransform {
         // The first quad of a pair is used to render the base texture,
         // while the second quad is used to render the overlay.
 
-        final Function<Pair<SpritesSource, BlockState>, Pair<Pair<Sprite, Optional<BlockState>>, OptionalInt>> findMaybeSpriteAndColor =
-            pair -> pair.getFirst()
-                .getSpriteAndColor(dir, quadIndex % pair.getFirst().getCount(dir), data.color)
-                .mapFirst(s -> Pair.of(s, Optional.of(pair.getSecond())));
-
         if (quadIndex % 2 == 0) {
-            if (!data.sprites.isPresent()) {
-                return true; // no custom texture => stop transforming, show regular texture
-            }
-
-            final Float4 us = origUvs.getFirst();
-            final Float4 vs = origUvs.getSecond();
-
-            final Pair<Pair<Sprite, Optional<BlockState>>, OptionalInt> spriteAndColor = findMaybeSpriteAndColor.apply(data.sprites.get());
-
-            final Sprite sprite = spriteAndColor.getFirst().getFirst();
-
-            spriteAndColor.getFirst().getSecond().ifPresent(materialSource -> {
-                final @Nullable RenderMaterial target = MaterialMap.get(materialSource).getMapped(sprite);
-
-                if (target != null) {
-                    mqv.material(target);
-                }
-            });
-
-            applySpriteAndColor(mqv, sprite, spriteAndColor.getSecond(), us, vs);
-            return true;
+            return data.baseApplier.apply(mqv, dir, quadIndex, origUvs.getFirst(), origUvs.getSecond(), data.baseColor);
         } else {
             return data.overlay.match(
                 overlay -> {
-                    data.cachedOverlayColorApplier.apply(mqv);
+                    data.overlayColorApplier.apply(mqv);
                     return overlay.apply(mqv, origUvs.getFirst(), origUvs.getSecond(), dir);
                 },
-                () -> {
-                    final Optional<Pair<Pair<Sprite, Optional<BlockState>>, OptionalInt>> maybeSpriteAndColor =
-                        data.sprites.map(findMaybeSpriteAndColor);
-                    final Float4 us = origUvs.getFirst();
-                    final Float4 vs = origUvs.getSecond();
-
-                    maybeSpriteAndColor.ifPresent(spriteAndColor -> {
-                        final Sprite sprite = spriteAndColor.getFirst().getFirst();
-
-                        spriteAndColor.getFirst().getSecond().ifPresent(materialSource -> {
-                            final @Nullable RenderMaterial target = MaterialMap.get(materialSource).getMapped(sprite);
-
-                            if (target != null) {
-                                mqv.material(target);
-                            }
-                        });
-
-                        applySpriteAndColor(mqv, sprite, spriteAndColor.getSecond(), us, vs);
-                    });
-
-                    return maybeSpriteAndColor.isPresent();
-                }
+                () -> data.baseApplier.apply(mqv, dir, quadIndex, origUvs.getFirst(), origUvs.getSecond(), data.baseColor)
             );
-
-//            data.overlay.apply(mqv, origUvs.getFirst(), origUvs.getSecond(), dir);
-
-//            final Optional<Overlay> maybeOverlay = data.overlay;
-//
-//            if (!maybeOverlay.isPresent()) {
-//                maybeSpriteAndColor = data.sprites.map(findMaybeSpriteAndColor);
-//
-//                us = origUvs.getFirst();
-//                vs = origUvs.getSecond();
-//            } else {
-//                final Overlay overlay = maybeOverlay.get();
-//
-//                overlay.textureSource().apply(mqv, us, vs, dir);
-//
-////                final Optional<TextureSource> maybeTextureSource = overlay.textureSource();
-////                if (!maybeTextureSource.isPresent()) {
-////                    maybeSpriteAndColor = Optional.empty();
-////                } else {
-////                    final TextureSource textureSource = maybeTextureSource.get();
-////
-////                    textureSource.apply(mqv, us, vs, dir);
-////
-////                    final Optional<TextureSource.Entry> maybeEntry = textureSource.entryFor(dir);
-////
-////                    if (!maybeEntry.isPresent()) {
-////                        return false; // there is an overlay, but it doesn't have a texture for this direction
-////                    }
-////
-////                    //noinspection deprecation
-////                    maybeSpriteAndColor = maybeEntry.map(entry ->
-////                        Pair.of(
-////                            Pair.of(
-////                                MinecraftClient.getInstance()
-////                                    .getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE)
-////                                    .apply(entry.texture),
-////                                entry.materialSource
-////                            ),
-////                            data.maybeCachedOverlayColor
-////                        )
-////                    );
-////                }
-//
-//                final Optional<Map<Direction, Offsetters>> maybeSidedOffsetters = overlay.sidedOffsetters();
-//                if (!maybeSidedOffsetters.isPresent()) {
-//                    us = origUvs.getFirst();
-//                    vs = origUvs.getSecond();
-//                } else {
-//                    final Map<Direction, Offsetters> sidedOffsetters = maybeSidedOffsetters.get();
-//
-//                    final Offsetters offsetters = sidedOffsetters.get(dir);
-//                    if (offsetters == null) {
-//                        us = origUvs.getFirst();
-//                        vs = origUvs.getSecond();
-//                    } else {
-//                        us = offsetters.u.map(o -> o.offset(origUvs.getFirst())).orElseGet(origUvs::getFirst);
-//                        vs = offsetters.v.map(o -> o.offset(origUvs.getSecond())).orElseGet(origUvs::getSecond);
-//                    }
-//                }
-//            }
         }
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private static class Data {
-        public final Optional<Pair<SpritesSource, BlockState>> sprites;
+        public final BaseApplier baseApplier;
         public final Overlay overlay;
-        public final ColorApplier cachedOverlayColorApplier;
-        public final int color;
+        public final ColorApplier overlayColorApplier;
+        public final int baseColor;
 
-        public Data(final Optional<Pair<SpritesSource, BlockState>> sprites, final Overlay overlay, final OptionalInt maybeCachedOverlayColor, final int color) {
-            this.sprites = sprites;
+        public Data(final BaseApplier baseApplier, final Overlay overlay, final OptionalInt maybeCachedOverlayColor, final int baseColor) {
+            this.baseApplier = baseApplier;
             this.overlay = overlay;
-            this.cachedOverlayColorApplier = ColorApplier.ofOptional(maybeCachedOverlayColor);
-            this.color = color;
+            this.overlayColorApplier = ColorApplier.ofOptional(maybeCachedOverlayColor);
+            this.baseColor = baseColor;
         }
     }
 
@@ -220,28 +113,25 @@ public final class FrameTransform implements RenderContext.QuadTransform {
         }
 
         //noinspection unchecked
-        final Stream<Pair<Optional<BlockState>, Optional<Identifier>>> attachment =
-            (Stream<Pair<Optional<BlockState>, Optional<Identifier>>>) ((RenderAttachedBlockView) brv).getBlockEntityRenderAttachment(pos);
+        final List<Pair<Optional<BlockState>, Optional<Identifier>>> attachment =
+            (List<Pair<Optional<BlockState>, Optional<Identifier>>>) ((RenderAttachedBlockView) brv).getBlockEntityRenderAttachment(pos);
 
         //noinspection ConstantConditions
-        data = attachment.map(pair -> {
+        data = attachment.stream().map(pair -> {
             final Optional<BlockState> maybeBaseState = pair.getFirst();
 
             final int color;
-            final Optional<Pair<SpritesSource, BlockState>> sprites;
+            final BaseApplier baseApplier;
 
             if (maybeBaseState.isPresent()) {
                 final BlockState baseState = maybeBaseState.get();
                 color = Optional.ofNullable(ColorProviderRegistry.BLOCK.get(baseState.getBlock()))
                     .map(prov -> prov.getColor(baseState, brv, pos, 1) | 0xFF000000)
                     .orElse(0xFFFFFFFF);
-                sprites = Optional.of(Pair.of(
-                    new SpritesSource(baseState, MinecraftClient.getInstance().getBlockRenderManager().getModel(baseState), randomSupplier.get()),
-                    baseState
-                ));
+                baseApplier = new BaseApplier.Some(baseState, MinecraftClient.getInstance().getBlockRenderManager().getModel(baseState), randomSupplier.get());
             } else {
                 color = 0xFFFFFFFF;
-                sprites = Optional.empty();
+                baseApplier = BaseApplier.NONE;
             }
 
             final Overlay overlay = pair.getSecond().map(CLIENT_OVERLAYS::getOverlayFor).orElse(Overlay.NONE);
@@ -255,7 +145,7 @@ public final class FrameTransform implements RenderContext.QuadTransform {
                     )
                 );
 
-            return new Data(sprites, overlay, cachedOverlayColor, color);
+            return new Data(baseApplier, overlay, cachedOverlayColor, color);
         }).toArray(Data[]::new);
     }
 

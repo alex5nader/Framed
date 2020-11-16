@@ -1,8 +1,9 @@
-package dev.alexnader.framity2.client.assets;
+package dev.alexnader.framity2.client.transform;
 
 import dev.alexnader.framity2.client.util.ToOptional;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Function;
@@ -13,6 +14,14 @@ public abstract class ColorApplier implements ToOptional<ColorApplier> {
     public static ColorApplier ofOptional(final OptionalInt optional) {
         if (optional.isPresent()) {
             return new Some(optional.getAsInt());
+        } else {
+            return NONE;
+        }
+    }
+
+    public static ColorApplier ofBool(final boolean present, final int value) {
+        if (present) {
+            return new Some(value);
         } else {
             return NONE;
         }

@@ -8,6 +8,10 @@ public interface ToOptional<O extends ToOptional<O>> {
     Optional<O> toOptional();
     <T> T match(Function<O, T> some, Supplier<T> none);
 
+    default boolean isPresent() {
+        return toOptional().isPresent();
+    }
+
     interface Some<O extends ToOptional<O>> extends ToOptional<O> {
         default Optional<O> toOptional() {
             //noinspection unchecked

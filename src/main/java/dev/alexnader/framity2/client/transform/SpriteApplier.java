@@ -1,4 +1,4 @@
-package dev.alexnader.framity2.client.assets;
+package dev.alexnader.framity2.client.transform;
 
 import dev.alexnader.framity2.util.Float4;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;

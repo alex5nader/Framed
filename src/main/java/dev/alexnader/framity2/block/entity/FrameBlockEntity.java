@@ -33,6 +33,7 @@ import net.minecraft.world.World;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static dev.alexnader.framity2.Framity2.OVERLAYS;
@@ -239,13 +240,13 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
     }
 
     @Override
-    public Stream<Pair<Optional<BlockState>, Optional<Identifier>>> getRenderAttachmentData() {
+    public List<Pair<Optional<BlockState>, Optional<Identifier>>> getRenderAttachmentData() {
         //noinspection UnstableApiUsage
         return Streams.zip(
             Arrays.stream(baseStates()),
             overlayItems().stream().map(i -> i.flatMap(OVERLAYS::getOverlayId)),
             Pair::new
-        );
+        ).collect(Collectors.toList());
     }
 
     @Override

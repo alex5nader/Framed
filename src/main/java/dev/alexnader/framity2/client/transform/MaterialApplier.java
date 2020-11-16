@@ -1,14 +1,30 @@
-package dev.alexnader.framity2.client.assets;
+package dev.alexnader.framity2.client.transform;
 
+import grondag.frex.api.material.MaterialMap;
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
 public abstract class MaterialApplier {
+    public static MaterialApplier ofSpriteAndBlockState(@Nonnull final Sprite sprite, @Nullable final BlockState blockState) {
+        if (blockState == null) {
+            return NONE;
+        }
+
+        final RenderMaterial material = MaterialMap.get(blockState).getMapped(sprite);
+        final Identifier id = Registry.BLOCK.getId(blockState.getBlock());
+
+        return MaterialApplier.ofNullable(id, material);
+    }
+
     public static MaterialApplier ofNullable(@Nullable final Identifier id, @Nullable final RenderMaterial toApply) {
         if (id != null && toApply != null) {
             return new Some(id, toApply);
