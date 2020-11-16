@@ -32,7 +32,7 @@ public class SlabFrame extends SlabBlock implements FrameSlotInfo, ConstructorCa
     public static final int UPPER_SLOT = 1;
 
     @Override
-    public int getRelativeSlotAt(final BlockState state, final Vec3d posInBlock, final Direction side) {
+    public int getRelativeSlotAt(final Vec3d posInBlock, final Direction side) {
         switch (side) {
         case UP:
             return posInBlock.y == 0.5 ? LOWER_SLOT : UPPER_SLOT;

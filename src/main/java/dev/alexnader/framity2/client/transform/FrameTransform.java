@@ -2,33 +2,33 @@ package dev.alexnader.framity2.client.transform;
 
 import com.mojang.datafixers.util.Pair;
 import dev.alexnader.framity2.block.FrameSlotInfo;
-import dev.alexnader.framity2.block.frame.Frame;
+import dev.alexnader.framity2.block.frame.data.FrameData;
 import dev.alexnader.framity2.client.BaseApplier;
 import dev.alexnader.framity2.client.assets.overlay.Overlay;
 import dev.alexnader.framity2.util.Float4;
-import grondag.frex.api.material.MaterialMap;
 import grondag.jmx.api.QuadTransformRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockRenderView;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
@@ -46,8 +46,13 @@ public final class FrameTransform implements RenderContext.QuadTransform {
 
         @Nullable
         @Override
-        public RenderContext.QuadTransform getForItem(final ItemStack itemStack, final Supplier<Random> supplier) {
-            return null;
+        public RenderContext.QuadTransform getForItem(final ItemStack stack, final Supplier<Random> randomSupplier) {
+            System.out.println(stack.getTag());
+            if (!stack.hasTag()) {
+                return null;
+            } else {
+                return new FrameTransform(stack, randomSupplier);
+            }
         }
     };
 
@@ -102,21 +107,12 @@ public final class FrameTransform implements RenderContext.QuadTransform {
         }
     }
 
-    private final BlockState state;
+    private final FrameSlotInfo slotInfo;
     protected Data[] data;
 
-    protected FrameTransform(final BlockRenderView brv, final BlockState state, final BlockPos pos, final Supplier<Random> randomSupplier) {
-        this.state = state;
+    private FrameTransform(final FrameSlotInfo slotInfo, final BlockRenderView brv, final BlockPos pos, final Supplier<Random> randomSupplier, final List<Pair<Optional<BlockState>, Optional<Identifier>>> attachment) {
+        this.slotInfo = slotInfo;
 
-        if (!(state.getBlock() instanceof Frame)) {
-            throw new IllegalArgumentException("Cannot apply frame transform to non-frame block " + state.getBlock() + ".");
-        }
-
-        //noinspection unchecked
-        final List<Pair<Optional<BlockState>, Optional<Identifier>>> attachment =
-            (List<Pair<Optional<BlockState>, Optional<Identifier>>>) ((RenderAttachedBlockView) brv).getBlockEntityRenderAttachment(pos);
-
-        //noinspection ConstantConditions
         data = attachment.stream().map(pair -> {
             final Optional<BlockState> maybeBaseState = pair.getFirst();
 
@@ -149,9 +145,30 @@ public final class FrameTransform implements RenderContext.QuadTransform {
         }).toArray(Data[]::new);
     }
 
+    private FrameTransform(final ItemStack stack, final Supplier<Random> randomSupplier) {
+        //noinspection ConstantConditions // player cannot be null while rendering, stack must have tag or this constructor will not run
+        this(
+            (FrameSlotInfo) ((BlockItem) stack.getItem()).getBlock(),
+            MinecraftClient.getInstance().player.clientWorld,
+            MinecraftClient.getInstance().player.getBlockPos(),
+            randomSupplier,
+            FrameData.fromTag(stack.getSubTag("BlockEntityTag").getCompound("frameData")).toRenderAttachment()
+        );
+    }
+
+    private FrameTransform(final BlockRenderView brv, final BlockState state, final BlockPos pos, final Supplier<Random> randomSupplier) {
+        //noinspection unchecked,ConstantConditions
+        this(
+            (FrameSlotInfo) state.getBlock(),
+            brv,
+            pos,
+            randomSupplier,
+            (List<Pair<Optional<BlockState>, Optional<Identifier>>>) ((RenderAttachedBlockView) brv).getBlockEntityRenderAttachment(pos)
+        );
+    }
+
     protected int getPartIndex(final MutableQuadView mqv, final Direction dir) {
-        return ((FrameSlotInfo) state.getBlock()).getRelativeSlotAt(
-            state,
+        return slotInfo.getRelativeSlotAt(
             new Vec3d(
                 calcCenter(mqv::x),
                 calcCenter(mqv::y),

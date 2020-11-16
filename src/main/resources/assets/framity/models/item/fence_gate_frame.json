@@ -1,6 +1,3 @@
 {
-  "parent": "block/template_fence_gate",
-  "textures": {
-    "texture": "framity:block/solid_frame"
-  }
+  "parent": "framity:block/fence_gate_frame"
 }

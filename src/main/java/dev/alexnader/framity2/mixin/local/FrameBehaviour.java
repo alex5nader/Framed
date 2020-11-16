@@ -218,7 +218,7 @@ public abstract class FrameBehaviour extends Block implements BlockEntityProvide
 
         if (playerStack != null) {
             final Vec3d posInBlock = hit.getPos().subtract(Vec3d.of(hit.getBlockPos()));
-            final int relativeSlot = getRelativeSlotAt(state, posInBlock, hit.getSide());
+            final int relativeSlot = getRelativeSlotAt(posInBlock, hit.getSide());
 
             final Function3<List<Optional<ItemStack>>, Integer, Supplier<Unit>, ActionResult> swapItems = (slots, absoluteSlot, onSuccess) -> {
                 final Optional<ItemStack> maybeStack = slots.get(relativeSlot);

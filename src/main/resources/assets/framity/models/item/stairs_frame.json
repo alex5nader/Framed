@@ -1,8 +1,3 @@
 {
-  "parent": "block/stairs",
-  "textures": {
-    "side": "framity:block/hollow_frame",
-    "top": "framity:block/hollow_frame",
-    "bottom": "framity:block/hollow_frame"
-  }
+  "parent": "framity:block/stairs_frame"
 }

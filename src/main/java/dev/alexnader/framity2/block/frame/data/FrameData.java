@@ -1,13 +1,21 @@
 package dev.alexnader.framity2.block.frame.data;
 
+import com.google.common.collect.Streams;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.util.Identifier;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static dev.alexnader.framity2.Framity2.OVERLAYS;
 
 public class FrameData {
     private static Optional<ItemStack>[] itemsFromTag(final Sections sections, final ListTag tag) {
@@ -71,6 +79,18 @@ public class FrameData {
         return items;
     }
 
+    public List<Optional<ItemStack>> baseItems() {
+        return Arrays.asList(items).subList(sections.base().start(), sections.base().end());
+    }
+
+    public List<Optional<ItemStack>> overlayItems() {
+        return Arrays.asList(items).subList(sections.overlay().start(), sections.overlay().end());
+    }
+
+    public List<Optional<ItemStack>> specialItems() {
+        return Arrays.asList(items).subList(sections.special().start(), sections.special().end());
+    }
+
     public Optional<BlockState>[] baseStates() {
         return baseStates;
     }
@@ -111,5 +131,14 @@ public class FrameData {
         }
 
         return tag;
+    }
+
+    public List<Pair<Optional<BlockState>, Optional<Identifier>>> toRenderAttachment() {
+        //noinspection UnstableApiUsage
+        return Streams.zip(
+            Arrays.stream(baseStates),
+            overlayItems().stream().map(i -> i.flatMap(OVERLAYS::getOverlayId)),
+            Pair::new
+        ).collect(Collectors.toList());
     }
 }

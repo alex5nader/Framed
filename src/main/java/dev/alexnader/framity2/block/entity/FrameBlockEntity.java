@@ -59,15 +59,15 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
     }
 
     public List<Optional<ItemStack>> baseItems() {
-        return Arrays.asList(data.items()).subList(data.sections().base().start(), data.sections().base().end());
+        return data.baseItems();
     }
 
     public List<Optional<ItemStack>> overlayItems() {
-        return Arrays.asList(data.items()).subList(data.sections().overlay().start(), data.sections().overlay().end());
+        return data.overlayItems();
     }
 
     public List<Optional<ItemStack>> specialItems() {
-        return Arrays.asList(data.items()).subList(data.sections().special().start(), data.sections().special().end());
+        return data.specialItems();
     }
 
     public Optional<BlockState>[] baseStates() {
@@ -241,12 +241,7 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
 
     @Override
     public List<Pair<Optional<BlockState>, Optional<Identifier>>> getRenderAttachmentData() {
-        //noinspection UnstableApiUsage
-        return Streams.zip(
-            Arrays.stream(baseStates()),
-            overlayItems().stream().map(i -> i.flatMap(OVERLAYS::getOverlayId)),
-            Pair::new
-        ).collect(Collectors.toList());
+        return data.toRenderAttachment();
     }
 
     @Override

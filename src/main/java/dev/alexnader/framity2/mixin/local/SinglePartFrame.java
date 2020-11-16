@@ -27,7 +27,7 @@ public abstract class SinglePartFrame implements FrameSlotInfo {
     }
 
     @Override
-    public int getRelativeSlotAt(final BlockState state, final Vec3d posInBlock, final Direction side) {
+    public int getRelativeSlotAt(final Vec3d posInBlock, final Direction side) {
         return 0;
     }
 

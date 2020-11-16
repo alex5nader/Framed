@@ -1,6 +1,42 @@
 {
-  "parent": "block/fence_inventory",
+  "parent": "jmx:block/2/jmx_fence_inventory",
   "textures": {
     "texture": "framity:block/solid_frame"
+  },
+  "jmx": {
+    "quad_transform": "framity:frame_transform",
+    "textures": {
+      "jmx_tex_particle": "framity:block/solid_frame",
+      "layered_textures": [
+        { "jmx_texture": "framity:block/solid_frame" },
+        { "jmx_texture": null }
+      ]
+    },
+    "materials": {
+      "jmx_material": {
+        "layers": [
+          { "layer": "cutout_mipped" },
+          { "layer": "cutout_mipped" }
+        ]
+      }
+    }
+  },
+  "frex": {
+    "quad_transform": "framity:frame_transform",
+    "textures": {
+      "jmx_tex_particle": "framity:block/solid_frame",
+      "layered_textures": [
+        { "jmx_texture": "framity:block/solid_frame" },
+        { "jmx_texture": null }
+      ]
+    },
+    "materials": {
+      "jmx_material": {
+        "layers": [
+          { "layer": "cutout_mipped" },
+          { "layer": "cutout_mipped" }
+        ]
+      }
+    }
   }
 }
