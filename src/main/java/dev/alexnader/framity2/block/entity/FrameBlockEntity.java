@@ -32,10 +32,7 @@ import net.minecraft.world.World;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static dev.alexnader.framity2.Framity2.OVERLAYS;
 import static dev.alexnader.framity2.Framity2.SPECIAL_ITEMS;
 import static dev.alexnader.framity2.util.GetItemBeforeEmptyUtil.getItemBeforeEmpty;
 import static dev.alexnader.framity2.util.ValidQuery.checkIf;

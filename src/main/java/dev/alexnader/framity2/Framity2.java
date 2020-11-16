@@ -1,14 +1,10 @@
 package dev.alexnader.framity2;
 
-import com.mojang.serialization.Codec;
 import dev.alexnader.framity2.data.OverlayDataListener;
 import dev.alexnader.framity2.items.SpecialItems;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
 
 public class Framity2 implements ModInitializer {
     public static FramityProperties PROPERTIES;

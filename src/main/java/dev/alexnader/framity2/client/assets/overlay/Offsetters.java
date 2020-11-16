@@ -17,7 +17,7 @@ public class Offsetters {
         CODECS.OFFSETTER.optionalFieldOf("v").forGetter(o -> o.v.toOptional())
     ).apply(inst, Offsetters::new));
 
-    public static final Offsetters NONE = new Offsetters(Offsetter.NONE, Offsetter.NONE);
+    public static final Offsetters NONE = new Offsetters();
 
     public final @Nonnull Offsetter u;
     public final @Nonnull Offsetter v;
@@ -28,8 +28,8 @@ public class Offsetters {
         this.v = v.orElse(Offsetter.NONE);
     }
 
-    private Offsetters(@Nonnull final Offsetter u, @Nonnull final Offsetter v) {
-        this.u = u;
-        this.v = v;
+    private Offsetters() {
+        this.u = Offsetter.NONE;
+        this.v = Offsetter.NONE;
     }
 }

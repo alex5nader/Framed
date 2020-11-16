@@ -1,7 +1,6 @@
 package dev.alexnader.framity2.client.transform;
 
 import grondag.frex.api.material.MaterialMap;
-import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.minecraft.block.BlockState;

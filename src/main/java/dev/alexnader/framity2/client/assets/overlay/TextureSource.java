@@ -33,11 +33,11 @@ public abstract class TextureSource implements ToOptional<TextureSource> {
         public final @Nonnull SpriteApplier textureApplier;
         public final @Nonnull MaterialApplier materialApplier;
 
-        public static final Entry NONE = new Entry(SpriteApplier.NONE, MaterialApplier.NONE);
+        public static final Entry NONE = new Entry();
 
-        private Entry(@Nonnull final SpriteApplier textureApplier, @Nonnull final MaterialApplier materialApplier) {
-            this.textureApplier = textureApplier;
-            this.materialApplier = materialApplier;
+        private Entry() {
+            this.textureApplier = SpriteApplier.NONE;
+            this.materialApplier = MaterialApplier.NONE;
         }
 
         public Entry(final Identifier texture, final Optional<Identifier> materialSource) {
@@ -143,7 +143,7 @@ public abstract class TextureSource implements ToOptional<TextureSource> {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public static TextureSource NONE = new TextureSource(null) {
+    public static final TextureSource NONE = new TextureSource(null) {
         @Override
         public Optional<TextureSource> toOptional() {
             return Optional.empty();

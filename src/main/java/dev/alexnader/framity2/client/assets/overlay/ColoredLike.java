@@ -1,7 +1,6 @@
 package dev.alexnader.framity2.client.assets.overlay;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;

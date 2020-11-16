@@ -14,6 +14,7 @@ import net.minecraft.util.registry.Registry;
 
 import static dev.alexnader.framity2.Framity2.META;
 
+@SuppressWarnings("unused") // fields are initialized with side-effects
 public class FramityBlocks extends Registrar<Block> {
     public FramityBlocks() {
         super(Registry.BLOCK);

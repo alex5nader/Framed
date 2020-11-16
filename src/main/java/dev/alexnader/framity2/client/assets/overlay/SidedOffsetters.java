@@ -3,10 +3,8 @@ package dev.alexnader.framity2.client.assets.overlay;
 import com.mojang.serialization.Codec;
 import dev.alexnader.framity2.client.util.ToOptional;
 import dev.alexnader.framity2.util.Float4;
-import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.minecraft.util.math.Direction;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -26,12 +24,12 @@ public abstract class SidedOffsetters {
         }
 
         @Override
-        public Float4 applyUs(final MutableQuadView mqv, final Float4 origUs, final Direction dir) {
+        public Float4 applyUs(final Float4 origUs, final Direction dir) {
             return origUs;
         }
 
         @Override
-        public Float4 applyVs(final MutableQuadView mqv, final Float4 origVs, final Direction dir) {
+        public Float4 applyVs(final Float4 origVs, final Direction dir) {
             return origVs;
         }
 
@@ -42,8 +40,8 @@ public abstract class SidedOffsetters {
     };
 
     public static abstract class Base implements ToOptional<Base> {
-        public abstract Float4 applyUs(MutableQuadView mqv, Float4 origUs, Direction dir);
-        public abstract Float4 applyVs(MutableQuadView mqv, Float4 origVs, Direction dir);
+        public abstract Float4 applyUs(Float4 origUs, Direction dir);
+        public abstract Float4 applyVs(Float4 origVs, Direction dir);
     }
 
     public static class Some extends Base implements ToOptional.Some<Base> {
@@ -59,12 +57,12 @@ public abstract class SidedOffsetters {
         }
 
         @Override
-        public Float4 applyUs(final MutableQuadView mqv, final Float4 origUs, final Direction dir) {
+        public Float4 applyUs(final Float4 origUs, final Direction dir) {
             return map.get(dir).u.offset(origUs);
         }
 
         @Override
-        public Float4 applyVs(final MutableQuadView mqv, final Float4 origVs, final Direction dir) {
+        public Float4 applyVs(final Float4 origVs, final Direction dir) {
             return map.get(dir).v.offset(origVs);
         }
     }

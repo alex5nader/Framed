@@ -3,7 +3,6 @@ package dev.alexnader.framity2.client.transform;
 import com.mojang.datafixers.util.Pair;
 import dev.alexnader.framity2.block.FrameSlotInfo;
 import dev.alexnader.framity2.block.frame.data.FrameData;
-import dev.alexnader.framity2.client.BaseApplier;
 import dev.alexnader.framity2.client.assets.overlay.Overlay;
 import dev.alexnader.framity2.util.Float4;
 import grondag.jmx.api.QuadTransformRegistry;
@@ -15,19 +14,15 @@ import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.Sprite;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockRenderView;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -116,7 +111,7 @@ public final class FrameTransform implements RenderContext.QuadTransform {
     }
 
     private final FrameSlotInfo slotInfo;
-    protected Data[] data;
+    private final Data[] data;
 
     private FrameTransform(final FrameSlotInfo slotInfo, final BlockRenderView brv, final BlockPos pos, final Supplier<Random> randomSupplier, final List<Pair<Optional<BlockState>, Optional<Identifier>>> attachment) {
         this.slotInfo = slotInfo;
@@ -184,20 +179,6 @@ public final class FrameTransform implements RenderContext.QuadTransform {
             ),
             dir
         );
-    }
-
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    protected void applySpriteAndColor(final MutableQuadView mqv, final Sprite sprite, final OptionalInt maybeColor, final Float4 us, final Float4 vs) {
-        mqv.sprite(0, 0, MathHelper.lerp(us.a, sprite.getMinU(), sprite.getMaxU()), MathHelper.lerp(vs.a, sprite.getMinV(), sprite.getMaxV()));
-        mqv.sprite(1, 0, MathHelper.lerp(us.b, sprite.getMinU(), sprite.getMaxU()), MathHelper.lerp(vs.b, sprite.getMinV(), sprite.getMaxV()));
-        mqv.sprite(2, 0, MathHelper.lerp(us.c, sprite.getMinU(), sprite.getMaxU()), MathHelper.lerp(vs.c, sprite.getMinV(), sprite.getMaxV()));
-        mqv.sprite(3, 0, MathHelper.lerp(us.d, sprite.getMinU(), sprite.getMaxU()), MathHelper.lerp(vs.d, sprite.getMinV(), sprite.getMaxV()));
-
-        if (maybeColor.isPresent()) {
-            final int color = maybeColor.getAsInt();
-
-            mqv.spriteColor(0, color, color, color, color);
-        }
     }
 
     protected Pair<Float4, Float4> getUvs(final MutableQuadView mqv, final Direction dir) {

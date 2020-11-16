@@ -1,8 +1,5 @@
-package dev.alexnader.framity2.client;
+package dev.alexnader.framity2.client.transform;
 
-import dev.alexnader.framity2.client.transform.LazyColorApplier;
-import dev.alexnader.framity2.client.transform.MaterialApplier;
-import dev.alexnader.framity2.client.transform.SpriteApplier;
 import dev.alexnader.framity2.client.util.ToOptional;
 import dev.alexnader.framity2.mixin.mc.BakedQuadAccess;
 import dev.alexnader.framity2.util.Float4;

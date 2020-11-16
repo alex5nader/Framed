@@ -12,12 +12,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 
 import javax.annotation.Nullable;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static dev.alexnader.framity2.client.Framity2Client.CODECS;
 import static dev.alexnader.framity2.client.Framity2Client.CLIENT_OVERLAYS;
 
 @Environment(EnvType.CLIENT)
@@ -96,8 +94,8 @@ public abstract class Overlay implements ToOptional<Overlay> {
 
         @Override
         public boolean apply(final MutableQuadView mqv, final Float4 us, final Float4 vs, final Direction dir) {
-            final Float4 finalUs = sidedOffsetters().applyUs(mqv, us, dir);
-            final Float4 finalVs = sidedOffsetters().applyVs(mqv, vs, dir);
+            final Float4 finalUs = sidedOffsetters().applyUs(us, dir);
+            final Float4 finalVs = sidedOffsetters().applyVs(vs, dir);
 
             // coloredLike is cached on creation and applied outside of Overlay.apply
 
