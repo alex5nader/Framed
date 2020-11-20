@@ -3,6 +3,8 @@ package dev.alexnader.framity2.client.assets.overlay;
 import com.mojang.serialization.Codec;
 import dev.alexnader.framity2.client.util.ToOptional;
 import dev.alexnader.framity2.util.Float4;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.math.Direction;
 
 import java.util.Map;
@@ -12,6 +14,7 @@ import java.util.function.Supplier;
 
 import static dev.alexnader.framity2.client.Framity2Client.CODECS;
 
+@Environment(EnvType.CLIENT)
 public abstract class SidedOffsetters {
     private SidedOffsetters() { }
 

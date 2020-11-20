@@ -1,6 +1,8 @@
 package dev.alexnader.framity2.client.transform;
 
 import grondag.frex.api.material.MaterialMap;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.minecraft.block.BlockState;
@@ -12,6 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
+@Environment(EnvType.CLIENT)
 public abstract class MaterialApplier {
     public static MaterialApplier ofSpriteAndBlockState(@Nonnull final Sprite sprite, @Nullable final BlockState blockState) {
         if (blockState == null) {

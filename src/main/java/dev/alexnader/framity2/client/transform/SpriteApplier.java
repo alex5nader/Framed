@@ -1,6 +1,8 @@
 package dev.alexnader.framity2.client.transform;
 
 import dev.alexnader.framity2.util.Float4;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.minecraft.client.texture.MissingSprite;
 import net.minecraft.client.texture.Sprite;
@@ -9,6 +11,7 @@ import net.minecraft.util.math.MathHelper;
 
 import javax.annotation.Nullable;
 
+@Environment(EnvType.CLIENT)
 public abstract class SpriteApplier {
     public static SpriteApplier ofNullable(@Nullable final Sprite toApply) {
         if (toApply != null) {

@@ -1,6 +1,8 @@
 package dev.alexnader.framity2.client.transform;
 
 import dev.alexnader.framity2.client.util.ToOptional;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 
 import java.util.Optional;
@@ -8,6 +10,7 @@ import java.util.OptionalInt;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public abstract class ColorApplier implements ToOptional<ColorApplier> {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static ColorApplier ofOptional(final OptionalInt optional) {

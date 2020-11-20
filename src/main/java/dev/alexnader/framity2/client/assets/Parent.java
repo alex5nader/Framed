@@ -1,6 +1,8 @@
 package dev.alexnader.framity2.client.assets;
 
 import dev.alexnader.framity2.client.util.ToOptional;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.Identifier;
 
 import javax.annotation.Nonnull;
@@ -9,6 +11,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public abstract class Parent implements ToOptional<Parent> {
     public static Parent ofNullable(@Nullable final Identifier parentId) {
         if (parentId == null) {

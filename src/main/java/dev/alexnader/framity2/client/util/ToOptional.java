@@ -1,9 +1,13 @@
 package dev.alexnader.framity2.client.util;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public interface ToOptional<O extends ToOptional<O>> {
     Optional<O> toOptional();
     <T> T match(Function<O, T> some, Supplier<T> none);

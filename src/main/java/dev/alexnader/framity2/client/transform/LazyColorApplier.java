@@ -1,7 +1,10 @@
 package dev.alexnader.framity2.client.transform;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 
+@Environment(EnvType.CLIENT)
 public abstract class LazyColorApplier {
     public static final LazyColorApplier NONE = new LazyColorApplier() {
         @Override
