@@ -41,7 +41,6 @@ public final class FrameTransform implements RenderContext.QuadTransform {
 
         @Override
         public RenderContext.QuadTransform getForItem(final ItemStack stack, final Supplier<Random> randomSupplier) {
-            System.out.println(stack.getTag());
             final FrameSlotInfo slotInfo = (FrameSlotInfo) ((BlockItem) stack.getItem()).getBlock();
             if (!stack.hasTag()) {
                 return new FrameTransform(slotInfo, new FrameData(slotInfo.sections()), randomSupplier);
@@ -60,7 +59,7 @@ public final class FrameTransform implements RenderContext.QuadTransform {
 
     @Override
     public boolean transform(final MutableQuadView mqv) {
-        if (mqv.tag() == 1) {
+        if (mqv.tag() == 0) {
             return true;
         }
 
@@ -75,16 +74,12 @@ public final class FrameTransform implements RenderContext.QuadTransform {
 
         final Pair<Float4, Float4> origUvs = getUvs(mqv, dir);
 
-        // JMX defines models such that all quads appear twice
-        // The first quad of a pair is used to render the base texture,
-        // while the second quad is used to render the overlay.
-
-        if (quadIndex % 2 == 0) {
+        if (mqv.tag() == 1) {
             data.baseApplier.apply(mqv, dir, quadIndex, origUvs.getFirst(), origUvs.getSecond(), data.baseColor);
             // ignore return value of baseApplier.apply because it will return false when there's no custom texture
             // this is bad, because then the regular frame texture wouldn't show either (which should be the case when there's no custom texture)
             return true;
-        } else {
+        } else if (mqv.tag() == 2) {
             return data.overlay.match(
                 overlay -> {
                     data.overlayColorApplier.apply(mqv);
@@ -92,6 +87,8 @@ public final class FrameTransform implements RenderContext.QuadTransform {
                 },
                 () -> data.baseApplier.apply(mqv, dir, quadIndex, origUvs.getFirst(), origUvs.getSecond(), data.baseColor)
             );
+        } else {
+            return false;
         }
     }
 

@@ -1,71 +1,151 @@
 {
-  "parent": "block/block",
+  "parent": "jmx:block/v1/block",
   "textures": {
     "particle": "#all",
     "all": "framity:block/solid_frame"
   },
   "elements": [
     {
-      "from": [0, 0, 0],
-      "to": [16, 15, 16],
-      "faces":{
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        15,
+        16
+      ],
+      "faces": {
         "down": {
-          "uv": [0, 0, 16, 16],
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
           "texture": "#all",
           "cullface": "down",
-          "jmx_material": "#jmx_mat_all",
-          "layered_textures": [
-            { "jmx_tex": "#jmx_tex_all" },
-            { "jmx_tex": "#jmx_tex_all" }
+          "jmx_layers": [
+            {
+              "texture": "#jmx_tex_all",
+              "material": "#jmx_mat_all",
+              "tag": "#jmx_tag_all"
+            },
+            {
+              "texture": "#jmx_tex_all",
+              "material": "#jmx_mat_all",
+              "tag": "#jmx_tag_all"
+            }
           ]
         },
         "up": {
-          "uv": [0, 0, 16, 16],
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
           "texture": "#all",
-          "jmx_material": "#jmx_mat_all",
-          "layered_textures": [
-            { "jmx_tex": "#jmx_tex_all" },
-            { "jmx_tex": "#jmx_tex_all" }
+          "jmx_layers": [
+            {
+              "texture": "#jmx_tex_all",
+              "material": "#jmx_mat_all",
+              "tag": "#jmx_tag_all"
+            },
+            {
+              "texture": "#jmx_tex_all",
+              "material": "#jmx_mat_all",
+              "tag": "#jmx_tag_all"
+            }
           ]
         },
         "north": {
-          "uv": [0, 0, 16, 15],
+          "uv": [
+            0,
+            0,
+            16,
+            15
+          ],
           "texture": "#all",
           "cullface": "north",
-          "jmx_material": "#jmx_mat_all",
-          "layered_textures": [
-            { "jmx_tex": "#jmx_tex_all" },
-            { "jmx_tex": "#jmx_tex_all" }
+          "jmx_layers": [
+            {
+              "texture": "#jmx_tex_all",
+              "material": "#jmx_mat_all",
+              "tag": "#jmx_tag_all"
+            },
+            {
+              "texture": "#jmx_tex_all",
+              "material": "#jmx_mat_all",
+              "tag": "#jmx_tag_all"
+            }
           ]
         },
         "south": {
-          "uv": [0, 0, 16, 15],
+          "uv": [
+            0,
+            0,
+            16,
+            15
+          ],
           "texture": "#all",
           "cullface": "south",
-          "jmx_material": "#jmx_mat_all",
-          "layered_textures": [
-            { "jmx_tex": "#jmx_tex_all" },
-            { "jmx_tex": "#jmx_tex_all" }
+          "jmx_layers": [
+            {
+              "texture": "#jmx_tex_all",
+              "material": "#jmx_mat_all",
+              "tag": "#jmx_tag_all"
+            },
+            {
+              "texture": "#jmx_tex_all",
+              "material": "#jmx_mat_all",
+              "tag": "#jmx_tag_all"
+            }
           ]
         },
         "east": {
-          "uv": [0, 0, 16, 15],
+          "uv": [
+            0,
+            0,
+            16,
+            15
+          ],
           "texture": "#all",
           "cullface": "east",
-          "jmx_material": "#jmx_mat_all",
-          "layered_textures": [
-            { "jmx_tex": "#jmx_tex_all" },
-            { "jmx_tex": "#jmx_tex_all" }
+          "jmx_layers": [
+            {
+              "texture": "#jmx_tex_all",
+              "material": "#jmx_mat_all",
+              "tag": "#jmx_tag_all"
+            },
+            {
+              "texture": "#jmx_tex_all",
+              "material": "#jmx_mat_all",
+              "tag": "#jmx_tag_all"
+            }
           ]
         },
         "west": {
-          "uv": [0, 0, 16, 15],
+          "uv": [
+            0,
+            0,
+            16,
+            15
+          ],
           "texture": "#all",
           "cullface": "west",
-          "jmx_material": "#jmx_mat_all",
-          "layered_textures": [
-            { "jmx_tex": "#jmx_tex_all" },
-            { "jmx_tex": "#jmx_tex_all" }
+          "jmx_layers": [
+            {
+              "texture": "#jmx_tex_all",
+              "material": "#jmx_mat_all",
+              "tag": "#jmx_tag_all"
+            },
+            {
+              "texture": "#jmx_tex_all",
+              "material": "#jmx_mat_all",
+              "tag": "#jmx_tag_all"
+            }
           ]
         }
       }
@@ -76,35 +156,30 @@
     "textures": {
       "particle": "framity:block/solid_frame",
       "layered_textures": [
-        { "jmx_tex_all": "framity:block/solid_frame" },
-        { "jmx_tex_all": null }
+        {
+          "jmx_tex_all": "framity:block/solid_frame"
+        },
+        {
+          "jmx_tex_all": "framity:block/transparent"
+        }
       ]
     },
-    "materials": {
-      "jmx_mat_all": {
-        "layers": [
-          { "layer": "cutout_mipped" },
-          { "layer": "cutout_mipped" }
-        ]
+    "materials": [
+      {
+        "jmx_mat_all": "framity:frame"
+      },
+      {
+        "jmx_mat_all": "framity:frame"
       }
-    }
+    ],
+    "tags": [
+      {
+        "jmx_tag_all": 1
+      },
+      {
+        "jmx_tag_all": 2
+      }
+    ]
   },
-  "frex": {
-    "quad_transform": "framity:frame_transform",
-    "textures": {
-      "particle": "framity:block/solid_frame",
-      "layered_textures": [
-        { "jmx_tex_all": "framity:block/solid_frame" },
-        { "jmx_tex_all": null }
-      ]
-    },
-    "materials": {
-      "jmx_mat_all": {
-        "layers": [
-          { "layer": "cutout_mipped" },
-          { "layer": "cutout_mipped" }
-        ]
-      }
-    }
-  }
+  "jmx_version": 1
 }

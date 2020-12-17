@@ -4,6 +4,7 @@ import dev.alexnader.framity2.data.OverlayDataListener;
 import dev.alexnader.framity2.items.SpecialItems;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.resource.ResourceType;
 
 public class Framity2 implements ModInitializer {

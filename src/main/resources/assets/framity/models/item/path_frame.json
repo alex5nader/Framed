@@ -1,3 +1,4 @@
 {
-  "parent": "framity:block/path_frame"
+  "parent": "framity:block/path_frame",
+  "jmx_version": 1
 }

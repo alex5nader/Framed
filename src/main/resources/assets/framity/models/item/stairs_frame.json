@@ -1,3 +1,4 @@
 {
-  "parent": "framity:block/stairs_frame"
+  "parent": "framity:block/stairs_frame",
+  "jmx_version": 1
 }

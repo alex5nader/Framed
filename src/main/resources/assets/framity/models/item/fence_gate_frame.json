@@ -1,3 +1,4 @@
 {
-  "parent": "framity:block/fence_gate_frame"
+  "parent": "framity:block/fence_gate_frame",
+  "jmx_version": 1
 }
