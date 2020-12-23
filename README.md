@@ -1,5 +1,7 @@
 # HELP! I'm being framed!
 
+![Several framed blocks](assets/demo_640x360.png)
+
 HELP! I'm being framed! (also known as Framed) is a
 [Minecraft](https://www.minecraft.net/) mod for the
 [Fabric](https://fabricmc.net/use/) mod loader.
@@ -10,11 +12,7 @@ frame can have its texture changed to that of any full-size block in
 the game. While flowers, slabs, and similar items, are able to be
 placed into the world, they are not able to be placed into a frame.
 
-<p align="center">
-    <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api">
-        <img title="Requires Fabric API" height="50" src="https://i.imgur.com/Ol1Tcf8.png">
-    </a>
-</p>
+[![Requires Fabric API](assets/fabric_api_banner.png)](https://www.curseforge.com/minecraft/mc-mods/fabric-api)
 
 Framed depends on [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api),
 [LibGui](https://www.curseforge.com/minecraft/mc-mods/libgui),
@@ -25,7 +23,8 @@ Framed depends on [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabr
 ## Download
 
 Framed is not currently available, but when it is, it will be available through
-its [CurseForge page](https://www.curseforge.com/minecraft/mc-mods/framed).
+its [Modrinth](https://modrinth.com/mod/framed) and
+[CurseForge](https://www.curseforge.com/minecraft/mc-mods/framed) pages.
 
 ## Roadmap
 
