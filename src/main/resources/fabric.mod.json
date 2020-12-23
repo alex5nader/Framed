@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "framity",
+  "id": "framed",
   "version": "${version}",
 
-  "name": "Framity",
+  "name": "Framed",
   "description": "",
   "authors": [
     "Alex Habich <me@alexnader.dev>"
@@ -12,18 +12,18 @@
     "homepage": "https://alexnader.dev/"
   },
   "license": "MIT",
-  "icon": "assets/framity/icon.png",
+  "icon": "assets/framed/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.alexnader.framity.Framity"
+      "dev.alexnader.framed.Framed"
     ],
     "client": [
-      "dev.alexnader.framity.client.FramityClient"
+      "dev.alexnader.framed.client.FramedClient"
     ]
   },
   "mixins": [
-    "mixins.framity.json"
+    "mixins.framed.json"
   ],
   "depends": {
     "fabricloader": ">=0.7.1",

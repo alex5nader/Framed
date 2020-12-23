@@ -1,9 +1,11 @@
-# Framity
+# HELP! I'm being framed!
 
-Framity is a [Minecraft](https://www.minecraft.net/) mod for the [Fabric](https://fabricmc.net/use/) mod loader.
+HELP! I'm being framed! (also known as Framed) is a
+[Minecraft](https://www.minecraft.net/) mod for the
+[Fabric](https://fabricmc.net/use/) mod loader.
 There are no plans for a version for the Forge mod loader.
 
-Framity adds several types of block frame with various shapes. Each
+Framed adds several types of block frame with various shapes. Each
 frame can have its texture changed to that of any full-size block in
 the game. While flowers, slabs, and similar items, are able to be
 placed into the world, they are not able to be placed into a frame.
@@ -14,7 +16,7 @@ placed into the world, they are not able to be placed into a frame.
     </a>
 </p>
 
-Framity depends on [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api),
+Framed depends on [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api),
 [LibGui](https://www.curseforge.com/minecraft/mc-mods/libgui),
 [JMX](https://www.curseforge.com/minecraft/mc-mods/jmx), and
 [FREX](https://www.curseforge.com/minecraft/mc-mods/frex), but you only need to install 
@@ -22,18 +24,18 @@ Framity depends on [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fab
 
 ## Download
 
-Framity is not currently available, but when it is, it will be available through
-its [CurseForge page](https://www.curseforge.com/minecraft/mc-mods/framity).
+Framed is not currently available, but when it is, it will be available through
+its [CurseForge page](https://www.curseforge.com/minecraft/mc-mods/framed).
 
 ## Roadmap
 
-A roadmap is available [here](https://github.com/alex5nader/Framity/projects/1).
+A roadmap is available [here](https://github.com/alex5nader/Framed/projects/1).
     
 ## Thanks
 
 Thanks to:
 - The members of the [Fabric Discord](https://discord.gg/v6v4pMv) for their
-incredible help and support throughout the creation of Framity.
+incredible help and support throughout the creation of Framed.
 - [Grondag](https://www.curseforge.com/members/grondagthebarbarian)
 for immensely helping me understand the fabric rendering API.
 - [LibGui](https://github.com/CottonMC/LibGui) for making GUI creation so easy.
@@ -45,5 +47,5 @@ me use assets from the original
 
 ## License
 
-Framity is licensed under the [LGPL v2.1](LICENSE.md).
+Framed is licensed under the [LGPL v2.1](LICENSE.md).
 

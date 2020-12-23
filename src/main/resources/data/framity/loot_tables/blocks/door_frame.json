@@ -9,13 +9,13 @@
           "conditions": [
             {
               "condition": "minecraft:block_state_property",
-              "block": "framity:door_frame",
+              "block": "framed:door_frame",
               "properties": {
                 "half": "lower"
               }
             }
           ],
-          "name": "framity:door_frame"
+          "name": "framed:door_frame"
         }
       ],
       "conditions": [

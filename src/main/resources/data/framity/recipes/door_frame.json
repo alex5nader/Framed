@@ -7,11 +7,11 @@
   ],
   "key": {
     "F": {
-      "item": "framity:block_frame"
+      "item": "framed:block_frame"
     }
   },
   "result": {
-    "item": "framity:door_frame",
+    "item": "framed:door_frame",
     "count": 3
   }
 }

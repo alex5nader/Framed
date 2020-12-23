@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "framity:torch_frame"
+          "name": "framed:torch_frame"
         }
       ],
       "conditions": [

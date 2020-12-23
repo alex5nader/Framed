@@ -9,11 +9,11 @@
       "tag": "minecraft:coals"
     },
     "F": {
-      "item": "framity:block_frame"
+      "item": "framed:block_frame"
     }
   },
   "result": {
-    "item": "framity:torch_frame",
+    "item": "framed:torch_frame",
     "count": 4
   }
 }

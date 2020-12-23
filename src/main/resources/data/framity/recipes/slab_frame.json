@@ -5,11 +5,11 @@
   ],
   "key": {
     "F": {
-      "item": "framity:block_frame"
+      "item": "framed:block_frame"
     }
   },
   "result": {
-    "item": "framity:slab_frame",
+    "item": "framed:slab_frame",
     "count": 6
   }
 }

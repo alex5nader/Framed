@@ -39,21 +39,21 @@
   "overrides": [
     {
       "predicate": {
-        "framity:hammer_mode": 0
+        "framed:hammer_mode": 0
       },
-      "model": "framity:item/framers_hammer_none"
+      "model": "framed:item/framers_hammer_none"
     },
     {
       "predicate": {
-        "framity:hammer_mode": 1
+        "framed:hammer_mode": 1
       },
-      "model": "framity:item/framers_hammer_partial"
+      "model": "framed:item/framers_hammer_partial"
     },
     {
       "predicate": {
-        "framity:hammer_mode": 2
+        "framed:hammer_mode": 2
       },
-      "model": "framity:item/framers_hammer_whole"
+      "model": "framed:item/framers_hammer_whole"
     }
   ]
 }

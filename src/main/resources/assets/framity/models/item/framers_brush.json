@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "framity:item/brush"
+    "layer0": "framed:item/brush"
   }
 }

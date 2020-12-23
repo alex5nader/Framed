@@ -2,7 +2,7 @@
   "credit": "Made with Blockbench",
   "textures": {
     "particle": "#all",
-    "all": "framity:block/hollow_frame"
+    "all": "framed:block/hollow_frame"
   },
   "elements": [
     {
@@ -373,24 +373,24 @@
     }
   ],
   "jmx": {
-    "quad_transform": "framity:frame_transform",
+    "quad_transform": "framed:frame_transform",
     "textures": {
-      "particle": "framity:block/hollow_frame",
+      "particle": "framed:block/hollow_frame",
       "layered_textures": [
         {
-          "jmx_tex_all": "framity:block/hollow_frame"
+          "jmx_tex_all": "framed:block/hollow_frame"
         },
         {
-          "jmx_tex_all": "framity:block/transparent"
+          "jmx_tex_all": "framed:block/transparent"
         }
       ]
     },
     "materials": [
       {
-        "jmx_mat_all": "framity:frame"
+        "jmx_mat_all": "framed:frame"
       },
       {
-        "jmx_mat_all": "framity:frame"
+        "jmx_mat_all": "framed:frame"
       }
     ],
     "tags": [

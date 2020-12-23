@@ -10,10 +10,10 @@
       "item": "minecraft:iron_ingot"
     },
     "F": {
-      "item": "framity:block_frame"
+      "item": "framed:block_frame"
     }
   },
   "result": {
-    "item": "framity:framers_hammer"
+    "item": "framed:framers_hammer"
   }
 }

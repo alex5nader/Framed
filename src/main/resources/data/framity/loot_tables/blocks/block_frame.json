@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "framity:block_frame"
+          "name": "framed:block_frame"
         }
       ],
       "conditions": [

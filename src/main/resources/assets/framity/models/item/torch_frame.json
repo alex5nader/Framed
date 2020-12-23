@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "framity:block/torch_frame"
+    "layer0": "framed:block/torch_frame"
   }
 }

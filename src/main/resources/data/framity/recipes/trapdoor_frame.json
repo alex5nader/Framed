@@ -6,11 +6,11 @@
   ],
   "key": {
     "F": {
-      "item": "framity:block_frame"
+      "item": "framed:block_frame"
     }
   },
   "result": {
-    "item": "framity:trapdoor_frame",
+    "item": "framed:trapdoor_frame",
     "count": 2
   }
 }

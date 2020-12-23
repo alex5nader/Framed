@@ -1,5 +1,5 @@
 {
-  "parent": "framity:framity/overlays/zero_sides.json",
+  "parent": "framed:framed/overlays/zero_sides.json",
   "textureSource": {
     "type": "sided",
     "value": [
@@ -12,7 +12,7 @@
       {
         "sides": [ "north", "south", "east", "west" ],
         "value": {
-          "texture": "framity:framity/hay_side_overlay"
+          "texture": "framed:framed/hay_side_overlay"
         }
       }
     ]

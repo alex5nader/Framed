@@ -1,4 +1,4 @@
 {
-  "parent": "framity:block/trapdoor_frame_bottom",
+  "parent": "framed:block/trapdoor_frame_bottom",
   "jmx_version": 1
 }

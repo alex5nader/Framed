@@ -1,5 +1,5 @@
 {
   "variants": {
-    "": { "model":  "framity:block/block_frame" }
+    "": { "model":  "framed:block/block_frame" }
   }
 }

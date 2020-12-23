@@ -2,20 +2,20 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "framity:stairs_frame"
+      "item": "framed:stairs_frame"
     },
     {
-      "item": "framity:stairs_frame"
+      "item": "framed:stairs_frame"
     },
     {
-      "item": "framity:stairs_frame"
+      "item": "framed:stairs_frame"
     },
     {
-      "item": "framity:stairs_frame"
+      "item": "framed:stairs_frame"
     }
   ],
   "result": {
-    "item": "framity:block_frame",
+    "item": "framed:block_frame",
     "count": 3
   }
 }

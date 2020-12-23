@@ -1,27 +1,27 @@
 {
   "parent": "jmx:block/v1/2/jmx_template_fence_gate_wall",
   "textures": {
-    "texture": "framity:block/solid_frame"
+    "texture": "framed:block/solid_frame"
   },
   "jmx": {
-    "quad_transform": "framity:frame_transform",
+    "quad_transform": "framed:frame_transform",
     "textures": {
-      "jmx_tex_particle": "framity:block/solid_frame",
+      "jmx_tex_particle": "framed:block/solid_frame",
       "layered_textures": [
         {
-          "jmx_texture": "framity:block/solid_frame"
+          "jmx_texture": "framed:block/solid_frame"
         },
         {
-          "jmx_texture": "framity:block/transparent"
+          "jmx_texture": "framed:block/transparent"
         }
       ]
     },
     "materials": [
       {
-        "jmx_material": "framity:frame"
+        "jmx_material": "framed:frame"
       },
       {
-        "jmx_material": "framity:frame"
+        "jmx_material": "framed:frame"
       }
     ],
     "tags": [

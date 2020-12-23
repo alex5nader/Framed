@@ -1,5 +1,5 @@
 {
   "variants": {
-    "": { "model": "framity:block/torch_frame" }
+    "": { "model": "framed:block/torch_frame" }
   }
 }

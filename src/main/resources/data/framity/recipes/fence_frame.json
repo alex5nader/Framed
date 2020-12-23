@@ -9,11 +9,11 @@
       "item": "minecraft:stick"
     },
     "F": {
-      "item": "framity:block_frame"
+      "item": "framed:block_frame"
     }
   },
   "result": {
-    "item": "framity:fence_frame",
+    "item": "framed:fence_frame",
     "count": 3
   }
 }

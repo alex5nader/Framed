@@ -1,5 +1,5 @@
 {
   "variants": {
-    "": { "model": "framity:block/uv_test" }
+    "": { "model": "framed:block/uv_test" }
   }
 }

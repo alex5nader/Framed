@@ -1,5 +1,5 @@
 {
-  "parent": "framity:framity/overlays/zero_sides.json",
+  "parent": "framed:framed/overlays/zero_sides.json",
   "textureSource": {
     "type": "sided",
     "value": [

@@ -2,7 +2,7 @@
   "ambientocclusion": false,
   "textures": {
     "particle": "#torch",
-    "torch": "framity:block/torch_frame"
+    "torch": "framed:block/torch_frame"
   },
   "elements": [
     {
@@ -130,25 +130,25 @@
     }
   ],
   "jmx": {
-    "quad_transform": "framity:frame_transform",
+    "quad_transform": "framed:frame_transform",
     "textures": {
-      "particle": "framity:block/torch_frame",
+      "particle": "framed:block/torch_frame",
       "layered_textures": [
         {
-          "jmx_tex_torch": "framity:block/torch_frame"
+          "jmx_tex_torch": "framed:block/torch_frame"
         },
         {
-          "jmx_tex_torch": "framity:block/transparent"
+          "jmx_tex_torch": "framed:block/transparent"
         }
       ]
     },
     "materials": [
       {
-        "jmx_mat_fire": "framity:torch_frame_flame",
-        "jmx_mat_all": "framity:torch_frame"
+        "jmx_mat_fire": "framed:torch_frame_flame",
+        "jmx_mat_all": "framed:torch_frame"
       },
       {
-        "jmx_mat_all": "framity:torch_frame"
+        "jmx_mat_all": "framed:torch_frame"
       }
     ],
     "tags": [

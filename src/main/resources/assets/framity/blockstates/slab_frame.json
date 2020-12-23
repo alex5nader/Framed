@@ -1,7 +1,7 @@
 {
   "variants": {
-    "type=bottom": { "model": "framity:block/slab_frame" },
-    "type=top": { "model": "framity:block/slab_frame_top" },
-    "type=double": { "model": "framity:block/slab_frame_full" }
+    "type=bottom": { "model": "framed:block/slab_frame" },
+    "type=top": { "model": "framed:block/slab_frame_top" },
+    "type=double": { "model": "framed:block/slab_frame_full" }
   }
 }

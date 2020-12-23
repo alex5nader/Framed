@@ -1,6 +1,6 @@
 {
-  "parent": "framity:item/framers_hammer",
+  "parent": "framed:item/framers_hammer",
   "textures": {
-    "layer0": "framity:item/hammer_partial"
+    "layer0": "framed:item/hammer_partial"
   }
 }

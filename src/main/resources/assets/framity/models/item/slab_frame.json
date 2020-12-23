@@ -1,4 +1,4 @@
 {
-  "parent": "framity:block/slab_frame",
+  "parent": "framed:block/slab_frame",
   "jmx_version": 1
 }

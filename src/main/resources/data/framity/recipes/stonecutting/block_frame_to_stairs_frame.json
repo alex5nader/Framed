@@ -1,1 +1,1 @@
-{"type":"minecraft:stonecutting","ingredient":{"item":"framity:block_frame"},"result":"framity:stairs_frame","count":1}
+{"type":"minecraft:stonecutting","ingredient":{"item":"framed:block_frame"},"result":"framed:stairs_frame","count":1}

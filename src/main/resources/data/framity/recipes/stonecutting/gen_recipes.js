@@ -21,9 +21,9 @@ sources.forEach(source => {
         let recipe = {
             type: "minecraft:stonecutting",
             ingredient: {
-                item: "framity:" + source,
+                item: "framed:" + source,
             },
-            result: "framity:" + result,
+            result: "framed:" + result,
             count,
         }
 

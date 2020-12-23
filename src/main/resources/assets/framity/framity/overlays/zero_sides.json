@@ -4,7 +4,7 @@
       "sides": [ "north", "south", "east", "west" ],
       "value": {
         "v": {
-          "type": "framity:zero",
+          "type": "framed:zero",
           "value": { }
         }
       }
