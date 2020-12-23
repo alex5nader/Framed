@@ -31,10 +31,12 @@
     ],
     "tags": [
       {
-        "jmx_tag_bottom": 1
+        "jmx_tag_bottom": 1,
+        "jmx_tag_top": 1
       },
       {
-        "jmx_tag_bottom": 2
+        "jmx_tag_bottom": 2,
+        "jmx_tag_top": 2
       }
     ]
   },
