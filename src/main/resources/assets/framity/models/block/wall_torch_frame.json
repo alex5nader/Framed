@@ -6,198 +6,124 @@
   },
   "elements": [
     {
-      "from": [
-        -1,
-        3.5,
-        7
-      ],
-      "to": [
-        1,
-        11.5,
-        9
-      ],
+      "from": [ -1, 3.5, 7 ],
+      "to": [ 1, 11.5, 9 ],
       "rotation": {
-        "origin": [
-          0,
-          3.5,
-          8
-        ],
+        "origin": [ 0, 3.5, 8 ],
         "axis": "z",
         "angle": -22.5
       },
       "faces": {
         "down": {
-          "uv": [
-            7,
-            13,
-            9,
-            15
-          ],
+          "uv": [ 7, 13, 9, 15 ],
           "texture": "#torch",
           "jmx_layers": [
             {
               "texture": "#jmx_tex_torch",
               "material": "#jmx_mat_all",
-              "tag": "#jmx_tag_torch"
+              "tag": "#jmx_tag_all"
             },
             {
               "texture": "#jmx_tex_torch",
               "material": "#jmx_mat_all",
-              "tag": "#jmx_tag_torch"
+              "tag": "#jmx_tag_all"
             }
           ]
         },
         "west": {
-          "uv": [
-            7,
-            8,
-            9,
-            16
-          ],
+          "uv": [ 7, 8, 9, 16 ],
           "texture": "#torch",
           "jmx_layers": [
             {
               "texture": "#jmx_tex_torch",
               "material": "#jmx_mat_all",
-              "tag": "#jmx_tag_torch"
+              "tag": "#jmx_tag_all"
             },
             {
               "texture": "#jmx_tex_torch",
               "material": "#jmx_mat_all",
-              "tag": "#jmx_tag_torch"
+              "tag": "#jmx_tag_all"
             }
           ]
         },
         "east": {
-          "uv": [
-            7,
-            8,
-            9,
-            16
-          ],
+          "uv": [ 7, 8, 9, 16 ],
           "texture": "#torch",
           "jmx_layers": [
             {
               "texture": "#jmx_tex_torch",
               "material": "#jmx_mat_all",
-              "tag": "#jmx_tag_torch"
+              "tag": "#jmx_tag_all"
             },
             {
               "texture": "#jmx_tex_torch",
               "material": "#jmx_mat_all",
-              "tag": "#jmx_tag_torch"
+              "tag": "#jmx_tag_all"
             }
           ]
         },
         "north": {
-          "uv": [
-            7,
-            8,
-            9,
-            16
-          ],
+          "uv": [ 7, 8, 9, 16 ],
           "texture": "#torch",
           "jmx_layers": [
             {
               "texture": "#jmx_tex_torch",
               "material": "#jmx_mat_all",
-              "tag": "#jmx_tag_torch"
+              "tag": "#jmx_tag_all"
             },
             {
               "texture": "#jmx_tex_torch",
               "material": "#jmx_mat_all",
-              "tag": "#jmx_tag_torch"
+              "tag": "#jmx_tag_all"
             }
           ]
         },
         "south": {
-          "uv": [
-            7,
-            8,
-            9,
-            16
-          ],
+          "uv": [ 7, 8, 9, 16 ],
           "texture": "#torch",
           "jmx_layers": [
             {
               "texture": "#jmx_tex_torch",
               "material": "#jmx_mat_all",
-              "tag": "#jmx_tag_torch"
+              "tag": "#jmx_tag_all"
             },
             {
               "texture": "#jmx_tex_torch",
               "material": "#jmx_mat_all",
-              "tag": "#jmx_tag_torch"
+              "tag": "#jmx_tag_all"
             }
           ]
         }
       }
     },
     {
-      "from": [
-        -1,
-        11.5,
-        7
-      ],
-      "to": [
-        1,
-        13.5,
-        9
-      ],
+      "from": [ -1, 11.5, 7 ],
+      "to": [ 1, 13.5, 9 ],
       "rotation": {
-        "origin": [
-          0,
-          3.5,
-          8
-        ],
+        "origin": [ 0, 3.5, 8 ],
         "axis": "z",
         "angle": -22.5
       },
       "shade": false,
       "faces": {
         "up": {
-          "uv": [
-            7,
-            6,
-            9,
-            8
-          ],
+          "uv": [ 7, 6, 9, 8 ],
           "texture": "#torch"
         },
         "west": {
-          "uv": [
-            7,
-            6,
-            9,
-            8
-          ],
+          "uv": [ 7, 6, 9, 8 ],
           "texture": "#torch"
         },
         "east": {
-          "uv": [
-            7,
-            6,
-            9,
-            8
-          ],
+          "uv": [ 7, 6, 9, 8 ],
           "texture": "#torch"
         },
         "north": {
-          "uv": [
-            7,
-            6,
-            9,
-            8
-          ],
+          "uv": [ 7, 6, 9, 8 ],
           "texture": "#torch"
         },
         "south": {
-          "uv": [
-            7,
-            6,
-            9,
-            8
-          ],
+          "uv": [ 7, 6, 9, 8 ],
           "texture": "#torch"
         }
       }
