@@ -21,9 +21,9 @@ Framed depends on [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabr
 
 ## Download
 
-Framed is not currently available, but when it is, it will be available through
-its [Modrinth](https://modrinth.com/mod/framed) and
-[CurseForge](https://www.curseforge.com/minecraft/mc-mods/framed) pages.
+Framed is available through [GitHub Releases](https://github.com/alex5nader/Framed/releases),
+[Modrinth](https://modrinth.com/mod/framed), and
+[CurseForge](https://www.curseforge.com/minecraft/mc-mods/framed).
 
 ## Roadmap
 
