@@ -7,7 +7,7 @@ HELP! I'm being framed! (or Framed, for short) is a
 [Fabric](https://fabricmc.net/use/) mod loader.
 There are no plans for a version for the Forge mod loader.
 
-Framed adds several types of block frame with various shapes. Each
+Framed adds several types of frames with various shapes. Each
 frame can have its texture changed to that of any full-size block in
 the game. While flowers, slabs, and similar items, are able to be
 placed into the world, they are not able to be placed into a frame.
@@ -29,7 +29,7 @@ its [Modrinth](https://modrinth.com/mod/framed) and
 ## Roadmap
 
 A roadmap is available [here](https://github.com/alex5nader/Framed/projects/1).
-    
+
 ## Thanks
 
 Thanks to:
