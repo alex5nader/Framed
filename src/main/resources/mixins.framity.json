@@ -6,6 +6,7 @@
     "local.FrameBehaviour",
     "local.FrameEntityProvider",
     "local.SinglePartFrame",
+    "mc.FenceBlockMixin",
     "mc.GetItemBeforeEmpty",
     "mc.ModelLoaderDebugMixin"
   ],
