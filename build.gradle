@@ -50,8 +50,7 @@ dependencies {
     compileOnly("dev.alexnader:auto_codec:1.0")
     annotationProcessor("dev.alexnader:auto_codec:1.0")
 
-//    modRuntime "grondag:canvas-${project.mc_tag}:1.0.1191"
-//    modRuntime "me.shedaniel.cloth.api:cloth-api:1.4.6"
+    modRuntime "grondag:canvas-${project.mc_tag}:1.0.1262"
 }
 
 processResources {
