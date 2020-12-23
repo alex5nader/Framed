@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "dev.alexnader.framity2.mixin",
+  "package": "dev.alexnader.framity.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "local.FrameBehaviour",
