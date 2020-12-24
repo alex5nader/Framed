@@ -6,6 +6,7 @@ import dev.alexnader.framed.client.assets.overlay.OffsetterRegistry;
 import dev.alexnader.framed.client.assets.overlay.ZeroOffsetter;
 import dev.alexnader.framed.client.gui.FrameScreen;
 import dev.alexnader.framed.client.transform.FrameTransform;
+import dev.alexnader.framed.client.util.WorldRendererCallback;
 import dev.alexnader.framed.items.FramersHammer;
 import grondag.jmx.api.QuadTransformRegistry;
 import net.fabricmc.api.ClientModInitializer;
@@ -63,5 +64,7 @@ public class FramedClient implements ClientModInitializer {
         );
 
         FabricModelPredicateProviderRegistry.register(ITEMS.FRAMERS_HAMMER, META.id("hammer_mode"), FramersHammer.MODEL_PREDICATE);
+
+        WorldRendererCallback.EVENT.register(FramePreviewOutline::renderPreviewOutline);
     }
 }

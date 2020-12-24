@@ -46,7 +46,7 @@ dependencies {
     include(modApi("grondag:frex-${project.mc_tag}:${project.frex_version}") { transitive = false })
     include(modImplementation("grondag:jmx-${project.mc_tag}:${project.jmx_version}") { transitive = false })
 
-    modRuntime("grondag:canvas-${project.mc_tag}:1.0.1262")
+//    modRuntime("grondag:canvas-${project.mc_tag}:1.0.1262")
 }
 
 processResources {
