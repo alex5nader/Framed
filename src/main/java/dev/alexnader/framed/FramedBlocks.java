@@ -12,6 +12,8 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
+import java.util.function.Function;
+
 import static dev.alexnader.framed.Framed.META;
 
 public class FramedBlocks extends Registrar<Block> {
@@ -36,13 +38,20 @@ public class FramedBlocks extends Registrar<Block> {
     }
 
     {
-        final AbstractBlock.Settings frameSettings = FabricBlockSettings
-            .of(Material.WOOD)
-            .hardness(0.33f)
-            .sounds(BlockSoundGroup.WOOD)
-            .nonOpaque()
-            .solidBlock((a, b, c) -> false)
-            .luminance(state -> state.get(Properties.LIT) ? 15 : 0);
+        final Function<Material, AbstractBlock.Settings> makeSettings = material ->
+            FabricBlockSettings
+                .of(material)
+                .hardness(0.33f)
+                .sounds(BlockSoundGroup.WOOD)
+                .nonOpaque()
+                .solidBlock((a, b, c) -> false)
+                .luminance(state -> state.get(Properties.LIT) ? 15 : 0);
+
+        final AbstractBlock.Settings frameSettings = makeSettings.apply(Material.WOOD);
+        final AbstractBlock.Settings torchFrameSettings = makeSettings.apply(Material.SUPPORTED)
+            .noCollision()
+            .breakInstantly()
+            .luminance(state -> state.get(Properties.LIT) ? 15 : 14);
 
         final Item.Settings itemSettings = new Item.Settings()
             .group(META.MAIN_ITEM_GROUP);
@@ -52,11 +61,11 @@ public class FramedBlocks extends Registrar<Block> {
         STAIRS_FRAME = registerWithItem(new StairsFrame(BLOCK_FRAME.getDefaultState(), frameSettings), META.id("stairs_frame"), itemSettings);
         FENCE_FRAME = registerWithItem(new FenceFrame(frameSettings), META.id("fence_frame"), itemSettings);
         FENCE_GATE_FRAME = registerWithItem(new FenceGateFrame(frameSettings), META.id("fence_gate_frame"), itemSettings);
-        TRAPDOOR_FRAME = registerWithItem(new TrapdoorFrame(frameSettings), META.id("trapdoor_frame"), itemSettings);
+        TRAPDOOR_FRAME = registerWithItem(new TrapdoorFrame(frameSettings.allowsSpawning((a, b, c, d) -> false)), META.id("trapdoor_frame"), itemSettings);
         DOOR_FRAME = registerWithItem(new DoorFrame(frameSettings), META.id("door_frame"), itemSettings);
         PATH_FRAME = registerWithItem(new PathFrame(frameSettings), META.id("path_frame"), itemSettings);
 
-        TORCH_FRAME = register(new TorchFrame(frameSettings), META.id("torch_frame"));
-        WALL_TORCH_FRAME = register(new WallTorchFrame(frameSettings), META.id("wall_torch_frame"));
+        TORCH_FRAME = register(new TorchFrame(torchFrameSettings), META.id("torch_frame"));
+        WALL_TORCH_FRAME = register(new WallTorchFrame(torchFrameSettings), META.id("wall_torch_frame"));
     }
 }
