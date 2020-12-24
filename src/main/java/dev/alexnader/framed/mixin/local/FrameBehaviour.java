@@ -88,7 +88,11 @@ public abstract class FrameBehaviour extends Block implements BlockEntityProvide
     @SuppressWarnings("deprecation")
     @Override
     public int getWeakRedstonePower(final BlockState state, final BlockView world, final BlockPos pos, final Direction direction) {
-        return state.get(PROPERTIES.HAS_REDSTONE) ? 15 : 0;
+        if (state.get(PROPERTIES.HAS_REDSTONE)) {
+            return 15 - super.getWeakRedstonePower(state, world, pos, direction);
+        } else {
+            return super.getWeakRedstonePower(state, world, pos, direction);
+        }
     }
 
     @SuppressWarnings("deprecation")
