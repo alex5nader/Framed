@@ -129,7 +129,7 @@ public class FramePreviewOutline extends RenderLayer {
             final BakedModel upModel = client.getBlockRenderManager().getModel(upState);
 
             final boolean upValid = new ItemPlacementContext(player, Hand.MAIN_HAND, stack, hitResult.withBlockPos(upPos)).canReplaceExisting() || client.world.getBlockState(upPos).isAir();
-            final boolean downValid = blockState.canPlaceAt(client.world, pos) && (placementContext.canReplaceExisting() || client.world.getBlockState(pos).isAir());
+            final boolean downValid = blockState.canPlaceAt(client.world, pos) && (placementContext.canPlace() || client.world.getBlockState(pos).isAir());
             if (!upValid) {
                 valid = false;
             } else {
@@ -138,7 +138,7 @@ public class FramePreviewOutline extends RenderLayer {
 
             renderPreview(bufferBuilders, matrixStack, ticks, tickDelta, camera, client.world, upState, upPos, upModel, upValid && downValid);
         } else {
-            valid = blockState.canPlaceAt(client.world, pos) && (placementContext.canReplaceExisting() || client.world.getBlockState(pos).isAir());
+            valid = blockState.canPlaceAt(client.world, pos) && (placementContext.canPlace() || client.world.getBlockState(pos).isAir());
         }
 
         renderPreview(bufferBuilders, matrixStack, ticks, tickDelta, camera, client.world, blockState, pos, model, valid);
