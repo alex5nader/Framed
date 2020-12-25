@@ -37,6 +37,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.model.ModelHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.*;
@@ -45,6 +46,7 @@ import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.client.util.math.Vector4f;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -62,6 +64,8 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
 
+import static dev.alexnader.framed.Framed.BLOCKS;
+
 @Environment(EnvType.CLIENT)
 public class FramePreviewOutline extends RenderLayer {
     public static final RenderLayer TRANSLUCENT_UNLIT = RenderLayer.of(
@@ -78,11 +82,13 @@ public class FramePreviewOutline extends RenderLayer {
             .build(true)
     );
 
+    @SuppressWarnings("unused") // required by javac, unused bc of mixin
     public FramePreviewOutline(final String name, final VertexFormat vertexFormat, final int drawMode, final int expectedBufferSize, final boolean hasCrumbling, final boolean translucent, final Runnable startAction, final Runnable endAction) {
         super(name, vertexFormat, drawMode, expectedBufferSize, hasCrumbling, translucent, startAction, endAction);
         throw new IllegalStateException("Should not instantiate utility class");
     }
 
+    @SuppressWarnings("unused") // renderPreviewOutline matches interface WorldRendererCallback
     public static void renderPreviewOutline(final BufferBuilderStorage bufferBuilders, final WorldRenderer renderer, final MatrixStack matrixStack, final int ticks, final float tickDelta, final Camera camera, @Nullable final Frustum frustum) {
         final MinecraftClient client = MinecraftClient.getInstance();
 
@@ -105,29 +111,42 @@ public class FramePreviewOutline extends RenderLayer {
             return;
         }
 
-        final BlockState blockState = ((BlockItemAccess) player.getStackInHand(Hand.MAIN_HAND).getItem()).getPlacementStateProxy(new ItemPlacementContext(player, Hand.MAIN_HAND, stack, (BlockHitResult) client.crosshairTarget));
+        final BlockHitResult hitResult = (BlockHitResult) client.crosshairTarget;
+        final ItemPlacementContext placementContext = new ItemPlacementContext(player, Hand.MAIN_HAND, stack, hitResult);
+        final BlockState blockState = ((BlockItemAccess) player.getStackInHand(Hand.MAIN_HAND).getItem()).getPlacementStateProxy(placementContext);
 
         if (blockState == null) {
             return;
         }
 
-        //TODO
-        // Add special case for door
-        // Fix preview positioning
-
-        BlockPos pos = ((BlockHitResult) client.crosshairTarget).getBlockPos();
+        final BlockPos pos = placementContext.getBlockPos();
         final BakedModel model = client.getBlockRenderManager().getModel(blockState);
+        final boolean valid;
 
-        for (int directionId  = 0; directionId <= 6; directionId++) {
-            final List<BakedQuad> quads = model.getQuads(blockState, ModelHelper.faceFromIndex(directionId), client.world.random);
+        if (block == BLOCKS.DOOR_FRAME) {
+            final BlockPos upPos = pos.up();
+            final BlockState upState = blockState.with(Properties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.UPPER);
+            final BakedModel upModel = client.getBlockRenderManager().getModel(upState);
 
-            boolean canPlaceAt = client.world.getBlockState(pos).canReplace(new ItemPlacementContext(client.player, Hand.MAIN_HAND, player.getStackInHand(Hand.MAIN_HAND), (BlockHitResult) client.crosshairTarget));
-
-            if (!canPlaceAt) {
-                pos = pos.offset(((BlockHitResult) client.crosshairTarget).getSide());
+            final boolean upValid = new ItemPlacementContext(player, Hand.MAIN_HAND, stack, hitResult.withBlockPos(upPos)).canReplaceExisting() || client.world.getBlockState(upPos).isAir();
+            final boolean downValid = blockState.canPlaceAt(client.world, pos) && (placementContext.canReplaceExisting() || client.world.getBlockState(pos).isAir());
+            if (!upValid) {
+                valid = false;
+            } else {
+                valid = downValid;
             }
 
-            canPlaceAt = client.world.getBlockState(pos).canReplace(new ItemPlacementContext(client.player, Hand.MAIN_HAND, player.getStackInHand(Hand.MAIN_HAND), (BlockHitResult) client.crosshairTarget));
+            renderPreview(bufferBuilders, matrixStack, ticks, tickDelta, camera, client.world, upState, upPos, upModel, upValid && downValid);
+        } else {
+            valid = blockState.canPlaceAt(client.world, pos) && (placementContext.canReplaceExisting() || client.world.getBlockState(pos).isAir());
+        }
+
+        renderPreview(bufferBuilders, matrixStack, ticks, tickDelta, camera, client.world, blockState, pos, model, valid);
+    }
+
+    private static void renderPreview(final BufferBuilderStorage bufferBuilders, final MatrixStack matrixStack, final int ticks, final float tickDelta, final Camera camera, final ClientWorld world, final BlockState blockState, final BlockPos pos, final BakedModel model, final boolean valid) {
+        for (int directionId  = 0; directionId <= 6; directionId++) {
+            final List<BakedQuad> quads = model.getQuads(blockState, ModelHelper.faceFromIndex(directionId), world.random);
 
             matrixStack.push();
             matrixStack.translate(-camera.getPos().x, -camera.getPos().y, -camera.getPos().z);
@@ -143,8 +162,6 @@ public class FramePreviewOutline extends RenderLayer {
             matrixStack.translate(-0.5 * scale, -0.5 * scale, -0.5 * scale);
             matrixStack.scale(scale, scale, scale);
             matrixStack.translate(0.5 / scale, 0.5 / scale, 0.5 / scale);
-
-            final boolean valid = blockState.canPlaceAt(client.world, pos) && canPlaceAt;
 
             final int c = 0;
             final int r = valid ? c : 255;
@@ -168,6 +185,7 @@ public class FramePreviewOutline extends RenderLayer {
         }
     }
 
+    @SuppressWarnings({"DuplicatedCode", "SameParameterValue"})
     private static void render(final BakedQuad quad, final MatrixStack.Entry entry, final VertexConsumer consumer, final float r, final float g, final float b, final float a) {
         final int[] is = quad.getVertexData();
         final Vec3i vec3i = quad.getFace().getVector();
@@ -215,6 +233,7 @@ public class FramePreviewOutline extends RenderLayer {
         }
     }
 
+    @SuppressWarnings({"DuplicatedCode", "SameParameterValue"})
     private static void renderLines(final BakedQuad quad, final MatrixStack.Entry entry, final VertexConsumer consumer, final float r, final float g, final float b, final float a) {
         final int[] is = quad.getVertexData();
         final Vec3i vec3i = quad.getFace().getVector();
