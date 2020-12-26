@@ -69,7 +69,7 @@ import static dev.alexnader.framed.Framed.BLOCKS;
 @Environment(EnvType.CLIENT)
 public class FramePreviewOutline extends RenderLayer {
     public static final RenderLayer TRANSLUCENT_UNLIT = RenderLayer.of(
-        "automotion:translucent",
+        "framed:translucent",
         VertexFormats.POSITION_COLOR,
         7,
         262144,
