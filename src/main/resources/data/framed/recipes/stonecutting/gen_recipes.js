@@ -1,5 +1,3 @@
-const fs = require("fs");
-
 const sources = [
     "block_frame"
 ];
@@ -10,12 +8,13 @@ const results = [
     ["path_frame", 1],
     ["slab_frame", 2],
     ["stairs_frame", 1],
+    ["pressure_plate_frame",1],
     // ["torch_frame"],
     // ["trapdoor_frame"],
 ];
 
-sources.forEach(source => {
-    results.forEach(([result, count]) => {
+for (const source of sources) {
+    for (const [result, count] of results) {
         let name = source + "_to_" + result + ".json";
 
         let recipe = {
@@ -27,6 +26,6 @@ sources.forEach(source => {
             count,
         }
 
-        fs.writeFileSync(name, JSON.stringify(recipe))
-    })
-})
+        await Deno.writeTextFile(name, JSON.stringify(recipe))
+    }
+}

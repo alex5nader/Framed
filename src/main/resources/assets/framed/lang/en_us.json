@@ -12,6 +12,7 @@
   "block.framed.path_frame": "Path Frame",
   "block.framed.torch_frame": "Torch Frame",
   "block.framed.wall_torch_frame": "Torch Frame",
+  "block.framed.pressure_plate_frame": "Pressure Plate Frame",
   "itemGroup.framed.framed": "Framed",
   "gui.framed.frame.base_label": "Base",
   "gui.framed.frame.overlay_label": "Overlay",
