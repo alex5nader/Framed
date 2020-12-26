@@ -24,6 +24,12 @@ repositories {
         name = "dblsaiko"
         url = "https://maven.dblsaiko.net/"
     }
+    maven {
+        url("https://www.cursemaven.com")
+        content {
+            includeGroup("curse.maven")
+        }
+    }
     maven { url "https://jitpack.io" }
 }
 
@@ -47,6 +53,8 @@ dependencies {
     include(modImplementation("grondag:jmx-${project.mc_tag}:${project.jmx_version}") { transitive = false })
 
     modRuntime("grondag:canvas-${project.mc_tag}:1.0.1262")
+
+    modRuntime("curse.maven:couplings-395659:3111745")
 }
 
 processResources {
