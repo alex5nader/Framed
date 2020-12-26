@@ -7,6 +7,7 @@ plugins {
     id("maven-publish")
 }
 
+version = Framed.version
 group = Framed.group
 
 base {
