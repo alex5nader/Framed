@@ -111,6 +111,7 @@
   ],
   "jmx_version": 1,
   "jmx": {
+    "quad_transform": "framed:frame_transform",
     "textures": {
       "particle": "framed:block/solid_frame",
       "layered_textures": [
