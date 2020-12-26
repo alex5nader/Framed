@@ -54,7 +54,8 @@ import static dev.alexnader.framed.util.ValidQuery.checkIf;
     DoorFrame.class,
     PathFrame.class,
     TorchFrame.class,
-    WallTorchFrame.class
+    WallTorchFrame.class,
+    PressurePlateFrame.class
 })
 public abstract class FrameBehaviour extends Block implements BlockEntityProvider, ConstructorCallback, Frame, FrameSlotInfo {
     private FrameBehaviour(final Settings settings) {
@@ -82,7 +83,7 @@ public abstract class FrameBehaviour extends Block implements BlockEntityProvide
     @SuppressWarnings("deprecation")
     @Override
     public boolean emitsRedstonePower(final BlockState state) {
-        return state.get(PROPERTIES.HAS_REDSTONE);
+        return super.emitsRedstonePower(state) || state.get(PROPERTIES.HAS_REDSTONE);
     }
 
     @SuppressWarnings("deprecation")

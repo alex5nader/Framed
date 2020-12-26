@@ -23,7 +23,8 @@ import static dev.alexnader.framed.Framed.META;
     DoorFrame.class,
     PathFrame.class,
     TorchBlock.class,
-    WallTorchBlock.class
+    WallTorchBlock.class,
+    PressurePlateFrame.class
 })
 public class FrameEntityProvider implements BlockEntityProvider {
     private FrameEntityProvider() {
