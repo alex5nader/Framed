@@ -5,6 +5,7 @@ import net.fabricmc.loom.task.RemapJarTask
 import com.modrinth.minotaur.TaskModrinthUpload
 import com.matthewprenger.cursegradle.CurseArtifact
 import com.matthewprenger.cursegradle.CurseProject
+import com.matthewprenger.cursegradle.CurseRelation
 import com.matthewprenger.cursegradle.CurseUploadTask
 import com.matthewprenger.cursegradle.Options
 
@@ -96,13 +97,16 @@ publishing {
 
 val jar = tasks.getByName<Jar>("jar")
 
-val apiKeys = file("apiKeys.properties").inputStream().let { input -> Properties().apply { load(input) } }
-val modrinthApiKey: String by apiKeys
-val curseforgeApiKey: String by apiKeys
+val apiKeys by lazy {
+    val input = file("apiKeys.properties").inputStream()
+    Properties().apply { load(input) }
+}
 
 val publishModrinth = tasks.create<TaskModrinthUpload>("publishModrinth") {
+    val modrinthApiKey: String by apiKeys
+
     token = modrinthApiKey
-    projectId = "Ix9gggiE"
+    projectId = Framed.modrinthId
 
     changelog = "See https://github.com/alex5nader/Framed/projects for changelogs"
 
@@ -110,22 +114,51 @@ val publishModrinth = tasks.create<TaskModrinthUpload>("publishModrinth") {
     versionName = "Version ${Framed.version}"
     releaseType = "release"
 
-    uploadFile = jar
+    uploadFile = remapJar
 
     addGameVersion(Minecraft.version)
     addLoader("fabric")
 }
 
 curseforge {
+    val curseforgeApiKey: String by apiKeys
+
     apiKey = curseforgeApiKey
 
     project(closureOf<CurseProject> {
-        id = "356723"
+        id = Framed.curseforgeId
+
+        mainArtifact(remapJar)
 
         releaseType = "release"
 
         addGameVersion(Minecraft.version)
         addGameVersion("Fabric")
+
+        relations(closureOf<CurseRelation> {
+            jijDeps.forEach { dep ->
+                dep.curseforgeSlug
+                    .takeIf { dep.referenceOnCurseforge }
+                    ?.let {
+                        embeddedLibrary(it)
+                    }
+            }
+            deps.forEach { dep ->
+                dep.curseforgeSlug
+                    .takeIf { dep.referenceOnCurseforge }
+                    ?.takeIf { dep !in jijDeps }
+                    ?.let {
+                        requiredDependency(it)
+                    }
+            }
+            runtimeDeps.forEach { dep ->
+                dep.curseforgeSlug
+                    .takeIf { dep.referenceOnCurseforge }
+                    ?.let {
+                        optionalDependency(it)
+                    }
+            }
+        })
 
         changelog = "See https://github.com/alex5nader/Framed/projects for changelogs"
 
@@ -139,11 +172,12 @@ curseforge {
 
     options(closureOf<Options> {
         forgeGradleIntegration = false
+        debug = true
     })
 }
 
 project.afterEvaluate {
-    tasks.getByName<CurseUploadTask>("curseforge356723") {
+    tasks.getByName<CurseUploadTask>("curseforge${Framed.curseforgeId}") {
         dependsOn(remapJar)
     }
 }
