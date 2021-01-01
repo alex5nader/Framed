@@ -6,11 +6,13 @@
     "local.FrameBehaviour",
     "local.FrameEntityProvider",
     "local.SinglePartFrame",
+    "mc.BlockItemAccess",
     "mc.FenceBlockMixin",
     "mc.GetItemBeforeEmpty",
     "mc.WallBlockMixin"
   ],
   "client": [
+    "mc.WorldRendererAccess",
     "mc.BakedQuadAccess",
     "mc.ItemRendererMixin"
   ],
