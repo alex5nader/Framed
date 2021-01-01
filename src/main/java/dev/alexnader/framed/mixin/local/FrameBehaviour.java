@@ -63,6 +63,7 @@ import static dev.alexnader.framed.util.ValidQuery.checkIf;
     CarpetFrame.class
 })
 public abstract class FrameBehaviour extends Block implements BlockEntityProvider, Frame, FrameSlotInfo {
+    @SuppressWarnings("unused") // required by mixin
     private FrameBehaviour(final Settings settings) {
         super(settings);
         throw new IllegalStateException("Mixin constructor should never run.");
@@ -287,7 +288,7 @@ public abstract class FrameBehaviour extends Block implements BlockEntityProvide
 
         if (placer instanceof PlayerEntity) {
             final PlayerEntity player = (PlayerEntity) placer;
-            if (!(player.getOffHandStack().getItem() == ITEMS.FRAMERS_HAMMER) || player.getOffHandStack().getTag() == null) {
+            if (player.getOffHandStack().getItem() != ITEMS.FRAMERS_HAMMER || player.getOffHandStack().getTag() == null) {
                 tryCopy = false;
             } else {
                 final BlockEntity blockEntity = world.getBlockEntity(pos);

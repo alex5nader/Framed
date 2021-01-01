@@ -7,6 +7,10 @@ import java.util.function.ToIntFunction;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FunctionalUtil {
+    private FunctionalUtil() {
+        throw new IllegalStateException("Should not instantiate utility class.");
+    }
+
     public static <A> OptionalInt mapToInt(final Optional<A> optional, final ToIntFunction<A> f) {
         return optional.map(a -> OptionalInt.of(f.applyAsInt(a))).orElseGet(OptionalInt::empty);
     }

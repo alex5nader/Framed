@@ -41,7 +41,7 @@ public class SpecialItems {
 
     public final Map<Item, SpecialItem> MAP;
 
-    {
+    public SpecialItems() {
         final List<Pair<Item, BooleanProperty>> pairs = Lists.newArrayList(
             Pair.of(Items.GLOWSTONE_DUST, Properties.LIT),
             Pair.of(Items.REDSTONE, PROPERTIES.HAS_REDSTONE)

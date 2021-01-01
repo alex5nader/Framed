@@ -1,7 +1,6 @@
 package dev.alexnader.framed.mixin.mc;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.WallBlock;
@@ -29,11 +28,13 @@ public class WallBlockMixin extends Block {
 
     @Shadow @Final public static EnumProperty<WallShape> SOUTH_SHAPE;
 
+    @SuppressWarnings("unused")
     public WallBlockMixin(Settings settings) {
         super(settings);
         throw new IllegalStateException("Mixin constructor should not run.");
     }
 
+    @SuppressWarnings("unused")
     @Shadow
     private static VoxelShape method_24426(VoxelShape voxelShape, WallShape wallShape, VoxelShape voxelShape2, VoxelShape voxelShape3) {
         throw new IllegalStateException("Shadow method should not run.");
@@ -73,7 +74,7 @@ public class WallBlockMixin extends Block {
             voxelShape10 = method_24426(voxelShape10, wallShape3, voxelShape4, voxelShape8);
             voxelShape10 = method_24426(voxelShape10, wallShape2, voxelShape2, voxelShape6);
             voxelShape10 = method_24426(voxelShape10, wallShape4, voxelShape3, voxelShape7);
-            if (boolean_) {
+            if (Boolean.TRUE.equals(boolean_)) {
                 voxelShape10 = VoxelShapes.union(voxelShape10, voxelShape);
             }
 

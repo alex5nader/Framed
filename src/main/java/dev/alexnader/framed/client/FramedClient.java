@@ -59,7 +59,7 @@ public class FramedClient implements ClientModInitializer {
         CLIENT_OVERLAYS = new OverlayAssetListener();
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(CLIENT_OVERLAYS);
 
-        ModelLoadingRegistry.INSTANCE.registerAppender(
+        ModelLoadingRegistry.INSTANCE.registerModelProvider(
             (resourceManager, out) -> out.accept(new ModelIdentifier(META.id("framers_hammer_none"), "inventory"))
         );
 

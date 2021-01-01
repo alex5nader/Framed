@@ -2,6 +2,7 @@ package dev.alexnader.framed.util;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class Section implements Iterable<Integer> {
     private final int start;
@@ -74,6 +75,9 @@ public class Section implements Iterable<Integer> {
 
         @Override
         public Integer next() {
+            if (current >= end) {
+                throw new NoSuchElementException();
+            }
             return current++;
         }
     }

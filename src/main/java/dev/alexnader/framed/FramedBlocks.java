@@ -17,10 +17,6 @@ import java.util.function.Function;
 import static dev.alexnader.framed.Framed.META;
 
 public class FramedBlocks extends Registrar<Block> {
-    public FramedBlocks() {
-        super(Registry.BLOCK);
-    }
-
     public final BlockFrame BLOCK_FRAME;
     public final SlabFrame SLAB_FRAME;
     public final StairsFrame STAIRS_FRAME;
@@ -41,7 +37,9 @@ public class FramedBlocks extends Registrar<Block> {
         return register(block, id);
     }
 
-    {
+    public FramedBlocks() {
+        super(Registry.BLOCK);
+
         final Function<Material, AbstractBlock.Settings> makeSettings = material ->
             FabricBlockSettings
                 .of(material)
@@ -49,13 +47,13 @@ public class FramedBlocks extends Registrar<Block> {
                 .sounds(BlockSoundGroup.WOOD)
                 .nonOpaque()
                 .solidBlock((a, b, c) -> false)
-                .luminance(state -> state.get(Properties.LIT) ? 15 : 0);
+                .luminance(state -> Boolean.TRUE.equals(state.get(Properties.LIT)) ? 15 : 0);
 
         final AbstractBlock.Settings frameSettings = makeSettings.apply(Material.WOOD);
         final AbstractBlock.Settings torchFrameSettings = makeSettings.apply(Material.SUPPORTED)
             .noCollision()
             .breakInstantly()
-            .luminance(state -> state.get(Properties.LIT) ? 15 : 14);
+            .luminance(state -> Boolean.TRUE.equals(state.get(Properties.LIT)) ? 15 : 14);
 
         final Item.Settings itemSettings = new Item.Settings()
             .group(META.MAIN_ITEM_GROUP);

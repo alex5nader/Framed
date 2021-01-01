@@ -6,6 +6,10 @@ import net.fabricmc.api.Environment;
 
 @Environment(EnvType.CLIENT)
 public class QuadUtil {
+    private QuadUtil() {
+        throw new IllegalStateException("Should not instantiate utility class.");
+    }
+
     public static float calcCenter(final Int2FloatFunction key) {
         float min = Float.POSITIVE_INFINITY;
         float max = Float.NEGATIVE_INFINITY;

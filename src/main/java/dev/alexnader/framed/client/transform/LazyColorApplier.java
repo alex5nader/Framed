@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 
 @Environment(EnvType.CLIENT)
 public abstract class LazyColorApplier {
+    @SuppressWarnings("java:S1186")
     public static final LazyColorApplier NONE = new LazyColorApplier() {
         @Override
         public void apply(final MutableQuadView mqv, final int color) { }

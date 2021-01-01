@@ -81,6 +81,7 @@ public class FramePreviewOutline extends RenderLayer {
         throw new IllegalStateException("Should not instantiate utility class");
     }
 
+    @SuppressWarnings("java:S3776")
     public static void renderPreviewOutline(final WorldRenderContext context) {
         final MinecraftClient client = MinecraftClient.getInstance();
 
@@ -177,7 +178,7 @@ public class FramePreviewOutline extends RenderLayer {
         }
     }
 
-    @SuppressWarnings("SameParameterValue")
+    @SuppressWarnings({"SameParameterValue", "java:S1181"})
     private static void render(final BakedQuad quad, final MatrixStack.Entry entry, final VertexConsumer consumer, final float r, final float g, final float b, final float a) {
         final int[] is = quad.getVertexData();
         final Vec3i vec3i = quad.getFace().getVector();
