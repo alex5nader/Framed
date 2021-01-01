@@ -43,7 +43,9 @@ import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -176,21 +178,14 @@ public class FramePreviewOutline extends RenderLayer {
             final int r = valid ? c : 255;
             final int g = valid ? 255 : c;
             final int b = valid ? 64 : 0;
-            final int a = 64;
+            final int a = 127;
 
             final MatrixStack.Entry entry = matrixStack.peek();
 
-            // TODO: Make this work on Fabulous graphics.
             //noinspection ConstantConditions // this method should be registered to AFTER_ENTITIES, which will have a non-null consumer
-            final VertexConsumer faces = context.consumers().getBuffer(TRANSLUCENT_UNLIT);
+            final VertexConsumer faces = context.consumers().getBuffer(TexturedRenderLayers.getItemEntityTranslucentCull());
             for (final BakedQuad quad : quads) {
                 render(quad, entry, faces, r, g, b, a);
-            }
-
-            //noinspection ConstantConditions // this method should be registered to AFTER_ENTITIES, which will have a non-null consumer
-            final VertexConsumer lines = context.consumers().getBuffer(RenderLayer.LINES);
-            for (final BakedQuad quad : quads) {
-                renderLines(quad, entry, lines, r, g, b, a);
             }
             matrixStack.pop();
         }
@@ -221,12 +216,12 @@ public class FramePreviewOutline extends RenderLayer {
                 final float v;
                 final float w;
 
-                final int u = -1;
+                final int u = 0x00F000F0;
                 v = byteBuffer.getFloat(16);
                 w = byteBuffer.getFloat(20);
                 final Vector4f vector4f = new Vector4f(x, y, z, 1.0F);
                 vector4f.transform(matrix4f);
-                consumer.vertex(vector4f.getX(), vector4f.getY(), vector4f.getZ(), r/255F, g/255F, b/255F, a/255F, v, w, 1, u, vector3f.getX(), vector3f.getY(), vector3f.getZ());
+                consumer.vertex(vector4f.getX(), vector4f.getY(), vector4f.getZ(), r/255F, g/255F, b/255F, a/255F, v, w, OverlayTexture.DEFAULT_UV, u, vector3f.getX(), vector3f.getY(), vector3f.getZ());
             }
         } catch (final Throwable var38) {
             var17 = var38;
