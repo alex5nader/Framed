@@ -13,10 +13,10 @@ out/
 
 # fabric
 
-run/
-minecraft/
-logs/
+/run/
+/minecraft/
+/logs/
 
 # other
 
-apiKeys.properties
+/apiKeys.properties
