@@ -27,7 +27,8 @@ public class FramedBlockEntityTypes extends Registrar<BlockEntityType<?>> {
             BLOCKS.PRESSURE_PLATE_FRAME,
             BLOCKS.WALL_FRAME,
             BLOCKS.LAYER_FRAME,
-            BLOCKS.CARPET_FRAME
+            BLOCKS.CARPET_FRAME,
+            BLOCKS.PANE_FRAME
         ).build(null),
         META.id("frame")
     );

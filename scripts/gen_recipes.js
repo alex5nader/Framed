@@ -15,6 +15,7 @@ const results = [
     ["wall_frame", 1],
     ["layer_frame", 8],
     ["carpet_frame", 3],
+    ["pane_frame", 3],
 ];
 
 for (const source of sources) {

@@ -26,7 +26,8 @@ import static dev.alexnader.framed.Framed.META;
     PressurePlateFrame.class,
     WallFrame.class,
     LayerFrame.class,
-    CarpetFrame.class
+    CarpetFrame.class,
+    PaneFrame.class
 })
 public abstract class SinglePartFrame implements FrameSlotInfo {
     private SinglePartFrame() {

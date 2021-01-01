@@ -31,6 +31,7 @@ public class FramedBlocks extends Registrar<Block> {
     public final WallFrame WALL_FRAME;
     public final LayerFrame LAYER_FRAME;
     public final CarpetFrame CARPET_FRAME;
+    public final PaneFrame PANE_FRAME;
 
     private <A extends Block> A registerWithItem(final A block, final Identifier id, final Item.Settings settings) {
         Registry.register(Registry.ITEM, id, new BlockItem(block, settings));
@@ -70,6 +71,7 @@ public class FramedBlocks extends Registrar<Block> {
         WALL_FRAME = registerWithItem(new WallFrame(frameSettings), META.id("wall_frame"), itemSettings);
         LAYER_FRAME = registerWithItem(new LayerFrame(frameSettings), META.id("layer_frame"), itemSettings);
         CARPET_FRAME = registerWithItem(new CarpetFrame(frameSettings), META.id("carpet_frame"), itemSettings);
+        PANE_FRAME = registerWithItem(new PaneFrame(frameSettings), META.id("pane_frame"), itemSettings);
 
         TORCH_FRAME = register(new TorchFrame(torchFrameSettings), META.id("torch_frame"));
         WALL_TORCH_FRAME = register(new WallTorchFrame(torchFrameSettings), META.id("wall_torch_frame"));

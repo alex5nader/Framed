@@ -16,6 +16,7 @@
   "block.framed.wall_frame": "Wall Frame",
   "block.framed.layer_frame": "Layer Frame",
   "block.framed.carpet_frame": "Carpet Frame",
+  "block.framed.pane_frame": "Pane Frame",
   "itemGroup.framed.framed": "Framed",
   "gui.framed.frame.base_label": "Base",
   "gui.framed.frame.overlay_label": "Overlay",

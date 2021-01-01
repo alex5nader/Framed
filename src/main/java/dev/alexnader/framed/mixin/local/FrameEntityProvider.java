@@ -27,7 +27,8 @@ import static dev.alexnader.framed.Framed.META;
     PressurePlateFrame.class,
     WallFrame.class,
     LayerFrame.class,
-    CarpetFrame.class
+    CarpetFrame.class,
+    PaneFrame.class
 })
 public class FrameEntityProvider implements BlockEntityProvider {
     private FrameEntityProvider() {
