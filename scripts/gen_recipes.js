@@ -1,3 +1,7 @@
+#!/usr/bin/env -S deno run --allow-write --allow-read
+
+Deno.chdir("../src/main/resources/data/framed/recipes/stonecutting");
+
 const sources = [
     "block_frame"
 ];
@@ -9,6 +13,7 @@ const results = [
     ["slab_frame", 2],
     ["stairs_frame", 1],
     ["pressure_plate_frame",1],
+    ["wall_frame", 1],
     // ["torch_frame"],
     // ["trapdoor_frame"],
 ];

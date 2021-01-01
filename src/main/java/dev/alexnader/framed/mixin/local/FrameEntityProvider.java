@@ -24,7 +24,8 @@ import static dev.alexnader.framed.Framed.META;
     PathFrame.class,
     TorchBlock.class,
     WallTorchBlock.class,
-    PressurePlateFrame.class
+    PressurePlateFrame.class,
+    WallFrame.class
 })
 public class FrameEntityProvider implements BlockEntityProvider {
     private FrameEntityProvider() {

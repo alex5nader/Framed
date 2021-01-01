@@ -23,7 +23,8 @@ import static dev.alexnader.framed.Framed.META;
     PathFrame.class,
     TorchBlock.class,
     WallTorchBlock.class,
-    PressurePlateFrame.class
+    PressurePlateFrame.class,
+    WallFrame.class
 })
 public abstract class SinglePartFrame implements FrameSlotInfo {
     private SinglePartFrame() {

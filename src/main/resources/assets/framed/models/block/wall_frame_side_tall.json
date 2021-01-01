@@ -1,0 +1,24 @@
+{
+  "parent": "jmx:block/v1/2/jmx_template_wall_side_tall",
+  "jmx_version": 1,
+  "textures": {
+    "wall": "framed:block/solid_frame"
+  },
+  "jmx": {
+    "textures": {
+      "jmx_tex_particle": "framed:block/solid_frame",
+      "layered_textures": [
+        { "jmx_tex_wall": "framed:block/solid_frame" },
+        { "jmx_tex_wall": "framed:block/transparent" }
+      ]
+    },
+    "materials": [
+      { "jmx_mat_wall": "framed:frame" },
+      { "jmx_mat_wall": "framed:frame" }
+    ],
+    "tags": [
+      { "jmx_tag_wall": 1 },
+      { "jmx_tag_wall": 2 }
+    ]
+  }
+}

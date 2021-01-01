@@ -1,8 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "FF",
-    "FF"
+    "FFF",
+    "FFF"
   ],
   "key": {
     "F": {
@@ -10,7 +10,7 @@
     }
   },
   "result": {
-    "item": "framed:trapdoor_frame",
-    "count": 2
+    "item": "framed:wall_frame",
+    "count": 6
   }
 }
