@@ -24,32 +24,19 @@
 
 // This file is adapted from Hephaestus-Dev's Automotion, commit f3f5e3d.
 // Permalinks:
-// - https://github.com/Hephaestus-Dev/Automotion/blob/f3f5e3d1251a925efa2c3f32e67f7eaa0b732692/src/main/java/hephaestus/dev/automotion/client/WorldRendererCallback.java
+// - https://github.com/Hephaestus-Dev/Automotion/blob/f3f5e3d1251a925efa2c3f32e67f7eaa0b732692/src/main/java/hephaestus/dev/automotion/mixin/client/render/WorldRendererMixin.java
 
-package dev.alexnader.framed.client.util;
+package dev.alexnader.framed.mixin.mc;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.client.render.BufferBuilderStorage;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-import javax.annotation.Nullable;
-
+@Mixin(WorldRenderer.class)
 @Environment(EnvType.CLIENT)
-public interface WorldRendererCallback {
-    Event<WorldRendererCallback> EVENT = EventFactory.createArrayBacked(
-        WorldRendererCallback.class,
-        callbacks -> (bufferBuilders, renderer, matrixStack, ticks, tickDelta, camera, frustrum) -> {
-            for (WorldRendererCallback callback : callbacks) {
-                callback.render(bufferBuilders, renderer, matrixStack, ticks, tickDelta, camera, frustrum);
-            }
-        }
-    );
-
-    void render(BufferBuilderStorage bufferBuilders, WorldRenderer renderer, MatrixStack matrixStack, int ticks, float tickDelta, Camera camera, @Nullable Frustum frustum);
+public interface WorldRendererAccess {
+    @Accessor("ticks")
+    int ticks();
 }

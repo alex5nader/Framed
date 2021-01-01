@@ -6,13 +6,13 @@ import dev.alexnader.framed.client.assets.overlay.OffsetterRegistry;
 import dev.alexnader.framed.client.assets.overlay.ZeroOffsetter;
 import dev.alexnader.framed.client.gui.FrameScreen;
 import dev.alexnader.framed.client.transform.FrameTransform;
-import dev.alexnader.framed.client.util.WorldRendererCallback;
 import dev.alexnader.framed.items.FramersHammer;
 import grondag.jmx.api.QuadTransformRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.fabricmc.fabric.api.object.builder.v1.client.model.FabricModelPredicateProviderRegistry;
@@ -65,6 +65,6 @@ public class FramedClient implements ClientModInitializer {
 
         FabricModelPredicateProviderRegistry.register(ITEMS.FRAMERS_HAMMER, META.id("hammer_mode"), FramersHammer.MODEL_PREDICATE);
 
-        WorldRendererCallback.EVENT.register(FramePreviewOutline::renderPreviewOutline);
+        WorldRenderEvents.AFTER_ENTITIES.register(FramePreviewOutline::renderPreviewOutline);
     }
 }

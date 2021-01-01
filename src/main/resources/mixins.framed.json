@@ -9,10 +9,10 @@
     "mc.BlockItemAccess",
     "mc.FenceBlockMixin",
     "mc.GetItemBeforeEmpty",
-    "mc.WorldRendererMixin",
     "mc.WallBlockMixin"
   ],
   "client": [
+    "mc.WorldRendererAccess",
     "mc.BakedQuadAccess",
     "mc.ItemRendererMixin"
   ],

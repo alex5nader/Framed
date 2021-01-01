@@ -32,15 +32,21 @@ package dev.alexnader.framed.client;
 
 import dev.alexnader.framed.block.frame.Frame;
 import dev.alexnader.framed.mixin.mc.BlockItemAccess;
+import dev.alexnader.framed.mixin.mc.WorldRendererAccess;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.renderer.v1.model.ModelHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.util.math.MatrixStack;
@@ -59,7 +65,6 @@ import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3i;
 import org.lwjgl.system.MemoryStack;
 
-import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
@@ -88,8 +93,7 @@ public class FramePreviewOutline extends RenderLayer {
         throw new IllegalStateException("Should not instantiate utility class");
     }
 
-    @SuppressWarnings("unused") // renderPreviewOutline matches interface WorldRendererCallback
-    public static void renderPreviewOutline(final BufferBuilderStorage bufferBuilders, final WorldRenderer renderer, final MatrixStack matrixStack, final int ticks, final float tickDelta, final Camera camera, @Nullable final Frustum frustum) {
+    public static void renderPreviewOutline(final WorldRenderContext context) {
         final MinecraftClient client = MinecraftClient.getInstance();
 
         final ClientPlayerEntity player = client.player;
@@ -136,15 +140,20 @@ public class FramePreviewOutline extends RenderLayer {
                 valid = downValid;
             }
 
-            renderPreview(bufferBuilders, matrixStack, ticks, tickDelta, camera, client.world, upState, upPos, upModel, upValid && downValid);
+            renderPreview(context, client.world, upState, upPos, upModel, upValid && downValid);
         } else {
             valid = blockState.canPlaceAt(client.world, pos) && (placementContext.canPlace() || client.world.getBlockState(pos).isAir());
         }
 
-        renderPreview(bufferBuilders, matrixStack, ticks, tickDelta, camera, client.world, blockState, pos, model, valid);
+        renderPreview(context, client.world, blockState, pos, model, valid);
     }
 
-    private static void renderPreview(final BufferBuilderStorage bufferBuilders, final MatrixStack matrixStack, final int ticks, final float tickDelta, final Camera camera, final ClientWorld world, final BlockState blockState, final BlockPos pos, final BakedModel model, final boolean valid) {
+    private static void renderPreview(final WorldRenderContext context, final ClientWorld world, final BlockState blockState, final BlockPos pos, final BakedModel model, final boolean valid) {
+        final MatrixStack matrixStack = context.matrixStack();
+        final Camera camera = context.camera();
+        final int ticks = ((WorldRendererAccess) context.worldRenderer()).ticks();
+        final float tickDelta = context.tickDelta();
+
         for (int directionId  = 0; directionId <= 6; directionId++) {
             final List<BakedQuad> quads = model.getQuads(blockState, ModelHelper.faceFromIndex(directionId), world.random);
 
@@ -172,12 +181,14 @@ public class FramePreviewOutline extends RenderLayer {
             final MatrixStack.Entry entry = matrixStack.peek();
 
             // TODO: Make this work on Fabulous graphics.
-            final VertexConsumer faces = bufferBuilders.getEffectVertexConsumers().getBuffer(TRANSLUCENT_UNLIT);
+            //noinspection ConstantConditions // this method should be registered to AFTER_ENTITIES, which will have a non-null consumer
+            final VertexConsumer faces = context.consumers().getBuffer(TRANSLUCENT_UNLIT);
             for (final BakedQuad quad : quads) {
                 render(quad, entry, faces, r, g, b, a);
             }
 
-            final VertexConsumer lines = bufferBuilders.getEffectVertexConsumers().getBuffer(RenderLayer.LINES);
+            //noinspection ConstantConditions // this method should be registered to AFTER_ENTITIES, which will have a non-null consumer
+            final VertexConsumer lines = context.consumers().getBuffer(RenderLayer.LINES);
             for (final BakedQuad quad : quads) {
                 renderLines(quad, entry, lines, r, g, b, a);
             }
