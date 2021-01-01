@@ -7,7 +7,6 @@ import dev.alexnader.framed.block.entity.FrameBlockEntity;
 import dev.alexnader.framed.block.frame.*;
 import dev.alexnader.framed.items.FramersHammer;
 import dev.alexnader.framed.items.SpecialItems;
-import dev.alexnader.framed.util.ConstructorCallback;
 import dev.alexnader.framed.util.ValidQuery;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -35,6 +34,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -58,14 +60,14 @@ import static dev.alexnader.framed.util.ValidQuery.checkIf;
     PressurePlateFrame.class,
     WallFrame.class
 })
-public abstract class FrameBehaviour extends Block implements BlockEntityProvider, ConstructorCallback, Frame, FrameSlotInfo {
+public abstract class FrameBehaviour extends Block implements BlockEntityProvider, Frame, FrameSlotInfo {
     private FrameBehaviour(final Settings settings) {
         super(settings);
         throw new IllegalStateException("Mixin constructor should never run.");
     }
 
-    @Override
-    public void onConstructor() {
+    @Inject(method = "<init>*", at = @At("TAIL"))
+    void setFramePropertiesDefaultState(CallbackInfo ci) {
         setDefaultState(getDefaultState()
             .with(Properties.LIT, false)
             .with(PROPERTIES.HAS_REDSTONE, false)
