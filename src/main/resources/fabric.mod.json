@@ -33,5 +33,7 @@
     "json-model-extensions": "*",
     "frex": "*"
   },
-  "conflicts": {}
+  "conflicts": {
+    "sodium": "*"
+  }
 }

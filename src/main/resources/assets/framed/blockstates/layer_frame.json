@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "layers=1": {
+      "model": "framed:block/layer_frame_height2"
+    },
+    "layers=2": {
+      "model": "framed:block/layer_frame_height4"
+    },
+    "layers=3": {
+      "model": "framed:block/layer_frame_height6"
+    },
+    "layers=4": {
+      "model": "framed:block/layer_frame_height8"
+    },
+    "layers=5": {
+      "model": "framed:block/layer_frame_height10"
+    },
+    "layers=6": {
+      "model": "framed:block/layer_frame_height12"
+    },
+    "layers=7": {
+      "model": "framed:block/layer_frame_height14"
+    },
+    "layers=8": {
+      "model": "framed:block/layer_frame_height16"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "parent": "jmx:block/v1/2/jmx_carpet",
+  "textures": {
+    "wool": "framed:block/solid_frame"
+  },
+  "jmx": {
+    "quad_transform": "framed:frame_transform",
+    "textures": {
+      "jmx_tex_particle": "framed:block/solid_frame",
+      "layered_textures": [
+        { "jmx_tex_wool": "framed:block/solid_frame" },
+        { "jmx_tex_wool": "framed:block/transparent" }
+      ]
+    },
+    "materials": [
+      { "jmx_mat_wool": "framed:frame" },
+      { "jmx_mat_wool": "framed:frame" }
+    ],
+    "tags": [
+      { "jmx_tag_wool": 1 },
+      { "jmx_tag_wool": 2 }
+    ]
+  },
+  "jmx_version": 1
+}

@@ -7,7 +7,6 @@ import dev.alexnader.framed.block.entity.FrameBlockEntity;
 import dev.alexnader.framed.block.frame.*;
 import dev.alexnader.framed.items.FramersHammer;
 import dev.alexnader.framed.items.SpecialItems;
-import dev.alexnader.framed.util.ConstructorCallback;
 import dev.alexnader.framed.util.ValidQuery;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -35,6 +34,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,16 +56,20 @@ import static dev.alexnader.framed.util.ValidQuery.checkIf;
     DoorFrame.class,
     PathFrame.class,
     TorchFrame.class,
-    WallTorchFrame.class
+    WallTorchFrame.class,
+    PressurePlateFrame.class,
+    WallFrame.class,
+    LayerFrame.class,
+    CarpetFrame.class
 })
-public abstract class FrameBehaviour extends Block implements BlockEntityProvider, ConstructorCallback, Frame, FrameSlotInfo {
+public abstract class FrameBehaviour extends Block implements BlockEntityProvider, Frame, FrameSlotInfo {
     private FrameBehaviour(final Settings settings) {
         super(settings);
         throw new IllegalStateException("Mixin constructor should never run.");
     }
 
-    @Override
-    public void onConstructor() {
+    @Inject(method = "<init>*", at = @At("TAIL"))
+    void setFramePropertiesDefaultState(CallbackInfo ci) {
         setDefaultState(getDefaultState()
             .with(Properties.LIT, false)
             .with(PROPERTIES.HAS_REDSTONE, false)
@@ -82,13 +88,17 @@ public abstract class FrameBehaviour extends Block implements BlockEntityProvide
     @SuppressWarnings("deprecation")
     @Override
     public boolean emitsRedstonePower(final BlockState state) {
-        return state.get(PROPERTIES.HAS_REDSTONE);
+        return super.emitsRedstonePower(state) || state.get(PROPERTIES.HAS_REDSTONE);
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public int getWeakRedstonePower(final BlockState state, final BlockView world, final BlockPos pos, final Direction direction) {
-        return state.get(PROPERTIES.HAS_REDSTONE) ? 15 : 0;
+        if (state.get(PROPERTIES.HAS_REDSTONE)) {
+            return 15 - super.getWeakRedstonePower(state, world, pos, direction);
+        } else {
+            return super.getWeakRedstonePower(state, world, pos, direction);
+        }
     }
 
     @SuppressWarnings("deprecation")

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "framed:block/pressure_plate_frame_up"
+    },
+    "powered=true": {
+      "model": "framed:block/pressure_plate_frame_down"
+    }
+  }
+}

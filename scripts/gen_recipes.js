@@ -1,21 +1,24 @@
-const fs = require("fs");
+#!/usr/bin/env -S deno run --allow-write --allow-read
+
+Deno.chdir("../src/main/resources/data/framed/recipes/stonecutting");
 
 const sources = [
     "block_frame"
 ];
 const results = [
-    // ["door_frame"],
     ["fence_frame", 1],
     ["fence_gate_frame", 1],
     ["path_frame", 1],
     ["slab_frame", 2],
     ["stairs_frame", 1],
-    // ["torch_frame"],
-    // ["trapdoor_frame"],
+    ["pressure_plate_frame",1],
+    ["wall_frame", 1],
+    ["layer_frame", 8],
+    ["carpet_frame", 3],
 ];
 
-sources.forEach(source => {
-    results.forEach(([result, count]) => {
+for (const source of sources) {
+    for (const [result, count] of results) {
         let name = source + "_to_" + result + ".json";
 
         let recipe = {
@@ -27,6 +30,6 @@ sources.forEach(source => {
             count,
         }
 
-        fs.writeFileSync(name, JSON.stringify(recipe))
-    })
-})
+        await Deno.writeTextFile(name, JSON.stringify(recipe))
+    }
+}

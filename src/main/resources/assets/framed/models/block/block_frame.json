@@ -8,29 +8,17 @@
     "textures": {
       "jmx_tex_particle": "framed:block/hollow_frame",
       "layered_textures": [
-        {
-          "jmx_tex_all": "framed:block/hollow_frame"
-        },
-        {
-          "jmx_tex_all": "framed:block/transparent"
-        }
+        { "jmx_tex_all": "framed:block/hollow_frame" },
+        { "jmx_tex_all": "framed:block/transparent" }
       ]
     },
     "materials": [
-      {
-        "jmx_mat_all": "framed:frame"
-      },
-      {
-        "jmx_mat_all": "framed:frame"
-      }
+      { "jmx_mat_all": "framed:frame" },
+      { "jmx_mat_all": "framed:frame" }
     ],
     "tags": [
-      {
-        "jmx_tag_all": 1
-      },
-      {
-        "jmx_tag_all": 2
-      }
+      { "jmx_tag_all": 1 },
+      { "jmx_tag_all": 2 }
     ]
   },
   "jmx_version": 1
