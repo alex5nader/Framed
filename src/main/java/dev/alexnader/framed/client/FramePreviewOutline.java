@@ -75,20 +75,6 @@ import static dev.alexnader.framed.Framed.BLOCKS;
 
 @Environment(EnvType.CLIENT)
 public class FramePreviewOutline extends RenderLayer {
-    public static final RenderLayer TRANSLUCENT_UNLIT = RenderLayer.of(
-        "framed:translucent",
-        VertexFormats.POSITION_COLOR,
-        7,
-        262144,
-        true,
-        true,
-        RenderLayer.MultiPhaseParameters.builder()
-            .shadeModel(SMOOTH_SHADE_MODEL)
-            .transparency(TRANSLUCENT_TRANSPARENCY)
-            .target(TRANSLUCENT_TARGET)
-            .build(true)
-    );
-
     @SuppressWarnings("unused") // required by javac, unused bc of mixin
     public FramePreviewOutline(final String name, final VertexFormat vertexFormat, final int drawMode, final int expectedBufferSize, final boolean hasCrumbling, final boolean translucent, final Runnable startAction, final Runnable endAction) {
         super(name, vertexFormat, drawMode, expectedBufferSize, hasCrumbling, translucent, startAction, endAction);
@@ -191,7 +177,7 @@ public class FramePreviewOutline extends RenderLayer {
         }
     }
 
-    @SuppressWarnings({"DuplicatedCode", "SameParameterValue"})
+    @SuppressWarnings("SameParameterValue")
     private static void render(final BakedQuad quad, final MatrixStack.Entry entry, final VertexConsumer consumer, final float r, final float g, final float b, final float a) {
         final int[] is = quad.getVertexData();
         final Vec3i vec3i = quad.getFace().getVector();
@@ -222,72 +208,6 @@ public class FramePreviewOutline extends RenderLayer {
                 final Vector4f vector4f = new Vector4f(x, y, z, 1.0F);
                 vector4f.transform(matrix4f);
                 consumer.vertex(vector4f.getX(), vector4f.getY(), vector4f.getZ(), r/255F, g/255F, b/255F, a/255F, v, w, OverlayTexture.DEFAULT_UV, u, vector3f.getX(), vector3f.getY(), vector3f.getZ());
-            }
-        } catch (final Throwable var38) {
-            var17 = var38;
-            throw var38;
-        } finally {
-            if (var17 != null) {
-                try {
-                    memoryStack.close();
-                } catch (final Throwable var37) {
-                    var17.addSuppressed(var37);
-                }
-            } else {
-                memoryStack.close();
-            }
-        }
-    }
-
-    @SuppressWarnings({"DuplicatedCode", "SameParameterValue"})
-    private static void renderLines(final BakedQuad quad, final MatrixStack.Entry entry, final VertexConsumer consumer, final float r, final float g, final float b, final float a) {
-        final int[] is = quad.getVertexData();
-        final Vec3i vec3i = quad.getFace().getVector();
-        final Vector3f vector3f = new Vector3f((float)vec3i.getX(), (float)vec3i.getY(), (float)vec3i.getZ());
-        final Matrix4f matrix4f = entry.getModel();
-        vector3f.transform(entry.getNormal());
-
-        final int j = is.length / 8;
-        final MemoryStack memoryStack = MemoryStack.stackPush();
-        Throwable var17 = null;
-
-        try {
-            final ByteBuffer byteBuffer = memoryStack.malloc(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSize());
-            final IntBuffer intBuffer = byteBuffer.asIntBuffer();
-
-            for(int k = 0; k < j; ++k) {
-                {
-                    intBuffer.clear();
-                    intBuffer.put(is, k * 8, 8);
-                    final float x = byteBuffer.getFloat(0);
-                    final float y = byteBuffer.getFloat(4);
-                    final float z = byteBuffer.getFloat(8);
-                    final float v;
-                    final float w;
-
-                    final int u = -1;
-                    v = byteBuffer.getFloat(16);
-                    w = byteBuffer.getFloat(20);
-                    final Vector4f vector4f = new Vector4f(x, y, z, 1.0F);
-                    vector4f.transform(matrix4f);
-                    consumer.vertex(vector4f.getX(), vector4f.getY(), vector4f.getZ(), r / 255F, g / 255F, b / 255F, a / 255F, v, w, 1, u, vector3f.getX(), vector3f.getY(), vector3f.getZ());
-                }
-                {
-                    intBuffer.clear();
-                    intBuffer.put(is, ((k + 1) % j) * 8, 8);
-                    final float x = byteBuffer.getFloat(0);
-                    final float y = byteBuffer.getFloat(4);
-                    final float z = byteBuffer.getFloat(8);
-                    final float v;
-                    final float w;
-
-                    final int u = -1;
-                    v = byteBuffer.getFloat(16);
-                    w = byteBuffer.getFloat(20);
-                    final Vector4f vector4f = new Vector4f(x, y, z, 1.0F);
-                    vector4f.transform(matrix4f);
-                    consumer.vertex(vector4f.getX(), vector4f.getY(), vector4f.getZ(), r/255F, g/255F, b/255F, a/128F, v, w, 1, u, vector3f.getX(), vector3f.getY(), vector3f.getZ());
-                }
             }
         } catch (final Throwable var38) {
             var17 = var38;
