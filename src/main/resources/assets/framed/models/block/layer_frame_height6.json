@@ -1,0 +1,184 @@
+{
+  "textures": {
+    "particle": "framed:block/solid_frame",
+    "texture": "framed:block/solid_frame"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        6,
+        16
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#texture",
+          "cullface": "down",
+          "jmx_layers": [
+            {
+              "texture": "#jmx_texture",
+              "material": "#jmx_material",
+              "tag": "#jmx_tag"
+            },
+            {
+              "texture": "#jmx_texture",
+              "material": "#jmx_material",
+              "tag": "#jmx_tag"
+            }
+          ]
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#texture",
+          "jmx_layers": [
+            {
+              "texture": "#jmx_texture",
+              "material": "#jmx_material",
+              "tag": "#jmx_tag"
+            },
+            {
+              "texture": "#jmx_texture",
+              "material": "#jmx_material",
+              "tag": "#jmx_tag"
+            }
+          ]
+        },
+        "north": {
+          "uv": [
+            0,
+            10,
+            16,
+            16
+          ],
+          "texture": "#texture",
+          "cullface": "north",
+          "jmx_layers": [
+            {
+              "texture": "#jmx_texture",
+              "material": "#jmx_material",
+              "tag": "#jmx_tag"
+            },
+            {
+              "texture": "#jmx_texture",
+              "material": "#jmx_material",
+              "tag": "#jmx_tag"
+            }
+          ]
+        },
+        "south": {
+          "uv": [
+            0,
+            10,
+            16,
+            16
+          ],
+          "texture": "#texture",
+          "cullface": "south",
+          "jmx_layers": [
+            {
+              "texture": "#jmx_texture",
+              "material": "#jmx_material",
+              "tag": "#jmx_tag"
+            },
+            {
+              "texture": "#jmx_texture",
+              "material": "#jmx_material",
+              "tag": "#jmx_tag"
+            }
+          ]
+        },
+        "west": {
+          "uv": [
+            0,
+            10,
+            16,
+            16
+          ],
+          "texture": "#texture",
+          "cullface": "west",
+          "jmx_layers": [
+            {
+              "texture": "#jmx_texture",
+              "material": "#jmx_material",
+              "tag": "#jmx_tag"
+            },
+            {
+              "texture": "#jmx_texture",
+              "material": "#jmx_material",
+              "tag": "#jmx_tag"
+            }
+          ]
+        },
+        "east": {
+          "uv": [
+            0,
+            10,
+            16,
+            16
+          ],
+          "texture": "#texture",
+          "cullface": "east",
+          "jmx_layers": [
+            {
+              "texture": "#jmx_texture",
+              "material": "#jmx_material",
+              "tag": "#jmx_tag"
+            },
+            {
+              "texture": "#jmx_texture",
+              "material": "#jmx_material",
+              "tag": "#jmx_tag"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "jmx": {
+    "quad_transform": "framed:frame_transform",
+    "textures": {
+      "layered_textures": [
+        {
+          "jmx_texture": "framed:block/solid_frame"
+        },
+        {
+          "jmx_texture": "framed:block/transparent"
+        }
+      ],
+      "particle": "framed:block/solid_frame"
+    },
+    "materials": [
+      {
+        "jmx_material": "framed:frame"
+      },
+      {
+        "jmx_material": "framed:frame"
+      }
+    ],
+    "tags": [
+      {
+        "jmx_tag": 1
+      },
+      {
+        "jmx_tag": 2
+      }
+    ]
+  },
+  "jmx_version": 1
+}

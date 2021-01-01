@@ -33,6 +33,8 @@ public class FramedBlocks extends Registrar<Block> {
     public final WallTorchFrame WALL_TORCH_FRAME;
     public final PressurePlateFrame PRESSURE_PLATE_FRAME;
     public final WallFrame WALL_FRAME;
+    public final LayerFrame LAYER_FRAME;
+    public final CarpetFrame CARPET_FRAME;
 
     private <A extends Block> A registerWithItem(final A block, final Identifier id, final Item.Settings settings) {
         Registry.register(Registry.ITEM, id, new BlockItem(block, settings));
@@ -68,6 +70,8 @@ public class FramedBlocks extends Registrar<Block> {
         PATH_FRAME = registerWithItem(new PathFrame(frameSettings), META.id("path_frame"), itemSettings);
         PRESSURE_PLATE_FRAME = registerWithItem(new PressurePlateFrame(frameSettings), META.id("pressure_plate_frame"), itemSettings);
         WALL_FRAME = registerWithItem(new WallFrame(frameSettings), META.id("wall_frame"), itemSettings);
+        LAYER_FRAME = registerWithItem(new LayerFrame(frameSettings), META.id("layer_frame"), itemSettings);
+        CARPET_FRAME = registerWithItem(new CarpetFrame(frameSettings), META.id("carpet_frame"), itemSettings);
 
         TORCH_FRAME = register(new TorchFrame(torchFrameSettings), META.id("torch_frame"));
         WALL_TORCH_FRAME = register(new WallTorchFrame(torchFrameSettings), META.id("wall_torch_frame"));

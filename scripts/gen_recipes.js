@@ -6,7 +6,6 @@ const sources = [
     "block_frame"
 ];
 const results = [
-    // ["door_frame"],
     ["fence_frame", 1],
     ["fence_gate_frame", 1],
     ["path_frame", 1],
@@ -14,8 +13,8 @@ const results = [
     ["stairs_frame", 1],
     ["pressure_plate_frame",1],
     ["wall_frame", 1],
-    // ["torch_frame"],
-    // ["trapdoor_frame"],
+    ["layer_frame", 8],
+    ["carpet_frame", 3],
 ];
 
 for (const source of sources) {

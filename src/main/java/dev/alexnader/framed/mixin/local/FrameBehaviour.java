@@ -58,7 +58,9 @@ import static dev.alexnader.framed.util.ValidQuery.checkIf;
     TorchFrame.class,
     WallTorchFrame.class,
     PressurePlateFrame.class,
-    WallFrame.class
+    WallFrame.class,
+    LayerFrame.class,
+    CarpetFrame.class
 })
 public abstract class FrameBehaviour extends Block implements BlockEntityProvider, Frame, FrameSlotInfo {
     private FrameBehaviour(final Settings settings) {

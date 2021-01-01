@@ -5,6 +5,7 @@
     "wall": "framed:block/solid_frame"
   },
   "jmx": {
+    "quad_transform": "framed:frame_transform",
     "textures": {
       "jmx_tex_particle": "framed:block/solid_frame",
       "layered_textures": [

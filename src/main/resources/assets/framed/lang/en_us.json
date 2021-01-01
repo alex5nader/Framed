@@ -14,6 +14,8 @@
   "block.framed.wall_torch_frame": "Torch Frame",
   "block.framed.pressure_plate_frame": "Pressure Plate Frame",
   "block.framed.wall_frame": "Wall Frame",
+  "block.framed.layer_frame": "Layer Frame",
+  "block.framed.carpet_frame": "Carpet Frame",
   "itemGroup.framed.framed": "Framed",
   "gui.framed.frame.base_label": "Base",
   "gui.framed.frame.overlay_label": "Overlay",
