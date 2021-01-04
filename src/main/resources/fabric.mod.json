@@ -1,19 +1,25 @@
 {
   "schemaVersion": 1,
+
   "id": "framed",
   "version": "${version}",
+  "environment": "*",
 
   "name": "Framed",
-  "description": "",
-  "authors": [
-    "Alex Habich <me@alexnader.dev>"
-  ],
-  "contact": {
-    "homepage": "https://alexnader.dev/"
-  },
-  "license": "MIT",
+  "description": "Blocks with customizable textures",
   "icon": "assets/framed/icon.png",
-  "environment": "*",
+
+  "authors": [ "noobstar" ],
+  "contributors": [ "Haven King" ],
+  "contact": {
+    "sources": "https://github.com/alex5nader/Framed",
+    "issues": "https://github.com/alex5nader/Framed/issues",
+    "email": "framed@alexnader.dev",
+    "discord": "noob2star#7501"
+  },
+
+  "license": "LGPL-2.1-only",
+
   "entrypoints": {
     "main": [
       "dev.alexnader.framed.Framed"
@@ -25,13 +31,18 @@
   "mixins": [
     "mixins.framed.json"
   ],
+
   "depends": {
-    "fabricloader": ">=0.7.1",
-    "fabric": "*",
+    "fabricloader": "*",
+    "fabric": "${fapiVersion}",
     "minecraft": "1.16.x",
-    "libgui": "*",
-    "json-model-extensions": "*",
-    "frex": "*"
+    "libgui": "${libguiVersion}",
+    "json-model-extensions": "${jmxVersion}",
+    "frex": "${frexVersion}"
+  },
+  "suggests": {
+    "canvas": "*",
+    "couplings": "*"
   },
   "conflicts": {
     "sodium": "*"

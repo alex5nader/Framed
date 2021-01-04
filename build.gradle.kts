@@ -78,7 +78,13 @@ dependencies {
 tasks.getByName<ProcessResources>("processResources") {
     inputs.properties("version" to Framed.version)
     filesMatching("fabric.mod.json") {
-        expand("version" to Framed.version)
+        expand(
+            "version" to Framed.version,
+            "fapiVersion" to ">=${Fabric.api.version}",
+            "libguiVersion" to ">=${LibGui.version}",
+            "jmxVersion" to ">=${Jmx.version}",
+            "frexVersion" to ">=${Frex.version}"
+        )
     }
 }
 
