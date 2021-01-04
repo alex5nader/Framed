@@ -50,9 +50,9 @@ val Jsr305 = Dependency("com.google.code.findbugs", "jsr305", "3.0.2")
 
 val LibGui = Dependency("io.github.cottonmc", "LibGui", "3.3.2+${Minecraft.version}", curseforgeSlug = "libgui")
 
-val Frex = Dependency("grondag", "frex-${Minecraft.tag}", "4.4.199", transitive = false, curseforgeSlug = "frex")
-val Jmx = Dependency("grondag", "jmx-${Minecraft.tag}", "1.19.171", transitive = false, curseforgeSlug = "jmx")
-val Canvas = Dependency("grondag", "canvas-${Minecraft.tag}", "1.0.1263", curseforgeSlug = "canvas-renderer")
+val Frex = Dependency("grondag", "frex-${Minecraft.tag}", "4.5.201", transitive = false, curseforgeSlug = "frex")
+val Jmx = Dependency("grondag", "jmx-${Minecraft.tag}", "1.20.179", transitive = false, curseforgeSlug = "jmx")
+val Canvas = Dependency("grondag", "canvas-${Minecraft.tag}", "1.0.1267", curseforgeSlug = "canvas-renderer")
 
 val Couplings = CurseMavenDependency("couplings", 395659, 3111745)
 
