@@ -165,7 +165,7 @@ public class FramePreviewOutline extends RenderLayer {
             final int r = valid ? c : 255;
             final int g = valid ? 255 : c;
             final int b = valid ? 64 : 0;
-            final int a = 127;
+            final int a = valid ? 191 : 63;
 
             final MatrixStack.Entry entry = matrixStack.peek();
 
