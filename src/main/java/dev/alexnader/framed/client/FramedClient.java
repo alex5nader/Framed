@@ -22,6 +22,8 @@ import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 
+import java.util.Optional;
+
 import static dev.alexnader.framed.Framed.ITEMS;
 import static dev.alexnader.framed.Framed.META;
 
@@ -62,6 +64,15 @@ public class FramedClient implements ClientModInitializer {
             (resourceManager, out) -> out.accept(new ModelIdentifier(META.id("framers_hammer_none"), "inventory"))
         );
 
-        FabricModelPredicateProviderRegistry.register(ITEMS.FRAMERS_HAMMER, META.id("hammer_mode"), FramersHammer.MODEL_PREDICATE);
+        FabricModelPredicateProviderRegistry.register(
+            ITEMS.FRAMERS_HAMMER,
+            META.id("hammer_mode"),
+            (stack, world, entity) ->
+                Optional.ofNullable(stack.getTag())
+                    .map(t -> t.getString("mode"))
+                    .flatMap(FramersHammer.CopyMode::fromString)
+                    .orElse(FramersHammer.CopyMode.DEFAULT)
+                    .id
+        );
     }
 }
