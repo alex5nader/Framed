@@ -7,7 +7,6 @@ import dev.alexnader.framed.block.frame.data.FrameData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.item.ModelPredicateProvider;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -173,13 +172,6 @@ public class FramersHammer extends Item {
             return true;
         }
     }
-
-    public static final ModelPredicateProvider MODEL_PREDICATE = (stack, world, entity) ->
-        Optional.ofNullable(stack.getTag())
-            .map(t -> t.getString("mode"))
-            .flatMap(CopyMode::fromString)
-            .orElse(CopyMode.DEFAULT)
-            .id;
 
     private CompoundTag getTagOrAssignDefault(final ItemStack stack) {
         if (stack.getTag() == null) {

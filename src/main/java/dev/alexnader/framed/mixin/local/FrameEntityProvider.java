@@ -3,8 +3,6 @@ package dev.alexnader.framed.mixin.local;
 import dev.alexnader.framed.block.entity.FrameBlockEntity;
 import dev.alexnader.framed.block.frame.*;
 import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.TorchBlock;
-import net.minecraft.block.WallTorchBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,8 +20,8 @@ import static dev.alexnader.framed.Framed.META;
     TrapdoorFrame.class,
     DoorFrame.class,
     PathFrame.class,
-    TorchBlock.class,
-    WallTorchBlock.class,
+    TorchFrame.class,
+    WallTorchFrame.class,
     PressurePlateFrame.class,
     WallFrame.class,
     LayerFrame.class,

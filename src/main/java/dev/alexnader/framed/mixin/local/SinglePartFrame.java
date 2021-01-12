@@ -5,8 +5,6 @@ import dev.alexnader.framed.block.entity.FrameBlockEntity;
 import dev.alexnader.framed.block.frame.*;
 import dev.alexnader.framed.block.frame.data.Sections;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.TorchBlock;
-import net.minecraft.block.WallTorchBlock;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,8 +19,8 @@ import static dev.alexnader.framed.Framed.META;
     TrapdoorFrame.class,
     DoorFrame.class,
     PathFrame.class,
-    TorchBlock.class,
-    WallTorchBlock.class,
+    TorchFrame.class,
+    WallTorchFrame.class,
     PressurePlateFrame.class,
     WallFrame.class,
     LayerFrame.class,
