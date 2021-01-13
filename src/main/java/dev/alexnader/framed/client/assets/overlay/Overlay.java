@@ -3,6 +3,7 @@ package dev.alexnader.framed.client.assets.overlay;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.alexnader.framed.client.assets.Parent;
+import dev.alexnader.framed.client.transform.TransformResult;
 import dev.alexnader.framed.client.util.ToOptional;
 import dev.alexnader.framed.util.Float4;
 import net.fabricmc.api.EnvType;
@@ -28,7 +29,7 @@ public abstract class Overlay implements ToOptional<Overlay> {
         }
     }
 
-    public abstract boolean apply(MutableQuadView mqv, Float4 us, Float4 vs, Direction dir);
+    public abstract TransformResult apply(MutableQuadView mqv, Float4 us, Float4 vs, Direction dir);
 
     public abstract TextureSource textureSource();
     public abstract Optional<ColoredLike> coloredLike();
@@ -36,8 +37,8 @@ public abstract class Overlay implements ToOptional<Overlay> {
 
     public static final Overlay NONE = new Overlay() {
         @Override
-        public boolean apply(final MutableQuadView mqv, final Float4 us, final Float4 vs, final Direction dir) {
-            return false;
+        public TransformResult apply(final MutableQuadView mqv, final Float4 us, final Float4 vs, final Direction dir) {
+            return TransformResult.NOTHING_TO_DO;
         }
 
         @Override
@@ -93,7 +94,7 @@ public abstract class Overlay implements ToOptional<Overlay> {
         }
 
         @Override
-        public boolean apply(final MutableQuadView mqv, final Float4 us, final Float4 vs, final Direction dir) {
+        public TransformResult apply(final MutableQuadView mqv, final Float4 us, final Float4 vs, final Direction dir) {
             final Float4 finalUs = sidedOffsetters().applyUs(us, dir);
             final Float4 finalVs = sidedOffsetters().applyVs(vs, dir);
 

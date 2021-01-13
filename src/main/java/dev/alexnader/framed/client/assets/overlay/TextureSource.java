@@ -5,6 +5,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.alexnader.framed.client.transform.MaterialApplier;
 import dev.alexnader.framed.client.transform.SpriteApplier;
+import dev.alexnader.framed.client.transform.TransformResult;
 import dev.alexnader.framed.client.util.ToOptional;
 import dev.alexnader.framed.util.Float4;
 import net.fabricmc.api.EnvType;
@@ -74,7 +75,7 @@ public abstract class TextureSource implements ToOptional<TextureSource> {
         this.kind = kind;
     }
 
-    public boolean apply(final MutableQuadView mqv, final Float4 us, final Float4 vs, final Direction side) {
+    public TransformResult apply(final MutableQuadView mqv, final Float4 us, final Float4 vs, final Direction side) {
         final Entry entry = entryFor(side);
 
         entry.materialApplier.apply(mqv);
@@ -155,8 +156,8 @@ public abstract class TextureSource implements ToOptional<TextureSource> {
         }
 
         @Override
-        public boolean apply(final MutableQuadView mqv, final Float4 us, final Float4 vs, final Direction side) {
-            return false;
+        public TransformResult apply(final MutableQuadView mqv, final Float4 us, final Float4 vs, final Direction side) {
+            return TransformResult.NOTHING_TO_DO;
         }
 
         @Nonnull
