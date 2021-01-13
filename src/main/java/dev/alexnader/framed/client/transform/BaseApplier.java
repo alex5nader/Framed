@@ -21,12 +21,12 @@ import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public abstract class BaseApplier implements ToOptional<BaseApplier> {
-    public abstract boolean apply(MutableQuadView mqv, Direction dir, int index, Float4 us, Float4 vs, int color);
+    public abstract TransformResult apply(MutableQuadView mqv, Direction dir, int index, Float4 us, Float4 vs, int color);
 
     public static final BaseApplier NONE = new BaseApplier() {
         @Override
-        public boolean apply(final MutableQuadView mqv, final Direction dir, final int index, final Float4 us, final Float4 vs, final int color) {
-            return false;
+        public TransformResult apply(final MutableQuadView mqv, final Direction dir, final int index, final Float4 us, final Float4 vs, final int color) {
+            return TransformResult.NOTHING_TO_DO;
         }
 
         @Override
@@ -41,12 +41,14 @@ public abstract class BaseApplier implements ToOptional<BaseApplier> {
     };
 
     public static class Some extends BaseApplier implements ToOptional.Some<BaseApplier> {
+        private final BlockState state;
         private final Object2IntMap<Direction> sizes = new Object2IntOpenHashMap<>(7);
         private final Map<Direction, SpriteApplier[]> spriteAppliers = new HashMap<>(7);
         private final Map<Direction, MaterialApplier[]> materialAppliers = new HashMap<>(7);
         private final Map<Direction, LazyColorApplier[]> colorAppliers = new HashMap<>(7);
 
         public Some(final BlockState state, final BakedModel model, final Random r) {
+            this.state = state;
             for (int i = 0; i <= 6; i++) {
                 final Direction dir = ModelHelper.faceFromIndex(i);
                 final List<BakedQuad> quads = model.getQuads(state, dir, r);
@@ -74,8 +76,12 @@ public abstract class BaseApplier implements ToOptional<BaseApplier> {
         }
 
         @Override
-        public boolean apply(final MutableQuadView mqv, final Direction dir, final int quadIndex, final Float4 us, final Float4 vs, final int color) {
-            final int index = quadIndex % sizes.getInt(dir);
+        public TransformResult apply(final MutableQuadView mqv, final Direction dir, final int quadIndex, final Float4 us, final Float4 vs, final int color) {
+            int size = sizes.getInt(dir);
+            if (size == 0) {
+                return TransformResult.failed(String.format("No %s quads in model for %s.", dir, state));
+            }
+            final int index = quadIndex % size;
             materialAppliers.get(dir)[index].apply(mqv);
             colorAppliers.get(dir)[index].apply(mqv, color);
             return spriteAppliers.get(dir)[index].apply(mqv, us, vs);

@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+import static dev.alexnader.framed.Framed.META;
 import static dev.alexnader.framed.client.FramedClient.CLIENT_OVERLAYS;
 import static dev.alexnader.framed.client.util.QuadUtil.calcCenter;
 import static dev.alexnader.framed.util.FunctionalUtil.*;
@@ -75,21 +76,39 @@ public final class FrameTransform implements RenderContext.QuadTransform {
         final Pair<Float4, Float4> origUvs = getUvs(mqv, dir);
 
         if (mqv.tag() == 1) {
-            data.baseApplier.apply(mqv, dir, quadIndex, origUvs.getFirst(), origUvs.getSecond(), data.baseColor);
-            // ignore return value of baseApplier.apply because it will return false when there's no custom texture
-            // this is bad, because then the regular frame texture wouldn't show either (which should be the case when there's no custom texture)
-            return true;
+            TransformResult result = data.baseApplier.apply(mqv, dir, quadIndex, origUvs.getFirst(), origUvs.getSecond(), data.baseColor);
+            // render quad even when NOTHING_TO_DO so that regular frame texture shows
+            switch (result.status) {
+            case DID_SOMETHING:
+            case NOTHING_TO_DO:
+                return true;
+            case FAILED:
+                META.LOGGER.warn("An error occurred with a frame: " + result.message);
+                return false;
+            }
         } else if (mqv.tag() == 2) {
-            return data.overlay.match(
+            TransformResult result = data.overlay.match(
                 overlay -> {
                     data.overlayColorApplier.apply(mqv);
                     return overlay.apply(mqv, origUvs.getFirst(), origUvs.getSecond(), dir);
                 },
                 () -> data.baseApplier.apply(mqv, dir, quadIndex, origUvs.getFirst(), origUvs.getSecond(), data.baseColor)
             );
+
+            switch (result.status) {
+            case DID_SOMETHING:
+                return true;
+            case FAILED:
+                META.LOGGER.warn("An error occurred with a frame: " + result.message);
+            case NOTHING_TO_DO:
+                return false;
+            }
         } else {
             return false;
         }
+
+        META.LOGGER.warn("Somehow FrameTransform::transform didn't return a valid value.");
+        return false;
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
