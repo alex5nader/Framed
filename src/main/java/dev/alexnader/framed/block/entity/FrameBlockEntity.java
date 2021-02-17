@@ -1,12 +1,12 @@
 package dev.alexnader.framed.block.entity;
 
+import com.mojang.datafixers.util.Pair;
 import dev.alexnader.framed.block.frame.data.FrameData;
 import dev.alexnader.framed.block.frame.data.Sections;
 import dev.alexnader.framed.gui.FrameGuiDescription;
 import dev.alexnader.framed.items.SpecialItems;
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -24,8 +24,6 @@ import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
@@ -37,10 +35,14 @@ import static dev.alexnader.framed.Framed.SPECIAL_ITEMS;
 import static dev.alexnader.framed.util.GetItemBeforeEmptyUtil.getItemBeforeEmpty;
 import static dev.alexnader.framed.util.ValidQuery.checkIf;
 
-public class FrameBlockEntity extends LockableContainerBlockEntity implements ExtendedScreenHandlerFactory, RenderAttachmentBlockEntity, BlockEntityClientSerializable {
+public class FrameBlockEntity extends LockableContainerBlockEntity implements ExtendedScreenHandlerFactory, BlockEntityClientSerializable {
     private FrameData data;
 
-    public FrameBlockEntity(final BlockEntityType<?> type, final Sections sections) {
+    public FrameBlockEntity(
+        final BlockEntityType<?> type,
+        @SuppressWarnings("unused") Block base, // used by FrameMeshHolderImpl
+        final Sections sections
+    ) {
         super(type);
 
         data = new FrameData(sections);
@@ -241,10 +243,10 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
         }
     }
 
-    @Override
-    public List<Pair<Optional<BlockState>, Optional<Identifier>>> getRenderAttachmentData() {
-        return data.toRenderAttachment();
-    }
+//    @Override
+//    public List<Pair<Optional<BlockState>, Optional<Identifier>>> getRenderAttachmentData() {
+//        return data.toRenderAttachment();
+//    }
 
     @Override
     public CompoundTag toTag(final CompoundTag tag) {

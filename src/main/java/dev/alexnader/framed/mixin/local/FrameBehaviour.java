@@ -63,7 +63,7 @@ import static dev.alexnader.framed.util.ValidQuery.checkIf;
     CarpetFrame.class,
     PaneFrame.class
 })
-public abstract class FrameBehaviour extends Block implements BlockEntityProvider, Frame, FrameSlotInfo {
+public abstract class FrameBehaviour extends Block implements BlockEntityProvider, FrameSlotInfo {
     @SuppressWarnings("unused") // required by mixin
     private FrameBehaviour(final Settings settings) {
         super(settings);

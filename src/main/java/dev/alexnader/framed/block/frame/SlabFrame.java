@@ -3,8 +3,10 @@ package dev.alexnader.framed.block.frame;
 import dev.alexnader.framed.block.FrameSlotInfo;
 import dev.alexnader.framed.block.entity.FrameBlockEntity;
 import dev.alexnader.framed.block.frame.data.Sections;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.state.property.Properties;
@@ -17,7 +19,7 @@ import javax.annotation.Nullable;
 import static dev.alexnader.framed.Framed.BLOCK_ENTITY_TYPES;
 import static dev.alexnader.framed.Framed.META;
 
-public class SlabFrame extends SlabBlock implements FrameSlotInfo, BlockEntityProvider {
+public class SlabFrame extends SlabBlock implements BlockEntityProvider, Frame, FrameSlotInfo {
     public SlabFrame(final Settings settings) {
         super(settings);
     }
@@ -74,9 +76,13 @@ public class SlabFrame extends SlabBlock implements FrameSlotInfo, BlockEntityPr
         return super.isSideInvisible(state, stateFrom, direction) || (state == stateFrom);
     }
 
-    @Nullable
     @Override
-    public BlockEntity createBlockEntity(final BlockView world) {
-        return new FrameBlockEntity(BLOCK_ENTITY_TYPES.SLAB_FRAME, META.SLAB_FRAME_SECTIONS);
+    public @Nullable BlockEntity createBlockEntity(final BlockView world) {
+        return new FrameBlockEntity(BLOCK_ENTITY_TYPES.SLAB_FRAME, base(), META.SLAB_FRAME_SECTIONS);
+    }
+
+    @Override
+    public Block base() {
+        return Blocks.OAK_SLAB;
     }
 }

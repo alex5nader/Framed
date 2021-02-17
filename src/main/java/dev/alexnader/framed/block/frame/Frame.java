@@ -1,3 +1,7 @@
 package dev.alexnader.framed.block.frame;
 
-public interface Frame {}
+import net.minecraft.block.Block;
+
+public interface Frame {
+    Block base();
+}
