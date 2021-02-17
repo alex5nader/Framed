@@ -36,7 +36,7 @@ object Fabric {
     val api = Dependency("net.fabricmc.fabric-api", "fabric-api", "0.29.0+1.16")
 }
 
-object Framed : Dependency("dev.alexnader", "framed", "1.0") {
+object Framed : Dependency("dev.alexnader", "framed", "1.1") {
     const val modrinthId = "Ix9gggiE"
     const val curseforgeId = "356723"
 }
