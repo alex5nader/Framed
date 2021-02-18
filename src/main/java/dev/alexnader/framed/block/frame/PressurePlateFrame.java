@@ -19,11 +19,6 @@ public class PressurePlateFrame extends PressurePlateBlock implements net.minecr
 
     @Override
     public @Nullable BlockEntity createBlockEntity(final BlockView world) {
-        return new FrameBlockEntity(BLOCK_ENTITY_TYPES.PRESSURE_PLATE_FRAME, base(), META.FRAME_SECTIONS);
-    }
-
-    @Override
-    public Block base() {
-        return Blocks.OAK_PRESSURE_PLATE;
+        return BLOCK_ENTITY_TYPES.PRESSURE_PLATE_FRAME.instantiate();
     }
 }

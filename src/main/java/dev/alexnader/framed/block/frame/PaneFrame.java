@@ -19,11 +19,6 @@ public class PaneFrame extends PaneBlock implements net.minecraft.block.BlockEnt
 
     @Override
     public @Nullable BlockEntity createBlockEntity(final BlockView world) {
-        return new FrameBlockEntity(BLOCK_ENTITY_TYPES.PANE_FRAME, base(), META.FRAME_SECTIONS);
-    }
-
-    @Override
-    public Block base() {
-        return Blocks.GLASS_PANE;
+        return BLOCK_ENTITY_TYPES.PANE_FRAME.instantiate();
     }
 }

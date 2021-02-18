@@ -20,11 +20,6 @@ public class StairsFrame extends StairsBlock implements net.minecraft.block.Bloc
 
     @Override
     public @Nullable BlockEntity createBlockEntity(final BlockView world) {
-        return new FrameBlockEntity(BLOCK_ENTITY_TYPES.STAIRS_FRAME, base(), META.FRAME_SECTIONS);
-    }
-
-    @Override
-    public Block base() {
-        return Blocks.OAK_STAIRS;
+        return BLOCK_ENTITY_TYPES.STAIRS_FRAME.instantiate();
     }
 }

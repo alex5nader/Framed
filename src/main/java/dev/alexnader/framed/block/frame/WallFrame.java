@@ -19,11 +19,6 @@ public class WallFrame extends WallBlock implements net.minecraft.block.BlockEnt
 
     @Override
     public @Nullable BlockEntity createBlockEntity(final BlockView world) {
-        return new FrameBlockEntity(BLOCK_ENTITY_TYPES.WALL_FRAME, base(), META.FRAME_SECTIONS);
-    }
-
-    @Override
-    public Block base() {
-        return Blocks.COBBLESTONE_WALL;
+        return BLOCK_ENTITY_TYPES.WALL_FRAME.instantiate();
     }
 }

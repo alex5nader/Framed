@@ -5,6 +5,7 @@
   "mixins": [
     "local.FrameBehaviour",
     "local.SinglePartFrame",
+    "mc.BlockEntityMixin_BlockEntityMigration",
     "mc.BlockItemAccess",
     "mc.FenceBlockMixin",
     "mc.GetItemBeforeEmpty",

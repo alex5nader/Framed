@@ -19,11 +19,6 @@ public class LayerFrame extends SnowBlock implements net.minecraft.block.BlockEn
 
     @Override
     public @Nullable BlockEntity createBlockEntity(final BlockView world) {
-        return new FrameBlockEntity(BLOCK_ENTITY_TYPES.LAYER_FRAME, base(), META.FRAME_SECTIONS);
-    }
-
-    @Override
-    public Block base() {
-        return Blocks.SNOW;
+        return BLOCK_ENTITY_TYPES.LAYER_FRAME.instantiate();
     }
 }

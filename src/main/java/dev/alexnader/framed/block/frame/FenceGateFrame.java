@@ -19,11 +19,6 @@ public class FenceGateFrame extends FenceGateBlock implements net.minecraft.bloc
 
     @Override
     public @Nullable BlockEntity createBlockEntity(final BlockView world) {
-        return new FrameBlockEntity(BLOCK_ENTITY_TYPES.FENCE_GATE_FRAME, base(), META.FRAME_SECTIONS);
-    }
-
-    @Override
-    public Block base() {
-        return Blocks.OAK_FENCE_GATE;
+        return BLOCK_ENTITY_TYPES.FENCE_GATE_FRAME.instantiate();
     }
 }

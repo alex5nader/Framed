@@ -27,11 +27,6 @@ public class PathFrame extends PathBlock implements net.minecraft.block.BlockEnt
 
     @Override
     public @Nullable BlockEntity createBlockEntity(final BlockView world) {
-        return new FrameBlockEntity(BLOCK_ENTITY_TYPES.PATH_FRAME, base(), META.FRAME_SECTIONS);
-    }
-
-    @Override
-    public Block base() {
-        return Blocks.GRASS_PATH;
+        return BLOCK_ENTITY_TYPES.PATH_FRAME.instantiate();
     }
 }

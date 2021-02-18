@@ -78,11 +78,6 @@ public class SlabFrame extends SlabBlock implements BlockEntityProvider, Frame, 
 
     @Override
     public @Nullable BlockEntity createBlockEntity(final BlockView world) {
-        return new FrameBlockEntity(BLOCK_ENTITY_TYPES.SLAB_FRAME, base(), META.SLAB_FRAME_SECTIONS);
-    }
-
-    @Override
-    public Block base() {
-        return Blocks.OAK_SLAB;
+        return BLOCK_ENTITY_TYPES.SLAB_FRAME.instantiate();
     }
 }

@@ -20,11 +20,6 @@ public class TorchFrame extends TorchBlock implements net.minecraft.block.BlockE
 
     @Override
     public @Nullable BlockEntity createBlockEntity(final BlockView world) {
-        return new FrameBlockEntity(BLOCK_ENTITY_TYPES.TORCH_FRAME, base(), META.FRAME_SECTIONS);
-    }
-
-    @Override
-    public Block base() {
-        return Blocks.TORCH;
+        return BLOCK_ENTITY_TYPES.TORCH_FRAME.instantiate();
     }
 }
