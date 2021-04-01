@@ -13,11 +13,8 @@ the game.
 
 [![Requires Fabric API](assets/fabric_api_banner.png)](https://www.curseforge.com/minecraft/mc-mods/fabric-api)
 
-Framed depends on [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api),
-[LibGui](https://www.curseforge.com/minecraft/mc-mods/libgui),
-[JMX](https://www.curseforge.com/minecraft/mc-mods/jmx), and
-[FREX](https://www.curseforge.com/minecraft/mc-mods/frex), but you only need to install 
-[Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)!
+To use Framed, you must install [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)
+and (for version 1.1 or later) [Conrad](https://www.curseforge.com/minecraft/mc-mods/conrad).
 
 ## Download
 
