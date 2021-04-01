@@ -210,7 +210,7 @@ public class FramersHammer extends Item {
 
         if (player.isSneaking()) {
             player.sendMessage(new TranslatableText("gui.framed.framers_hammer.copy_settings"), true);
-            tag.put("storedData", frame.data.toTag());
+            tag.put("storedData", frame.data().toTag());
 
             return ActionResult.SUCCESS;
         } else {

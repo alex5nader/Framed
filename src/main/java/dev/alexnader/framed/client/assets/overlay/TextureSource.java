@@ -162,8 +162,8 @@ public abstract class TextureSource implements ToOptional<TextureSource> {
 
         @Nonnull
         @Override
+        @SuppressWarnings({"ReturnOfNull", "java:S2637"})
         protected Entry entryFor(final Direction side) {
-            //noinspection ReturnOfNull
             return null; // OK because apply is overridden => entryFor is never called
         }
     };

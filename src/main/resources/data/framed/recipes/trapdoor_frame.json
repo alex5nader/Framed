@@ -1,8 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "FFF",
-    "FFF"
+    "FF",
+    "FF"
   ],
   "key": {
     "F": {

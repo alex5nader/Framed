@@ -38,12 +38,16 @@ import static dev.alexnader.framed.util.GetItemBeforeEmptyUtil.getItemBeforeEmpt
 import static dev.alexnader.framed.util.ValidQuery.checkIf;
 
 public class FrameBlockEntity extends LockableContainerBlockEntity implements ExtendedScreenHandlerFactory, RenderAttachmentBlockEntity, BlockEntityClientSerializable {
-    public FrameData data;
+    private FrameData data;
 
     public FrameBlockEntity(final BlockEntityType<?> type, final Sections sections) {
         super(type);
 
         data = new FrameData(sections);
+    }
+
+    public FrameData data() {
+        return data;
     }
 
     public Sections sections() {
@@ -62,6 +66,7 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
         return data.overlayItems();
     }
 
+    @SuppressWarnings("unused") // kept in case needed in the future
     public List<Optional<ItemStack>> specialItems() {
         return data.specialItems();
     }
@@ -208,6 +213,7 @@ public class FrameBlockEntity extends LockableContainerBlockEntity implements Ex
             if (_new != null && world != null) {
                 _new.onAdd(world, this);
             }
+            break;
         default:
             setStack.run();
             break;

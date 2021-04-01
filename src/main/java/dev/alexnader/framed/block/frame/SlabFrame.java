@@ -3,7 +3,6 @@ package dev.alexnader.framed.block.frame;
 import dev.alexnader.framed.block.FrameSlotInfo;
 import dev.alexnader.framed.block.entity.FrameBlockEntity;
 import dev.alexnader.framed.block.frame.data.Sections;
-import dev.alexnader.framed.util.ConstructorCallback;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
@@ -18,15 +17,9 @@ import javax.annotation.Nullable;
 import static dev.alexnader.framed.Framed.BLOCK_ENTITY_TYPES;
 import static dev.alexnader.framed.Framed.META;
 
-public class SlabFrame extends SlabBlock implements FrameSlotInfo, ConstructorCallback, BlockEntityProvider {
+public class SlabFrame extends SlabBlock implements FrameSlotInfo, BlockEntityProvider {
     public SlabFrame(final Settings settings) {
         super(settings);
-        onConstructor();
-    }
-
-    @Override
-    public void onConstructor() {
-        throw new IllegalStateException("SlabFrame::onConstructor should be overwritten by mixin.");
     }
     public static final int LOWER_SLOT = 0;
     public static final int UPPER_SLOT = 1;

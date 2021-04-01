@@ -35,6 +35,7 @@ public abstract class MaterialApplier {
         }
     }
 
+    @SuppressWarnings("java:S1186")
     public static final MaterialApplier NONE = new MaterialApplier() {
         @Override
         public void apply(final MutableQuadView mqv) { }

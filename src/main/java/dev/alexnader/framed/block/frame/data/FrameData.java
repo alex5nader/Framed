@@ -39,10 +39,7 @@ public class FrameData {
         for (int i = 0, size = tag.size(); i < size; i++) {
             final CompoundTag stateTag = tag.getCompound(i);
             final int realIndex = stateTag.getInt("i");
-            //noinspection OptionalGetWithoutIsPresent
-            baseStates[realIndex] = Optional.of(
-                BlockState.CODEC.decode(new Dynamic<>(NbtOps.INSTANCE, stateTag)).result().get().getFirst()
-            );
+            baseStates[realIndex] = BlockState.CODEC.decode(new Dynamic<>(NbtOps.INSTANCE, stateTag)).result().map(Pair::getFirst);
         }
 
         return baseStates;

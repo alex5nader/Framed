@@ -12,6 +12,11 @@
   "block.framed.path_frame": "Path Frame",
   "block.framed.torch_frame": "Torch Frame",
   "block.framed.wall_torch_frame": "Torch Frame",
+  "block.framed.pressure_plate_frame": "Pressure Plate Frame",
+  "block.framed.wall_frame": "Wall Frame",
+  "block.framed.layer_frame": "Layer Frame",
+  "block.framed.carpet_frame": "Carpet Frame",
+  "block.framed.pane_frame": "Pane Frame",
   "itemGroup.framed.framed": "Framed",
   "gui.framed.frame.base_label": "Base",
   "gui.framed.frame.overlay_label": "Overlay",
@@ -21,5 +26,7 @@
   "gui.framed.framers_hammer.whole_copy": "Require all to copy",
   "gui.framed.framers_hammer.copy_settings": "Settings copied!",
   "gui.framed.framers_hammer.apply_settings": "Settings applied!",
-  "gui.framed.framers_hammer.different_format": "Did not apply because the source and target have different formats."
+  "gui.framed.framers_hammer.different_format": "Did not apply because the source and target have different formats.",
+  "framed:config": "Framed Config",
+  "framed:config/show_placement_preview": "Show Placement Preview"
 }

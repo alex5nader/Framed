@@ -1,16 +1,9 @@
 package dev.alexnader.framed.block.frame;
 
-import dev.alexnader.framed.util.ConstructorCallback;
 import net.minecraft.block.TrapdoorBlock;
 
-public class TrapdoorFrame extends TrapdoorBlock implements ConstructorCallback {
+public class TrapdoorFrame extends TrapdoorBlock {
     public TrapdoorFrame(final Settings settings) {
         super(settings);
-        onConstructor();
-    }
-
-    @Override
-    public void onConstructor() {
-        throw new IllegalStateException("TrapdoorFrame::onConstructor should be overwritten by mixin.");
     }
 }

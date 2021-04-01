@@ -12,13 +12,11 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
+import java.util.function.Function;
+
 import static dev.alexnader.framed.Framed.META;
 
 public class FramedBlocks extends Registrar<Block> {
-    public FramedBlocks() {
-        super(Registry.BLOCK);
-    }
-
     public final BlockFrame BLOCK_FRAME;
     public final SlabFrame SLAB_FRAME;
     public final StairsFrame STAIRS_FRAME;
@@ -29,20 +27,34 @@ public class FramedBlocks extends Registrar<Block> {
     public final PathFrame PATH_FRAME;
     public final TorchFrame TORCH_FRAME;
     public final WallTorchFrame WALL_TORCH_FRAME;
+    public final PressurePlateFrame PRESSURE_PLATE_FRAME;
+    public final WallFrame WALL_FRAME;
+    public final LayerFrame LAYER_FRAME;
+    public final CarpetFrame CARPET_FRAME;
+    public final PaneFrame PANE_FRAME;
 
     private <A extends Block> A registerWithItem(final A block, final Identifier id, final Item.Settings settings) {
         Registry.register(Registry.ITEM, id, new BlockItem(block, settings));
         return register(block, id);
     }
 
-    {
-        final AbstractBlock.Settings frameSettings = FabricBlockSettings
-            .of(Material.WOOD)
-            .hardness(0.33f)
-            .sounds(BlockSoundGroup.WOOD)
-            .nonOpaque()
-            .solidBlock((a, b, c) -> false)
-            .luminance(state -> state.get(Properties.LIT) ? 15 : 0);
+    public FramedBlocks() {
+        super(Registry.BLOCK);
+
+        final Function<Material, AbstractBlock.Settings> makeSettings = material ->
+            FabricBlockSettings
+                .of(material)
+                .hardness(0.33f)
+                .sounds(BlockSoundGroup.WOOD)
+                .nonOpaque()
+                .solidBlock((a, b, c) -> false)
+                .luminance(state -> Boolean.TRUE.equals(state.get(Properties.LIT)) ? 15 : 0);
+
+        final AbstractBlock.Settings frameSettings = makeSettings.apply(Material.WOOD);
+        final AbstractBlock.Settings torchFrameSettings = makeSettings.apply(Material.SUPPORTED)
+            .noCollision()
+            .breakInstantly()
+            .luminance(state -> Boolean.TRUE.equals(state.get(Properties.LIT)) ? 15 : 14);
 
         final Item.Settings itemSettings = new Item.Settings()
             .group(META.MAIN_ITEM_GROUP);
@@ -52,11 +64,16 @@ public class FramedBlocks extends Registrar<Block> {
         STAIRS_FRAME = registerWithItem(new StairsFrame(BLOCK_FRAME.getDefaultState(), frameSettings), META.id("stairs_frame"), itemSettings);
         FENCE_FRAME = registerWithItem(new FenceFrame(frameSettings), META.id("fence_frame"), itemSettings);
         FENCE_GATE_FRAME = registerWithItem(new FenceGateFrame(frameSettings), META.id("fence_gate_frame"), itemSettings);
-        TRAPDOOR_FRAME = registerWithItem(new TrapdoorFrame(frameSettings), META.id("trapdoor_frame"), itemSettings);
+        TRAPDOOR_FRAME = registerWithItem(new TrapdoorFrame(frameSettings.allowsSpawning((a, b, c, d) -> false)), META.id("trapdoor_frame"), itemSettings);
         DOOR_FRAME = registerWithItem(new DoorFrame(frameSettings), META.id("door_frame"), itemSettings);
         PATH_FRAME = registerWithItem(new PathFrame(frameSettings), META.id("path_frame"), itemSettings);
+        PRESSURE_PLATE_FRAME = registerWithItem(new PressurePlateFrame(frameSettings), META.id("pressure_plate_frame"), itemSettings);
+        WALL_FRAME = registerWithItem(new WallFrame(frameSettings), META.id("wall_frame"), itemSettings);
+        LAYER_FRAME = registerWithItem(new LayerFrame(frameSettings), META.id("layer_frame"), itemSettings);
+        CARPET_FRAME = registerWithItem(new CarpetFrame(frameSettings), META.id("carpet_frame"), itemSettings);
+        PANE_FRAME = registerWithItem(new PaneFrame(frameSettings), META.id("pane_frame"), itemSettings);
 
-        TORCH_FRAME = register(new TorchFrame(frameSettings), META.id("torch_frame"));
-        WALL_TORCH_FRAME = register(new WallTorchFrame(frameSettings), META.id("wall_torch_frame"));
+        TORCH_FRAME = register(new TorchFrame(torchFrameSettings), META.id("torch_frame"));
+        WALL_TORCH_FRAME = register(new WallTorchFrame(torchFrameSettings), META.id("wall_torch_frame"));
     }
 }

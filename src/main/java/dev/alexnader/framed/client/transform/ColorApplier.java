@@ -23,6 +23,7 @@ public abstract class ColorApplier implements ToOptional<ColorApplier> {
 
     public abstract void apply(MutableQuadView mqv);
 
+    @SuppressWarnings("java:S1186")
     public static final ColorApplier NONE = new ColorApplier() {
         @Override
         public void apply(final MutableQuadView mqv) { }

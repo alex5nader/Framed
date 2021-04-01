@@ -42,12 +42,12 @@ public abstract class SidedOffsetters {
         }
     };
 
-    public static abstract class Base implements ToOptional<Base> {
-        public abstract Float4 applyUs(Float4 origUs, Direction dir);
-        public abstract Float4 applyVs(Float4 origVs, Direction dir);
+    public interface Base extends ToOptional<Base> {
+        Float4 applyUs(Float4 origUs, Direction dir);
+        Float4 applyVs(Float4 origVs, Direction dir);
     }
 
-    public static class Some extends Base implements ToOptional.Some<Base> {
+    public static class Some implements Base, ToOptional.Some<Base> {
         public static final Codec<SidedOffsetters.Some> CODEC = CODECS.sidedMapOf(Offsetters.CODEC).xmap(SidedOffsetters.Some::new, so -> so.map);
 
         private final Map<Direction, Offsetters> map;

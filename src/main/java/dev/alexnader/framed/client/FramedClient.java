@@ -12,6 +12,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.fabricmc.fabric.api.object.builder.v1.client.model.FabricModelPredicateProviderRegistry;
@@ -60,7 +61,7 @@ public class FramedClient implements ClientModInitializer {
         CLIENT_OVERLAYS = new OverlayAssetListener();
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(CLIENT_OVERLAYS);
 
-        ModelLoadingRegistry.INSTANCE.registerAppender(
+        ModelLoadingRegistry.INSTANCE.registerModelProvider(
             (resourceManager, out) -> out.accept(new ModelIdentifier(META.id("framers_hammer_none"), "inventory"))
         );
 
@@ -74,5 +75,7 @@ public class FramedClient implements ClientModInitializer {
                     .orElse(FramersHammer.CopyMode.DEFAULT)
                     .id
         );
+
+        WorldRenderEvents.AFTER_ENTITIES.register(FramePreviewOutline::renderPreviewOutline);
     }
 }

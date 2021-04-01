@@ -20,7 +20,12 @@ import static dev.alexnader.framed.Framed.META;
     DoorFrame.class,
     PathFrame.class,
     TorchFrame.class,
-    WallTorchFrame.class
+    WallTorchFrame.class,
+    PressurePlateFrame.class,
+    WallFrame.class,
+    LayerFrame.class,
+    CarpetFrame.class,
+    PaneFrame.class
 })
 public abstract class SinglePartFrame implements FrameSlotInfo {
     private SinglePartFrame() {
