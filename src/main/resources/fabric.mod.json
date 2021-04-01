@@ -26,6 +26,9 @@
     ],
     "client": [
       "dev.alexnader.framed.client.FramedClient"
+    ],
+    "config": [
+      "dev.alexnader.framed.client.FramedConfig"
     ]
   },
   "mixins": [
@@ -42,7 +45,8 @@
   },
   "suggests": {
     "canvas": "*",
-    "couplings": "*"
+    "couplings": "*",
+    "modmenu": "*"
   },
   "conflicts": {
     "sodium": "*"

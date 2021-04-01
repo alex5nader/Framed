@@ -26,5 +26,7 @@
   "gui.framed.framers_hammer.whole_copy": "Require all to copy",
   "gui.framed.framers_hammer.copy_settings": "Settings copied!",
   "gui.framed.framers_hammer.apply_settings": "Settings applied!",
-  "gui.framed.framers_hammer.different_format": "Did not apply because the source and target have different formats."
+  "gui.framed.framers_hammer.different_format": "Did not apply because the source and target have different formats.",
+  "framed:config": "Framed Config",
+  "framed:config/show_placement_preview": "Show Placement Preview"
 }

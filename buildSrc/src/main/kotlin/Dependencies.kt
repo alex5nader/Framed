@@ -33,7 +33,7 @@ object Fabric {
 
     val yarn = Dependency("net.fabricmc", "yarn", "1.16.4+build.7:v2")
     val loader = Dependency("net.fabricmc", "fabric-loader", "0.10.8", referenceOnCurseforge = false)
-    val api = Dependency("net.fabricmc.fabric-api", "fabric-api", "0.29.0+1.16")
+    val api = Dependency("net.fabricmc.fabric-api", "fabric-api", "0.32.5+1.16")
 }
 
 object Framed : Dependency("dev.alexnader", "framed", "1.1") {
@@ -54,8 +54,11 @@ val Frex = Dependency("grondag", "frex-${Minecraft.tag}", "4.5.201", transitive 
 val Jmx = Dependency("grondag", "jmx-${Minecraft.tag}", "1.20.179", transitive = false, curseforgeSlug = "jmx")
 val Canvas = Dependency("grondag", "canvas-${Minecraft.tag}", "1.0.1267", curseforgeSlug = "canvas-renderer")
 
+val Conrad = Dependency("dev.inkwell", "conrad", "0.1.0")
+
+val ModMenu = Dependency("com.terraformersmc", "modmenu", "1.16.8")
 val Couplings = CurseMavenDependency("couplings", 395659, 3111745)
 
 val jijDeps = listOf(LibGui, Frex, Jmx)
-val deps = listOf(Fabric.loader, Fabric.api) + jijDeps
-val runtimeDeps = listOf(Canvas, Couplings)
+val deps = listOf(Fabric.loader, Fabric.api, Conrad) + jijDeps
+val runtimeDeps = listOf(Canvas, Couplings, ModMenu)

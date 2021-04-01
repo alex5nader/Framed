@@ -44,10 +44,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
@@ -74,15 +72,15 @@ import java.util.List;
 import static dev.alexnader.framed.Framed.BLOCKS;
 
 @Environment(EnvType.CLIENT)
-public class FramePreviewOutline extends RenderLayer {
-    @SuppressWarnings("unused") // required by javac, unused bc of mixin
-    public FramePreviewOutline(final String name, final VertexFormat vertexFormat, final int drawMode, final int expectedBufferSize, final boolean hasCrumbling, final boolean translucent, final Runnable startAction, final Runnable endAction) {
-        super(name, vertexFormat, drawMode, expectedBufferSize, hasCrumbling, translucent, startAction, endAction);
-        throw new IllegalStateException("Should not instantiate utility class");
-    }
+public class FramePreviewOutline {
+    public static boolean enabled = true;
 
     @SuppressWarnings("java:S3776")
     public static void renderPreviewOutline(final WorldRenderContext context) {
+        if (!enabled) {
+            return;
+        }
+
         final MinecraftClient client = MinecraftClient.getInstance();
 
         final ClientPlayerEntity player = client.player;

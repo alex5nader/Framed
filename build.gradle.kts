@@ -42,6 +42,12 @@ repositories {
     maven(url = "https://maven.dblsaiko.net/") {
         name = "dblsaiko"
     }
+    maven(url = "https://maven.terraformersmc.com/releases") {
+        name = "Terraformers"
+    }
+    maven(url = "https://hephaestus.dev/release") {
+        name = "Haven King"
+    }
     maven(url = "https://cursemaven.com/") {
         name = "Curse Maven"
         content {
@@ -62,6 +68,9 @@ dependencies {
             if (it.group != Fabric.api.group) {
                 exclude(group = Fabric.api.group)
             }
+            if (it.name != "modmenu") {
+                exclude(module = "modmenu")
+            }
             if (!it.transitive) {
                 isTransitive = false
             }
@@ -69,7 +78,17 @@ dependencies {
     }
 
     jijDeps.forEach { include(it.coordinate) }
-    runtimeDeps.forEach { modRuntime(it.coordinate) }
+
+    runtimeDeps.forEach {
+        modRuntime(it.coordinate) {
+            if (it.group != Fabric.api.group) {
+                exclude(group = Fabric.api.group)
+            }
+            if (it.name != "modmenu") {
+                exclude(module = "modmenu")
+            }
+        }
+    }
 
     implementation(Gson.coordinate)
     compileOnly(Jsr305.coordinate)
