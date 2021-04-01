@@ -18,15 +18,13 @@ To use Framed, you must install [Fabric API](https://www.curseforge.com/minecraf
 Starting with version 1.1, you can also install [Conrad](https://www.curseforge.com/minecraft/mc-mods/conrad)
 to configure certain parts of Framed.
 
-## Download
+## Info
 
-Framed is available through [GitHub Releases](https://github.com/alex5nader/Framed/releases),
+- Framed is available through [GitHub Releases](https://github.com/alex5nader/Framed/releases),
 [Modrinth](https://modrinth.com/mod/framed), and
 [CurseForge](https://www.curseforge.com/minecraft/mc-mods/framed).
-
-## Roadmap
-
-A roadmap is available [here](https://github.com/alex5nader/Framed/projects/1).
+- Framed has a [discord](https://discord.gg/MWVrw7NFTU)! (Invite code MWVrw7NFTU)
+- Framed has a roadmap [here](https://github.com/alex5nader/Framed/projects/1).
 
 ## Thanks
 
