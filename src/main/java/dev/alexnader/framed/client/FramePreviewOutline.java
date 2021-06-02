@@ -65,6 +65,7 @@ import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3i;
 import org.lwjgl.system.MemoryStack;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
@@ -193,7 +194,9 @@ public class FramePreviewOutline {
             final IntBuffer intBuffer = byteBuffer.asIntBuffer();
 
             for(int k = 0; k < j; ++k) {
-                intBuffer.clear();
+                // Cast is required for JDK compatibility. See https://stackoverflow.com/a/48694075.
+                // noinspection RedundantCast
+                ((Buffer)intBuffer).clear();
                 intBuffer.put(is, k * 8, 8);
                 final float x = byteBuffer.getFloat(0);
                 final float y = byteBuffer.getFloat(4);
