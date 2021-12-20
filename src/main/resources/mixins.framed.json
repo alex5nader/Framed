@@ -4,8 +4,8 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "local.FrameBehaviour",
-    "local.FrameEntityProvider",
     "local.SinglePartFrame",
+    "mc.BlockEntityMixin_BlockEntityMigration",
     "mc.BlockItemAccess",
     "mc.FenceBlockMixin",
     "mc.GetItemBeforeEmpty",
@@ -14,7 +14,8 @@
   "client": [
     "mc.WorldRendererAccess",
     "mc.BakedQuadAccess",
-    "mc.ItemRendererMixin"
+    "mc.ItemRendererMixin",
+    "client.local.FrameMeshHolderImpl"
   ],
   "injectors": {
     "defaultRequire": 1

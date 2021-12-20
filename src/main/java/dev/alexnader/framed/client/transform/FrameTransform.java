@@ -112,7 +112,7 @@ public final class FrameTransform implements RenderContext.QuadTransform {
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private static class Data {
+    public static class Data {
         public final BaseApplier baseApplier;
         public final Overlay overlay;
         public final ColorApplier overlayColorApplier;

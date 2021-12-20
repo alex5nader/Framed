@@ -5,6 +5,7 @@ import dev.alexnader.framed.client.assets.OverlayAssetListener;
 import dev.alexnader.framed.client.assets.overlay.OffsetterRegistry;
 import dev.alexnader.framed.client.assets.overlay.ZeroOffsetter;
 import dev.alexnader.framed.client.gui.FrameScreen;
+import dev.alexnader.framed.client.model.FrameModelVariantProvider;
 import dev.alexnader.framed.client.transform.FrameTransform;
 import dev.alexnader.framed.items.FramersHammer;
 import grondag.jmx.api.QuadTransformRegistry;
@@ -25,6 +26,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.Optional;
 
+import static dev.alexnader.framed.Framed.BLOCKS;
 import static dev.alexnader.framed.Framed.ITEMS;
 import static dev.alexnader.framed.Framed.META;
 
@@ -75,6 +77,30 @@ public class FramedClient implements ClientModInitializer {
                     .orElse(FramersHammer.CopyMode.DEFAULT)
                     .id
         );
+
+        ModelLoadingRegistry.INSTANCE.registerVariantProvider(resourceManager -> {
+            FrameModelVariantProvider mvp = new FrameModelVariantProvider();
+
+            mvp.useFrameModelFor(
+                BLOCKS.BLOCK_FRAME,
+                BLOCKS.SLAB_FRAME,
+                BLOCKS.STAIRS_FRAME,
+                BLOCKS.FENCE_FRAME,
+                BLOCKS.FENCE_GATE_FRAME,
+                BLOCKS.TRAPDOOR_FRAME,
+                BLOCKS.DOOR_FRAME,
+                BLOCKS.PATH_FRAME,
+                BLOCKS.TORCH_FRAME,
+                BLOCKS.WALL_TORCH_FRAME,
+                BLOCKS.PRESSURE_PLATE_FRAME,
+                BLOCKS.WALL_FRAME,
+                BLOCKS.LAYER_FRAME,
+                BLOCKS.CARPET_FRAME,
+                BLOCKS.PANE_FRAME
+            );
+
+            return mvp;
+        });
 
         WorldRenderEvents.AFTER_ENTITIES.register(FramePreviewOutline::renderPreviewOutline);
     }
