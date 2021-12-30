@@ -23,7 +23,6 @@ to configure certain parts of Framed.
 - Framed is available through [GitHub Releases](https://github.com/alex5nader/Framed/releases),
 [Modrinth](https://modrinth.com/mod/framed), and
 [CurseForge](https://www.curseforge.com/minecraft/mc-mods/framed).
-- Framed has a [discord](https://discord.gg/MWVrw7NFTU)! (Invite code MWVrw7NFTU)
 - Framed has a roadmap [here](https://github.com/alex5nader/Framed/projects/1).
 
 ## Thanks
